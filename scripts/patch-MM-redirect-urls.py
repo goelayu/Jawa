@@ -16,7 +16,101 @@ from Naked.toolshed.shell import execute_js
 import json
 import unicodedata
 import hashlib
+import multiprocessing as mp
+from functools import partial
+import traceback
 
+
+
+def unchunk(body):
+    new_body = ""
+    # iterate through chunks until we hit the last chunk
+    crlf_loc = body.find('\r\n')
+    chunk_size = int( body[:crlf_loc], 16 )
+    body = body[crlf_loc+2:]
+    while( chunk_size != 0 ):
+        # add chunk content to new body and remove from old body
+        new_body += body[0:chunk_size]
+        body = body[chunk_size:]
+
+        # remove CRLF trailing chunk
+        body = body[2:]
+
+        # get chunk size
+        crlf_loc = body.find('\r\n')
+        chunk_size = int( body[:crlf_loc], 16 )
+        body = body[crlf_loc+2:]
+
+    # on the last chunk
+    body = body[crlf_loc+2:]
+
+    return new_body
+
+def isJS(headers):
+    for header in headers:
+        if header.key.lower() == "content-type" and "javascript" in header.value.lower():
+            return True
+
+    return False
+
+def isChunked(headers,del_header):
+    for header in headers:
+        if header.key.lower() == "transfer-encoding" and header.value == "chunked":
+            if del_header:
+                headers.remove(header)
+            return True
+
+    return False
+
+def isZipped(headers):
+    for header in headers:
+        if header.key.lower() == "content-encoding":
+            return header.value.lower()
+    return False;
+
+
+def getPlainText(msg, del_header):
+    orig_body = msg.response.body
+    if isChunked(msg.response.header, del_header):
+        orig_body = unchunk(orig_body)
+
+    isCompressed = isZipped(msg.response.header)
+    if isCompressed == "br":
+        orig_body = brotli.decompress(orig_body)
+    elif isCompressed != False:
+        orig_body = zlib.decompress(bytes(bytearray(orig_body)), zlib.MAX_WBITS|32)
+
+    return orig_body
+
+def getZippedData(msg):
+    orig_body = msg.response.body
+
+    isCompressed = isZipped(msg.response.header)
+
+    if not isCompressed:
+        return orig_body
+
+    zipInput = '/tmp/_z1'
+    zipOutput = '/tmp/_z2'
+
+    f = open(zipInput,'w')
+    f.write(orig_body)
+    f.close()
+
+    if isCompressed != "br":
+            zipUtil = "gzip"
+    else: zipUtil = "brotli"
+
+    zipCommand = "{} -c {} > {}".format(zipUtil, zipInput, zipOutput)
+    subprocess.call(zipCommand, shell=True)
+
+    orig_body = open(zipOutput,'rb').read()
+    # if isCompressed == "br":
+    #     orig_body = brotli.compress(orig_body)
+    # elif isCompressed != False:
+    #     orig_body = zlib.compress(orig_body)
+
+    return orig_body
 
 
 def getFileWithMatchingURL(url, args):
@@ -30,16 +124,28 @@ def getFileWithMatchingURL(url, args):
             curUrl = removeTrailingSlash(http_data.request.first_line.split()[1])
             # print "Comparing ", curUrl ," with ", url
             if curUrl == url:
+                # continue
                 # Make sure it's not the exact same http_data by checking the response status
                 status = http_data.response.first_line.split()[1]
                 if "30" not in status:
-                    print "Found matching file", curUrl, url
+                    # print "Found matching file", curUrl, url
                     return http_data
-
     return
 
 
-def patchHttpData(origData, targetData):
+def isToolbarRes(url):
+    '''
+    If no timestamp in url, it is a toolbar resource
+    '''
+    ts = [i for i in url if i.isdigit()]
+    ts = re.findall(r'\d+',url)
+    if not len(ts) or len(ts[0]) != 14:
+        return True
+
+    return False
+
+
+def _patchRedirects(origData, targetData):
     origData.response.first_line = targetData.response.first_line
 
     # header_keys = ["Content-Type","Content-Encoding","Transfer-Encoding","Content-Length",""]
@@ -64,6 +170,103 @@ def patchHttpData(origData, targetData):
     #Update the body with the target body
     origData.response.body = targetData.response.body
 
+def removeToolBar(proto):
+    msg = getPlainText(proto, True)
+    toolbarstart = '<!-- BEGIN WAYBACK TOOLBAR INSERT -->'
+    toolbarend = '<!-- END WAYBACK TOOLBAR INSERT -->'
+
+    if re.search(toolbarstart, msg) is None:
+        return False
+
+    sInd = re.finditer(toolbarstart, msg).next().start()
+    eInd = re.finditer(toolbarend,msg).next().end()
+    print sInd, eInd
+    msg_notoolbar = msg[:sInd] + msg[eInd:]
+    proto.response.body = msg_notoolbar
+    proto.response.body =  getZippedData(proto)
+    len_header = False
+    for header in proto.response.header:
+        if header.key.lower() == "content-length":
+            header.value = bytes(len(proto.response.body))
+            len_header = True
+    if not len_header:
+        length_header = proto.response.header.add()
+        length_header.key = "Content-Length"
+        length_header.value = bytes(len(proto.response.body))
+    return True
+
+def isMainFile(first_line, url):
+    rts = removeTrailingSlash
+    _url = "".join(url.split('www.'))
+    return rts(first_line).endswith(rts(_url))
+
+def patchHttpData(root, http_orig_data, urlMap, patches, url,  file):
+        try:
+            f_orig = open(os.path.join(root,file), "rb")
+            # print f_orig.name
+            http_orig_data.ParseFromString(f_orig.read())
+            f_orig.close()
+
+            curUrl = removeTrailingSlash(http_orig_data.request.first_line.split()[1])
+            orig_data_copy = deepcopy(http_orig_data)
+
+            if "noredirect" in patches:
+
+                if curUrl in urlMap and "30" in http_orig_data.response.first_line:
+                    redirectUrl = urlMap[curUrl]
+
+                    # print "match for ", curUrl, " is ", redirectUrl
+                    redirectData = getFileWithMatchingURL(redirectUrl, args)
+                    if not redirectData:
+                        print "No matching file found for ", redirectUrl
+                        return
+                    # if redirectData
+                    _patchRedirects(orig_data_copy, redirectData)
+                    # removeToolBar(orig_data_copy)
+
+                    if "toolbar" in patches and isMainFile(curUrl, url):
+                        try:
+                            removeToolBar(orig_data_copy)
+                        except:
+                            print 'Exception while removing toolbar'
+                        # print orig_data_copy
+                    # try:
+                    #     os.mkdir(args.output)
+                    # except OSError as e:
+                    #     pass
+                    dst_f = os.path.join(args.output,file)
+                    createOutputFile(orig_data_copy, dst_f)
+                else:
+                    dst_f = os.path.join(args.output,file)
+                    createOutputFile(http_orig_data, dst_f)
+
+            # if "toolbar" in patches:
+            #     # print curUrl, http_orig_data.response.first_line
+            #     if isMainFile(curUrl, url):
+            #         # print curUrl, url
+            #         removeToolBar(orig_data_copy)
+
+            # #     # if isToolbarRes(curUrl):
+            # #     #     NOTFOUND='HTTP/1.1 404 NOT FOUND'
+            # #     #     http_orig_data.response.first_line=NOTFOUND
+            #         dst_f = os.path.join(args.output,file)
+            #         createOutputFile(http_orig_data, dst_f)
+
+            #     elif "noredirect" not in patches:
+            #         dst_f = os.path.join(args.output,file)
+            #         createOutputFile(http_orig_data, dst_f)
+
+
+
+
+            # if isJS(http_response_orig.response.header):
+            # print http_response_orig.response.first_line.split()[1], http_response_orig.request.first_line.split()[1]
+            # print http_response_orig.response.header
+        except Exception as e:
+            print "error while processing file",e
+            track = traceback.format_exc()
+            print(track)
+
 def removeTrailingSlash(url):
     if url[-1] == '/':
         return url[:-1]
@@ -83,40 +286,17 @@ def main(args):
     urlMap = json.loads(urlMapData)
     # print urlMap
     for root, folder, files in os.walk(args.original):
+        # pool = mp.Pool(mp.cpu_count())
+
+        # patch_singleton = partial(patchHttpData, root, http_orig_data, urlMap, args.patches, args.url)
+            
+        # pool.map(patch_singleton, files)
+        # pool.close()
+        # pool.join()
         for file in files:
-            try:
-                f_orig = open(os.path.join(root,file), "rb")
-                # print f_orig.name
-                http_orig_data.ParseFromString(f_orig.read())
-                f_orig.close()
+            patchHttpData(root, http_orig_data, urlMap, args.patches, args.url ,file)
 
-                curUrl = removeTrailingSlash(http_orig_data.request.first_line.split()[1])
-
-                if curUrl in urlMap:
-                    redirectUrl = urlMap[curUrl]
-                    print "match for ", curUrl, " is ", redirectUrl
-                    redirectData = getFileWithMatchingURL(redirectUrl, args)
-                    if not redirectData:
-                        print "No matching file found for ", redirectUrl
-                        return
-                    orig_data_copy = deepcopy(http_orig_data)
-                    patchHttpData(orig_data_copy, redirectData)
-
-                    try:
-                        os.mkdir(args.output)
-                    except OSError as e:
-                        pass
-                    dst_f = os.path.join(args.output,file)
-                    createOutputFile(orig_data_copy, dst_f)
-                else:
-                    dst_f = os.path.join(args.output,file)
-                    createOutputFile(http_orig_data, dst_f)
-
-                # if isJS(http_response_orig.response.header):
-                # print http_response_orig.response.first_line.split()[1], http_response_orig.request.first_line.split()[1]
-                # print http_response_orig.response.header
-            except Exception as e:
-                print "error while processing file",e
+        
 
 
 
@@ -125,5 +305,7 @@ if __name__ == "__main__":
     parser.add_argument('original', help='path to input directory')
     parser.add_argument('output', help='output directory for modified protobufs')
     parser.add_argument('urlMap',help='path to the url map')
+    parser.add_argument('url',help='url of the site')
+    parser.add_argument('--patches', help='types of patches to apply -- noredirect, notoolbar')
     args = parser.parse_args()
     main(args)

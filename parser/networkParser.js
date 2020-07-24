@@ -63,7 +63,11 @@ function parseNetworkLogs(netLog){
                 var url = payLoad.response.url;
                 if (!url.startsWith("http"))
                     continue;
-
+                var netObject;
+                if (!(requestId in requestIdToObject)){
+                    netObject = new NetworkEvent(log);
+                    requestIdToObject[requestId] = netObject;
+                }
                 var netObject = requestIdToObject[requestId];
                 netObject.ttfb = payLoad.timestamp;
                 if (netObject.redirectResponse){
@@ -79,11 +83,17 @@ function parseNetworkLogs(netLog){
                 netObject.protocol = payLoad.response.protocol;
                 netObject.response = payLoad.response;
                 break;
-            case 'Network.loadingFinished':
+            case 'Network.dataReceived':
                 if (!(requestId in requestIdToObject))
                     continue;
                 var netObject = requestIdToObject[requestId];
                 netObject.endTime = payLoad.timestamp;
+                break;
+            // case 'Network.loadingFinished':
+            //     if (!(requestId in requestIdToObject))
+            //         continue;
+            //     var netObject = requestIdToObject[requestId];
+            //     netObject.endTime = payLoad.timestamp;
         }
 
     }
@@ -94,14 +104,14 @@ function parseNetworkLogs(netLog){
 
 function NetworkEvent(data){
     var isRequest = data['Network.requestWillBeSent'] ? true : false;
-    data = data['Network.requestWillBeSent']
-    this.requestStart_o = data.timestamp
+    data = isRequest ? data['Network.requestWillBeSent'] : data['Network.responseReceived']
+    this.requestStart_o = isRequest ? data.timestamp : null;
     this.responseEnd = null;
     this.ttfb = 0;
     this.sendStart = 0;
     this.requestId = data.requestId;
     this.protocol = "";
-    this.url = data.request.url
+    this.url = isRequest ? data.request.url : data.response.url
     this.redirectResponse = data.redirectResponse;
 }
 

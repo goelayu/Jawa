@@ -5,7 +5,10 @@ Crawls wayback machine
 const http = require('http'),
     program = require('commander'),
     {spawnSync} = require('child_process'),
-    mkdirp = require('mkdirp');
+    {spawn} = require('child_process'),
+    mkdirp = require('mkdirp'),
+    path = require('path'),
+    fs = require('fs');
 
 
 program
@@ -14,7 +17,8 @@ program
     .option("-d, --debug",'verbose logging')
     .option("-s, --skip","skip the cdx server inquiry")
     .option("-m , --mahimahi [mahimahi]", "record or replay sites")
-    .option("-p, --path [path]","Path to be recorded or replayed")
+    .option("-p, --path [value]","Path to be recorded or replayed")
+    .option("-c, --chrome-flags [value]","Flags to be passed to the inspectChrome script")
     .parse(process.argv)
 
 
@@ -28,34 +32,93 @@ wayback api response format: [["urlkey","timestamp","original","mimetype","statu
 
 WAYBACK_SERVER_RTT=190
  
+var parseFlags = function(f){
+    var validFlags = "";
+    f.split(' ').forEach((_f)=>{
+        validFlags += ` --${_f}`;
+    })
+    return validFlags;
+}
+ 
 
 var sanitizeUrl = function(url){
     var surl = url.split('www')[1];
     return `www${surl}`;
 }
 
-var loadChrome = function(url,ts){
+var getRSPID = function(){
+    var pidCMD = "ps aux | grep 'blaze replay' | grep -v 'grep' | head -n 1 | awk '{print $2}'";
+    var _pid = spawnSync(pidCMD, {shell:true}).stdout.toString();
+    // console.log(_pid.stderr.toString())
+    console.log('pid is ',_pid)
+    var pid = _pid.trim();
+    return pid ? pid : 0;
+}
+
+var replayServerCleanup = function(serverProc){
+    console.log('Cleaning up', serverProc.pid)
+    spawnSync('sudo pkill dnsmasq',{shell:true});
+    spawnSync('sudo pkill nginx',{shell:true});
+    // var replayServerPID = Number.parseInt(fs.readFileSync(process.env.SERVERPID));
+    spawnSync('kill',['-SIGINT', getRSPID()]);
+    // serverProc.kill('SIGKILL');
+}
+
+var loadChrome = async function(url,ts){
     var outputDir = `${program.output}/${sanitizeUrl(program.url)}/${ts}/`,
         port = 9222 + Math.round(Math.random()*9222)
-    mkdirp.sync(outputDir);
+    await mkdirp(outputDir);
     var mahimahiConf = {
         record:mmwebrecord,
         replay:mmwebreplay
     };
-    var chromeCMD = program.mahimahi ? `${mahimahiConf[program.mahimahi]} ${program.path} ` : "";
+    var chromeCMD = '', mahimahipath;
+    program.path && (mahimahipath = path.resolve(program.path));
+    switch(program.mahimahi){
+        case 'record':
+            chromeCMD += `${mahimahiConf[program.mahimahi]} ${mahimahipath} `;
+            break;
+        case 'replay':
+            // Start the nginx server separately
+            var serverScript="startNgnxServer.sh",
+            serverCMD = `bash ${serverScript} ${mahimahipath} ${process.env.SERVERFLAGS}`
+            console.log(`Running replay server \n${serverCMD}`);
+            var serverProc = spawn(serverCMD,{shell:true});
+            // serverProc.stdout.on('data', (data) => {
+            //     console.log(`${data}`);
+            //   });
+              
+            //   serverProc.stderr.on('data', (data) => {
+            //     console.error(`${data}`);
+            //   });
+
+            await new Promise(r => setTimeout(r, 2000));
+            // if (serverProc.status !== 0){
+            //     console.error(`Replay server failed to start`)
+            //     return;
+            // }
+    }
+    // var chromeCMD = program.mahimahi ? `${mahimahiConf[program.mahimahi]} ${program.path} ` : "";
     if (program.mahimahi == "replay"){
+        if (!getRSPID()){
+            console.log('Replay server failed to start');
+            return;
+        }
         chromeCMD = `mm-delay ${WAYBACK_SERVER_RTT/2} ` + chromeCMD;
     }
 
-    chromeCMD += `node ${CHROME_LOADER} -u ${url} -l -o ${outputDir} -c -n --log --mode std -p ${port} -t`
+    chromeCMD += `node ${CHROME_LOADER} -u ${url} -l -o ${outputDir} -c -n --log --mode std -p ${port} -t ` + (program.chromeFlags ? parseFlags(program.chromeFlags) : "")
     console.log(chromeCMD);
     var chromeps = spawnSync(chromeCMD,{shell:true});
 
     console.log(chromeps.stdout.toString());
     console.error(chromeps.stderr.toString());
+
+    if (program.mahimahi == "replay")
+        replayServerCleanup(serverProc);
 }
 
-var parseResponse = function(res){
+var parseResponse = async function(res){
     // console.log(res);
     var {statusCode} = res;
     if (statusCode != 200){
@@ -80,16 +143,16 @@ var parseResponse = function(res){
 }
 
 
-function crawlWayBack(url){
-    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&output=json&limit=1`;
-    http.get(apiEndPoint,
-        parseResponse)
-    .on('error',(e)=>{
-        console.error(`Error: Request Failed ${url} -- ${e.message}`);
-    });
+async function crawlWayBack(url){
+    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&output=json&limit=1&from=2010`;
+    var res = await http.get(apiEndPoint);
+    await parseResponse(res);
+    // .on('error',(e)=>{
+    //     console.error(`Error: Request Failed ${url} -- ${e.message}`);
+    // });
 }
 
-function main(){
+async function main(){
     if (!program.skip)
         crawlWayBack(program.url);
     else {
