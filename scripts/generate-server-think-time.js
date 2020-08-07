@@ -8,7 +8,8 @@ time is taken into account as the server-think time
 
 const netParser = require('parser/networkParser'),
     fs = require('fs'),
-    program = require('commander');
+    program = require('commander'),
+    util = require('util');
 
 const DIRECT_STT="/home/goelayu/research/webArchive/data/processed/median-seen-ts-time/"
 
@@ -67,9 +68,9 @@ var getDirectTTFB = function(net,url, dType){
         if (n == mainReq && dType == "ttfb_sp"){
             seen[curTs] = true;
             ttfb = (n.ttfb - n.redirectFetch)*1000;
-            endTime = (n.endTime - n.redirectFetch)*1000;
-            var delay = 190 + endTime;
-            console.log(n.url, delay);
+            var dl = (n.endTime - n.ttfb)*2200;
+            var delay = 190 + ttfb + dl;
+            process.stdout.write(util.format(n.url, delay));
             return
             // ttfb = _ttfb = (n.redirectStart_o - n.requestFetch)*1000;
         }
@@ -90,7 +91,7 @@ var getDirectTTFB = function(net,url, dType){
                 // ttfb = Math.min(ttfb, _ttfb);
             }
             resLatencyMap[host][urlSuffix]=ttfb;
-            // console.log(n.url, ttfb);
+            console.log(n.url, ttfb);
         } else {
             var ttfb1,_ttfb,ttfb2;
             ttfb1 = (n.redirectStart_o - n.requestFetch)*1000;
@@ -98,7 +99,7 @@ var getDirectTTFB = function(net,url, dType){
             // resLatencyMap[host][urlSuffix]= ttfb1;
             var urlRedirect = n.redirectResponse.headers.Location.split(host).slice(1,).join("");
             ttfb2 = (n.ttfb - (n.redirectFetch))*1000;
-            // console.log(n.url, ttfb);
+            console.log(n.url, ttfb2);
             resLatencyMap[host][urlSuffix]= ttfb2;
             // var url = n.url; // The patched mahimahi files have the original url with the response of the redirected content, ie the redirected location is completely removed
         };
@@ -115,16 +116,38 @@ var removeTrailingSlash = function(url, host){
     else return (url.split(host).splice(1,)).join("");
 }
 
+var removeHost = function(url,host){
+    //for some reason newline inside location
+    if (url.indexOf('\n')>=0)
+        url = url.split('\n')[0];
+    return url.split(host).slice(1,).join("");
+}
+
 var getRedirectURLMap = function(net){
     var urlMap = {};
     for (var n of net){
-        var rr, rts = removeTrailingSlash;
+        if (!n.response) continue;
+        var rr, rh = removeHost;
+        var host = n.response.requestHeaders.Host;
         if (rr = n.redirectResponse){
-            urlMap[rts(rr.url)] = rts(rr.headers.location);
-            // console.log(rts(rr.url), rts(rr.headers.location));
-            fs.writeFileSync(program.output,JSON.stringify(urlMap))
+            urlMap[rh(n.url,host)] = rh(rr.headers.location,host);
+            // console.log(rts(rr.url), rts(rr.headers.location))
         }
     }
+    fs.writeFileSync(program.output,JSON.stringify(urlMap))
+}
+
+var getAllUrls = function(net){
+    var allUrls = [];
+    var typeDict = { "Document":"document", "Font":"font", "Image":"image","Script":"script","StyleSheet":"style","XHR":"fetch"}
+    net.forEach((n,ind)=>{
+        if (ind == 0 || !n.type) return;
+        // if (!timeStampInURL(n.url)) return;
+        var type = n.type;
+        if (!(type in typeDict)) return;
+        allUrls.push([n.url,typeDict[type]]);
+    });
+    fs.writeFileSync(program.output, JSON.stringify(allUrls));
 }
 
 function main(){
@@ -134,7 +157,10 @@ function main(){
     // getDirectTTFB(processNetLogs);
     if (program.data.indexOf("ttfb")>=0)
         getDirectTTFB(processNetLogs, program.url, program.data);
-    else getRedirectURLMap(processNetLogs);
+    else if (program.data == "map") 
+        getRedirectURLMap(processNetLogs);
+    else if (program.data == "all")
+        getAllUrls(processNetLogs)
 }
 
 main();

@@ -2,13 +2,13 @@
 Crawls wayback machine
 */
 
-const http = require('http'),
+const http = require('https'),
     program = require('commander'),
     {spawnSync} = require('child_process'),
     {spawn} = require('child_process'),
     mkdirp = require('mkdirp'),
     path = require('path'),
-    fs = require('fs');
+    fs = require('fs-extra');
 
 
 program
@@ -19,10 +19,11 @@ program
     .option("-m , --mahimahi [mahimahi]", "record or replay sites")
     .option("-p, --path [value]","Path to be recorded or replayed")
     .option("-c, --chrome-flags [value]","Flags to be passed to the inspectChrome script")
+    .option("-v, --verbose", 'enable verbose logging')
     .parse(process.argv)
 
 
-const WAYBACK_CDX="http://web.archive.org/cdx/search/cdx",
+const WAYBACK_CDX="https://web.archive.org/cdx/search/cdx",
     CHROME_LOADER="/home/goelayu/research/webArchive/scripts/inspectChrome.js",
     mmwebreplay="/home/goelayu/research/hotOS/Mahimahi/buildDir/bin/mm-webreplay",
     mmwebrecord="/home/goelayu/research/hotOS/Mahimahi/buildDir/bin/mm-webrecord";
@@ -41,13 +42,16 @@ var parseFlags = function(f){
 }
  
 
-var sanitizeUrl = function(url){
-    var surl = url.split('www')[1];
-    return `www${surl}`;
+var sanitizeUrlToDir = function(url){
+    if (url[url.length - 1] == "/")
+        url = url.slice(0,-1);
+    return url.replace(/https?:\/\//,'').replace(/\//g,'_')
+    // var surl = url.split('www')[1].replace('/','_');
+    // return `www${surl}`;
 }
 
-var getRSPID = function(){
-    var pidCMD = "ps aux | grep 'blaze replay' | grep -v 'grep' | head -n 1 | awk '{print $2}'";
+var getRSPID = function(path){
+    var pidCMD = `ps aux | grep 'blaze replay' | grep -v 'grep' | head -n 1 | awk '{print $2}'`;
     var _pid = spawnSync(pidCMD, {shell:true}).stdout.toString();
     // console.log(_pid.stderr.toString())
     console.log('pid is ',_pid)
@@ -55,67 +59,78 @@ var getRSPID = function(){
     return pid ? pid : 0;
 }
 
-var replayServerCleanup = function(serverProc){
-    console.log('Cleaning up', serverProc.pid)
-    spawnSync('sudo pkill dnsmasq',{shell:true});
-    spawnSync('sudo pkill nginx',{shell:true});
+var replayServerCleanup = async function(serverProc, procPath){
+    // console.log('Cleaning up', serverProc.pid)
+    // spawnSync('sudo pkill dnsmasq',{shell:true});
+    // spawnSync('sudo pkill nginx',{shell:true});
+    var _p  = getRSPID(procPath);
     // var replayServerPID = Number.parseInt(fs.readFileSync(process.env.SERVERPID));
-    spawnSync('kill',['-SIGINT', getRSPID()]);
-    // serverProc.kill('SIGKILL');
+    spawnSync('sudo',['kill','-SIGINT', _p]);
+    await new Promise(r => setTimeout(r, 1000));
+    _p  = getRSPID(procPath);
+    if (_p){
+        spawnSync('sudo',['kill','-SIGKILL', _p]);
+    }
+    serverProc.kill('SIGKILL');
 }
 
-var loadChrome = async function(url,ts){
-    var outputDir = `${program.output}/${sanitizeUrl(program.url)}/${ts}/`,
+var loadChrome = async function(wUrl,ts, url){
+    var pathSuffix = `${program.url}/${sanitizeUrlToDir(url)}/${ts}/`;
+    var outputDir = `${program.output}/${pathSuffix}`,
         port = 9222 + Math.round(Math.random()*9222)
-    await mkdirp(outputDir);
+    console.log('making directory', outputDir)
+    fs.ensureDirSync(outputDir,{recursive:true});
     var mahimahiConf = {
         record:mmwebrecord,
         replay:mmwebreplay
     };
-    var chromeCMD = '', mahimahipath;
-    program.path && (mahimahipath = path.resolve(program.path));
+    var chromeCMD = '', mahimahipath, replayServer;
+    program.path && (mahimahipath = `${path.resolve(program.path)}/${pathSuffix}`);
+    fs.ensureDirSync(`${path.resolve(program.path)}/${program.url}/${sanitizeUrlToDir(url)}/`);
     switch(program.mahimahi){
         case 'record':
             chromeCMD += `${mahimahiConf[program.mahimahi]} ${mahimahipath} `;
             break;
         case 'replay':
             // Start the nginx server separately
-            var serverScript="startNgnxServer.sh",
-            serverCMD = `bash ${serverScript} ${mahimahipath} ${process.env.SERVERFLAGS}`
-            console.log(`Running replay server \n${serverCMD}`);
-            var serverProc = spawn(serverCMD,{shell:true});
-            // serverProc.stdout.on('data', (data) => {
-            //     console.log(`${data}`);
-            //   });
-              
-            //   serverProc.stderr.on('data', (data) => {
-            //     console.error(`${data}`);
-            //   });
+            replayServer = process.env.REPLAYSERVER;
+            if (replayServer == 'nginx') {
+                var serverScript="startNgnxServer.sh",
+                serverCMD = `sudo bash ${serverScript} ${mahimahipath} ${process.env.SERVERFLAGS}`
+                console.log(`Running replay server \n${serverCMD}`);
+                var serverProc = spawn(serverCMD,{shell:true});
+                if (program.verbose){
+                    serverProc.stdout.on('data', (data) => {
+                        console.log(`${data}`);
+                    });
+                    
+                    serverProc.stderr.on('data', (data) => {
+                        console.error(`${data}`);
+                    });
+                }
 
-            await new Promise(r => setTimeout(r, 2000));
-            // if (serverProc.status !== 0){
-            //     console.error(`Replay server failed to start`)
-            //     return;
-            // }
+                await new Promise(r => setTimeout(r, 2000));
+            } else 
+                chromeCMD += `${mahimahiConf[program.mahimahi]} ${mahimahipath} `;
     }
     // var chromeCMD = program.mahimahi ? `${mahimahiConf[program.mahimahi]} ${program.path} ` : "";
     if (program.mahimahi == "replay"){
-        if (!getRSPID()){
+        if (replayServer == 'nginx' && !getRSPID(mahimahipath)){
             console.log('Replay server failed to start');
             return;
         }
         chromeCMD = `mm-delay ${WAYBACK_SERVER_RTT/2} ` + chromeCMD;
     }
 
-    chromeCMD += `node ${CHROME_LOADER} -u ${url} -l -o ${outputDir} -c -n --log --mode std -p ${port} -t ` + (program.chromeFlags ? parseFlags(program.chromeFlags) : "")
+    chromeCMD += `node ${CHROME_LOADER} -u ${wUrl} -l -o ${outputDir} -c -n --log --mode std -p ${port} -t ` + (program.chromeFlags ? parseFlags(program.chromeFlags) : "")
     console.log(chromeCMD);
     var chromeps = spawnSync(chromeCMD,{shell:true});
 
     console.log(chromeps.stdout.toString());
     console.error(chromeps.stderr.toString());
 
-    if (program.mahimahi == "replay")
-        replayServerCleanup(serverProc);
+    if (program.mahimahi == "replay" && replayServer == 'nginx')
+        await replayServerCleanup(serverProc, mahimahipath);
 }
 
 var parseResponse = async function(res){
@@ -128,25 +143,26 @@ var parseResponse = async function(res){
 
     var rawData = '';
     res.on('data',(chunk)=>{rawData+=chunk});
-    res.on('end',()=>{
+    res.on('end',async ()=>{
         var procRes = JSON.parse(rawData);
         program.debug && console.log(`Data retrieved: ${procRes} `)
         for (var entry of procRes){
             if (!Number.isInteger(Number.parseInt(entry[1])))
                 continue;
-
-            var ts = entry[1];
-            var waybackurl = `https://web.archive.org/web/${ts}/${program.url}`;
-            loadChrome(waybackurl, ts);
+            console.log(entry[1],entry[2]);
+            // continue;
+            var ts = entry[1], url = entry[2];
+            var waybackurl = `https://web.archive.org/web/${ts}/${url}`;
+            await loadChrome(waybackurl, ts, url);
         }
     })
 }
 
 
 async function crawlWayBack(url){
-    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&output=json&limit=1&from=2010`;
-    var res = await http.get(apiEndPoint);
-    await parseResponse(res);
+    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&matchType=prefix&from=201710&to=201711&output=json&limit=500&filter=mimetype:text/html&filter=statuscode:200`;
+    http.get(apiEndPoint, parseResponse);
+    // await parseResponse(res);
     // .on('error',(e)=>{
     //     console.error(`Error: Request Failed ${url} -- ${e.message}`);
     // });

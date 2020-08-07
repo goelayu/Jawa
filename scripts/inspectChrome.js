@@ -588,7 +588,7 @@ if (program.launch) {
         '--disable-features=IsolateOrigins,site-per-process,CrossSiteDocumentBlockingAlways,CrossSiteDocumentBlockingIfIsolating',
         '--disable-site-isolation-trials',
         '--allow-running-insecure-content',
-		 // '--headless',
+		//  '--headless',
          // '--v8-cache-options=off',
          // '--js-flags="--compilation-cache false"',
          // '--user-data-dir=/tmp/chromeProfiles/' + program.url.split('//')[1]

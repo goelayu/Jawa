@@ -130,6 +130,8 @@ def getFileWithMatchingURL(url, args):
                 if "30" not in status:
                     # print "Found matching file", curUrl, url
                     return http_data
+                else:
+                    print 'Wrongfully entered else, match should always be a direct response'
     return
 
 
@@ -170,6 +172,18 @@ def _patchRedirects(origData, targetData):
     #Update the body with the target body
     origData.response.body = targetData.response.body
 
+def updateHeader(proto):
+    len_header = False
+    for header in proto.response.header:
+        if header.key.lower() == "content-length":
+            header.value = bytes(len(proto.response.body))
+            len_header = True
+    if not len_header:
+        length_header = proto.response.header.add()
+        length_header.key = "Content-Length"
+        length_header.value = bytes(len(proto.response.body))
+    return
+
 def removeToolBar(proto):
     msg = getPlainText(proto, True)
     toolbarstart = '<!-- BEGIN WAYBACK TOOLBAR INSERT -->'
@@ -183,24 +197,49 @@ def removeToolBar(proto):
     print sInd, eInd
     msg_notoolbar = msg[:sInd] + msg[eInd:]
     proto.response.body = msg_notoolbar
-    proto.response.body =  getZippedData(proto)
-    len_header = False
-    for header in proto.response.header:
-        if header.key.lower() == "content-length":
-            header.value = bytes(len(proto.response.body))
-            len_header = True
-    if not len_header:
-        length_header = proto.response.header.add()
-        length_header.key = "Content-Length"
-        length_header.value = bytes(len(proto.response.body))
+    # proto.response.body =  getZippedData(proto)
+    # updateHeader(proto)
     return True
+
+def insertPreloadHeader(proto, links):
+    msg = proto.response.body
+    # msg = getPlainText(proto, True)
+    linkTemplate="<link rel='preload' href='{url}' as='{type}'>"
+    print "Inserting", len(links)
+    _linkStr = [linkTemplate.format(url=l[0], type=l[1]) for l in links]
+    linkStr = "\n".join(_linkStr)
+    # print linkStr
+    insertLoc = getPreloadLoc(msg)
+    newbody = insertAtInd(msg, insertLoc, linkStr)
+    proto.response.body = newbody
+    proto.response.body = getZippedData(proto)
+    updateHeader(proto)
+    return 
+
+def getPreloadType(type):
+    typeDict = { "Document":"document", "Font":"font", "Image":"image","Script":"script","StyleSheet":"style","XHR":"fetch"}
+    return typeDict[type] if type in typeDict else None 
+
+
+def getPreloadLoc(domStr):
+    e='<head.+>'
+    loc = re.search(e,domStr)
+    if not loc:
+        return 0
+        # raise Exception('No header tag found in the document')
+    # print 'Location of header', loc.end()
+    return loc.end()
+
+def insertAtInd(src, idx, str):
+    return src[:idx]+ str + src[idx:]
+
 
 def isMainFile(first_line, url):
     rts = removeTrailingSlash
     _url = "".join(url.split('www.'))
     return rts(first_line).endswith(rts(_url))
 
-def patchHttpData(root, http_orig_data, urlMap, patches, url,  file):
+def patchHttpData(root, http_orig_data, urlMap, patches, url, allUrls, file):
         try:
             f_orig = open(os.path.join(root,file), "rb")
             # print f_orig.name
@@ -211,7 +250,6 @@ def patchHttpData(root, http_orig_data, urlMap, patches, url,  file):
             orig_data_copy = deepcopy(http_orig_data)
 
             if "noredirect" in patches:
-
                 if curUrl in urlMap and "30" in http_orig_data.response.first_line:
                     redirectUrl = urlMap[curUrl]
 
@@ -230,6 +268,15 @@ def patchHttpData(root, http_orig_data, urlMap, patches, url,  file):
                         except:
                             print 'Exception while removing toolbar'
                         # print orig_data_copy
+                    
+                    if "sp" in patches and isMainFile(curUrl, url):
+                        if not allUrls:
+                            raise Exception('Missing --allUrls flags with the server push patch')
+                        # try:
+                        urls = json.loads(open(allUrls,'r').read())
+                        insertPreloadHeader(orig_data_copy, urls)
+                        # except :
+                            # print "Exception while inserting link preloads"
                     # try:
                     #     os.mkdir(args.output)
                     # except OSError as e:
@@ -268,6 +315,7 @@ def patchHttpData(root, http_orig_data, urlMap, patches, url,  file):
             print(track)
 
 def removeTrailingSlash(url):
+    return url
     if url[-1] == '/':
         return url[:-1]
     else:
@@ -294,7 +342,7 @@ def main(args):
         # pool.close()
         # pool.join()
         for file in files:
-            patchHttpData(root, http_orig_data, urlMap, args.patches, args.url ,file)
+            patchHttpData(root, http_orig_data, urlMap, args.patches, args.url ,args.allUrls,file)
 
         
 
@@ -305,6 +353,7 @@ if __name__ == "__main__":
     parser.add_argument('original', help='path to input directory')
     parser.add_argument('output', help='output directory for modified protobufs')
     parser.add_argument('urlMap',help='path to the url map')
+    parser.add_argument('--allUrls',help='path to the all urls for link preload')
     parser.add_argument('url',help='url of the site')
     parser.add_argument('--patches', help='types of patches to apply -- noredirect, notoolbar')
     args = parser.parse_args()

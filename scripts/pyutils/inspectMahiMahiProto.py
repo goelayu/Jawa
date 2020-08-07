@@ -74,7 +74,7 @@ def isZipped(headers):
     for header in headers:
         if header.key.lower() == "content-encoding":
             return header.value
-    return False;
+    return False
 
 
 def getPlainText(msg):
@@ -111,9 +111,14 @@ def main(args):
                 http_response_orig.ParseFromString(f_orig.read())
                 f_orig.close()
 
+                reqUrl = http_response_orig.request.first_line.split()[1]
+                print reqUrl, http_response_orig.request.first_line
+                # if reqUrl in args.url:
+                #     # body = getPlainText(http_response_orig)
+                #     print len(http_response_orig.response.body)
                 # if isJS(http_response_orig.response.header):
                 # print http_response_orig.response.first_line.split()[1], http_response_orig.request.first_line.split()[1]
-                print http_response_orig.response.first_line
+                # print http_response_orig.response.first_line
             except Exception as e:
                 print "error while processing file",e
 
@@ -122,6 +127,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('original', help='path to input directory')
+    parser.add_argument('url',help='url to be matched against')
     # parser.add_argument('modified', help='path to input directory')
     # parser.add_argument('url',help='path to output directory')
     args = parser.parse_args()
