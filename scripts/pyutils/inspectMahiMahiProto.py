@@ -105,22 +105,25 @@ def main(args):
         listOfJS[url] = []
         count = count+1
         for file in files:
-            try:
-                f_orig = open(os.path.join(root,file), "rb")
-                # print f_orig.name
-                http_response_orig.ParseFromString(f_orig.read())
-                f_orig.close()
+            # try:
+            f_orig = open(os.path.join(root,file), "rb")
+            # print f_orig.name
+            http_response_orig.ParseFromString(f_orig.read())
+            f_orig.close()
 
-                reqUrl = http_response_orig.request.first_line.split()[1]
-                print reqUrl, http_response_orig.request.first_line
+            reqUrl = http_response_orig.request.first_line.split()[1]
+            # print reqUrl, http_response_orig.request.first_line
+            for h in http_response_orig.response.header:
+                if h.key.lower() == 'content-length':
+                    print h.value, len(http_response_orig.response.body)
                 # if reqUrl in args.url:
                 #     # body = getPlainText(http_response_orig)
                 #     print len(http_response_orig.response.body)
                 # if isJS(http_response_orig.response.header):
                 # print http_response_orig.response.first_line.split()[1], http_response_orig.request.first_line.split()[1]
                 # print http_response_orig.response.first_line
-            except Exception as e:
-                print "error while processing file",e
+            # except Exception as e:
+            #     print "error while processing file",e
 
 
 

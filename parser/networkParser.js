@@ -82,6 +82,7 @@ function parseNetworkLogs(netLog){
                 // netObject.fetchStart = netObject.startTime + payLoad.response.timing.sendStart/1000
                 netObject.protocol = payLoad.response.protocol;
                 netObject.response = payLoad.response;
+                netObject.type = payLoad.type;
                 break;
             case 'Network.dataReceived':
                 if (!(requestId in requestIdToObject))
@@ -89,11 +90,11 @@ function parseNetworkLogs(netLog){
                 var netObject = requestIdToObject[requestId];
                 netObject.endTime = payLoad.timestamp;
                 break;
-            // case 'Network.loadingFinished':
-            //     if (!(requestId in requestIdToObject))
-            //         continue;
-            //     var netObject = requestIdToObject[requestId];
-            //     netObject.endTime = payLoad.timestamp;
+            case 'Network.loadingFinished':
+                if (!(requestId in requestIdToObject))
+                    continue;
+                var netObject = requestIdToObject[requestId];
+                netObject.size = payLoad.encodedDataLength;
         }
 
     }
@@ -113,6 +114,7 @@ function NetworkEvent(data){
     this.protocol = "";
     this.url = isRequest ? data.request.url : data.response.url
     this.redirectResponse = data.redirectResponse;
+    this.initiator = isRequest ? data.initiator : null;
 }
 
 module.exports = {

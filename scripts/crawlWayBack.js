@@ -25,8 +25,8 @@ program
 
 const WAYBACK_CDX="https://web.archive.org/cdx/search/cdx",
     CHROME_LOADER="/home/goelayu/research/webArchive/scripts/inspectChrome.js",
-    mmwebreplay="/home/goelayu/research/hotOS/Mahimahi/buildDir/bin/mm-webreplay",
-    mmwebrecord="/home/goelayu/research/hotOS/Mahimahi/buildDir/bin/mm-webrecord";
+    mmwebreplay="/home/goelayu/research/mahimahi/build/bin/mm-webreplay",
+    mmwebrecord="/home/goelayu/research/mahimahi/build/bin/mm-webrecord";
 /*
 wayback api response format: [["urlkey","timestamp","original","mimetype","statuscode","digest","length"]
 */
@@ -75,23 +75,27 @@ var replayServerCleanup = async function(serverProc, procPath){
 }
 
 var loadChrome = async function(wUrl,ts, url){
-    var pathSuffix = `${program.url}/${sanitizeUrlToDir(url)}/${ts}/`;
-    var outputDir = `${program.output}/${pathSuffix}`,
-        port = 9222 + Math.round(Math.random()*9222)
-    console.log('making directory', outputDir)
-    fs.ensureDirSync(outputDir,{recursive:true});
     var mahimahiConf = {
         record:mmwebrecord,
         replay:mmwebreplay
-    };
-    var chromeCMD = '', mahimahipath, replayServer;
-    program.path && (mahimahipath = `${path.resolve(program.path)}/${pathSuffix}`);
-    fs.ensureDirSync(`${path.resolve(program.path)}/${program.url}/${sanitizeUrlToDir(url)}/`);
+    }, chromeCMD = '';
+    var mahimahipath, replayServer,
+    port = 9222 + Math.round(Math.random()*9222);
     switch(program.mahimahi){
         case 'record':
+            var pathSuffix = `${program.url}/${sanitizeUrlToDir(url)}/${ts}/`;
+            var outputDir = `${program.output}/${pathSuffix}`;
+            console.log('making directory', outputDir)
+            fs.ensureDirSync(outputDir,{recursive:true});
+            program.path && (mahimahipath = `${path.resolve(program.path)}/${pathSuffix}`);
+            fs.ensureDirSync(`${path.resolve(program.path)}/${program.url}/${sanitizeUrlToDir(url)}/`);
             chromeCMD += `${mahimahiConf[program.mahimahi]} ${mahimahipath} `;
             break;
         case 'replay':
+            var outputDir = `${program.output}/${sanitizeUrlToDir(url)}/${ts}/`
+            var mahimahipath = `${program.path}/${sanitizeUrlToDir(url)}`
+            console.log('making directory', outputDir)
+            fs.ensureDirSync(outputDir,{recursive:true});
             // Start the nginx server separately
             replayServer = process.env.REPLAYSERVER;
             if (replayServer == 'nginx') {
@@ -122,7 +126,7 @@ var loadChrome = async function(wUrl,ts, url){
         chromeCMD = `mm-delay ${WAYBACK_SERVER_RTT/2} ` + chromeCMD;
     }
 
-    chromeCMD += `node ${CHROME_LOADER} -u ${wUrl} -l -o ${outputDir} -c -n --log --mode std -p ${port} -t ` + (program.chromeFlags ? parseFlags(program.chromeFlags) : "")
+    chromeCMD += `node ${CHROME_LOADER} -u ${wUrl} -l -o ${outputDir} -c -n --log --mode std -p ${port} ` + (program.chromeFlags ? parseFlags(program.chromeFlags) : "")
     console.log(chromeCMD);
     var chromeps = spawnSync(chromeCMD,{shell:true});
 
@@ -153,6 +157,7 @@ var parseResponse = async function(res){
             // continue;
             var ts = entry[1], url = entry[2];
             var waybackurl = `https://web.archive.org/web/${ts}/${url}`;
+            // console.log(waybackurl)
             await loadChrome(waybackurl, ts, url);
         }
     })
@@ -176,7 +181,7 @@ async function main(){
         var wayBackUrl = `https://web.archive.org/web/${program.url}`;
         var [ts,_url] = program.url.split('/http');
         program.url = `http${_url}`;
-        loadChrome(wayBackUrl,ts)
+        loadChrome(wayBackUrl,ts, program.url)
     }
 };
 

@@ -72,6 +72,9 @@ class Mahimahi:
     def getStatus(self):
         return self.http_obj.response.first_line.split()[1]
 
+    def getBody(self):
+        return self.http_obj.response.body
+
     def getUrl(self):
         if not self.http_obj.request.first_line.split():
             return None
