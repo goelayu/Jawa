@@ -1,9 +1,7 @@
-# Ignore everything in repository root 
-/*
-
-# Files to not ignore
-!/.gitignore
-!/README.md
-!/**/.sh
-!/**/.py
-
+*
+!scripts/
+!scripts/*/
+!parser/
+!*js
+!*py
+!*sh
