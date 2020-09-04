@@ -81,6 +81,9 @@ var loadChrome = async function(wUrl,ts, url){
     }, chromeCMD = '';
     var mahimahipath, replayServer,
     port = 9222 + Math.round(Math.random()*9222);
+    var pathSuffix = `${sanitizeUrlToDir(program.url)}/${ts}/`;
+    var outputDir = `${program.output}/${pathSuffix}`;
+    fs.ensureDirSync(outputDir,{recursive:true});
     switch(program.mahimahi){
         case 'record':
             var pathSuffix = `${program.url}/${sanitizeUrlToDir(url)}/${ts}/`;
@@ -165,7 +168,8 @@ var parseResponse = async function(res){
 
 
 async function crawlWayBack(url){
-    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&matchType=prefix&from=201710&to=201711&output=json&limit=500&filter=mimetype:text/html&filter=statuscode:200`;
+    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&matchType=prefix&output=json&limit=1&filter=mimetype:text/html&filter=statuscode:200&from=${process.env.YEAR}`;
+    console.log(apiEndPoint);
     http.get(apiEndPoint, parseResponse);
     // await parseResponse(res);
     // .on('error',(e)=>{

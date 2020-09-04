@@ -36,7 +36,7 @@ GrepErrorToken(){
         if [[ "$1" == "undefined" ]]; then
             dom=`cat $i`
             if [[ ${dom} == "undefined" ]];then
-                echo $i | cut -d/ -f9
+                echo $i | cut -d/ -f8
             fi
         elif grep -iq "$1" $i; then
             # echo Found match in $i
@@ -47,15 +47,16 @@ GrepErrorToken(){
         <(cat $3 | sort) <(cat $TMPFILE2 | sort) > $TMPFILE1
 
     echo `cat $3 | wc -l ` to `cat $TMPFILE1 | wc -l` urls
+    cat $TMPFILE2
     cp $TMPFILE1 $TMPFILE3
 }
 
-errTokens=("We are limiting the number"
-# "Not found"
-# "No web site is configured"
-# "Forbidden"
-# "302 response at crawl time"
-# "undefined"
+errTokens=("We are limiting the number of URLs you can submit to be Archived to the Wayback Machine"
+# "Not found"  -- not detailed enough
+"No web site is configured"
+# "Forbidden" -- not detailed enough
+"302 response at crawl time"
+"undefined"
 "replayserver")
 
 cp $1 $TMPFILE3
@@ -69,7 +70,7 @@ for ((ind = 0; ind < ${#errTokens[@]}; ind++)); do
 done
 
 
-cp $TMPFILE3 $1".${3}.filtered"
+cp $TMPFILE3 ${3}
 
 # GrepErrorToken "too many requests" $2 $1
 # GrepErrorToken "crawl error" $2 $TMPFILE3

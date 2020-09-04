@@ -4,15 +4,6 @@
 # Files to not ignore
 !/.gitignore
 !/README.md
-!/*.sh
-!/*.js
-!/*.py
+!/**/.sh
+!/**/.py
 
-# Folder to not ignore
-#!/scripts/*.sh
-#!/scripts/*.js
-#!/scripts/*.py
-
-#!/parser/*.sh
-#!/parser/*.js
-#!/parser/*.py

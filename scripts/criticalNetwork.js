@@ -6,6 +6,7 @@ const netParser = require('parser/networkParser'),
     fs = require('fs'),
     program = require('commander'),
     util = require('util');
+const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 
 program
     .option('-n, --network [network]', 'path to the network log')
@@ -18,7 +19,10 @@ program
 
 const DEBUG_FILE = ".debug";
 
-
+var _oldLog = console.log;
+var newLog = function(msg){
+    _oldLog(`${program.url}: ${msg}`);
+}
 /*
 Computes the total TTFB time across all network events
 */
@@ -161,6 +165,21 @@ var timeStampInURL = function (url) {
     return false
 }
 
+var getSizePerType = function(net){
+    var type2size = {};
+    for (var n of net){
+        if (!n.type || !n.size) continue;
+
+        if (!(n.type in type2size))
+            type2size[n.type] = 0;
+        type2size[n.type] += n.size;
+    };
+    var totalSize = Object.values(type2size).reduce((acc,cur)=>{return acc + cur;},0);
+    Object.keys(type2size).forEach((t)=>{
+        newLog(`${t} ${type2size[t]/totalSize}`);
+    });
+}
+
 var scanTTFB = function (net, url, plt, ts) {
     var mainReq = computeMainFileReq(net, url);
     // var ts = removeTrailingSlash;
@@ -175,7 +194,7 @@ var scanTTFB = function (net, url, plt, ts) {
     // console.log((mainReqTime.ttfb - mainReqTime.fetchRedirectStart)*1000)
     // console.log(mainReqTime.redirectResponse == null);
     var own = script = 0;
-    var seen = {}, totalSize = 0;
+    var typeToSize = {};
     for (var n of net) {
         if (!n.ttfb) continue;
         // if (n == mainReq){
@@ -275,8 +294,9 @@ function main() {
     program.debug && fs.writeFileSync(DEBUG_FILE, JSON.stringify(processNetLogs));
 
 
+    getSizePerType(processNetLogs);
     // console.log(processNetLogs.length);
-    scanTTFB(processNetLogs, program.url, plt, program.ts);
+    // scanTTFB(processNetLogs, program.url, plt, program.ts);
     // printTTFB(processNetLogs);
     // console.log(isMainReqSlowest(processNetLogs, program.url))
     // computeTTFBPercentage(processNetLogs);

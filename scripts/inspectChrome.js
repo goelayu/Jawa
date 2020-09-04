@@ -337,6 +337,7 @@ function navigate(launcher){
             } else 
                 dataReceived=true
             await extractPageLoadTime(Runtime, "plt");
+            await takePageScreenshot(Page, '/screenshot.png');
 
             if (program.coverage) {
                 var _coverageData = await Profiler.takePreciseCoverage();
@@ -550,6 +551,11 @@ async function extractPageLoadTime(Runtime, outputFile){
     console.log("Dump performance timing information to file " + JSON.stringify(pageLoadTime));
     fs.writeFileSync(program.output + outputFile, JSON.stringify(pageLoadTime));
 
+}
+
+async function takePageScreenshot(Page, outputFile){
+    var image = await Page.captureScreenshot();
+    fs.writeFileSync(program.output + outputFile, JSON.stringify(image.data), 'base64');
 }
 
 function escapeBackSlash(str){

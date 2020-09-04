@@ -107,10 +107,11 @@ var getFunctionStats = async function(Runtime, outDir) {
 }
 
 var getDOM = async function(Runtime, outFile){
-    var script = fs.readFileSync(SERIALIZESTYLES,"utf-8");
-    await Runtime.evaluate({ expression: script });
+    /* Don't need style information */
+    // var script = fs.readFileSync(SERIALIZESTYLES,"utf-8");
+    // await Runtime.evaluate({ expression: script });
     let html = await Runtime.evaluate({
-        expression: 'document.documentElement.serializeWithStyles();'
+        expression: 'document.documentElement.outerHTML;'
     });
     // console.log(html)
     fs.writeFileSync(outFile,html.result.value);

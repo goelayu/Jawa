@@ -1,4 +1,7 @@
-Element.prototype.serializeWithStyles = (function () {  
+//Should be added to Element.prototype
+//However sometimes Element.prototype is rewritten itself, and therefore it is better to simply
+//rewrite Object.prototype. // HACK
+Object.prototype.serializeWithStyles = (function () {  
 
     // Mapping between tag names and css default values lookup tables. This allows to exclude default values in the result.
     var defaultStylesByTagName = {};

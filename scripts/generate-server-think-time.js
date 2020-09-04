@@ -131,7 +131,7 @@ var getRedirectURLMap = function(net){
         var host = n.response.requestHeaders.Host;
         if (rr = n.redirectResponse){
             urlMap[rh(n.url,host)] = rh(rr.headers.location,host);
-            // console.log(rts(rr.url), rts(rr.headers.location))
+            console.log((rr.url), (rr.headers.location))
         }
     }
     fs.writeFileSync(program.output,JSON.stringify(urlMap))
