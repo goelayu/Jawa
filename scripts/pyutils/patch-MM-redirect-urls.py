@@ -202,8 +202,8 @@ def removeToolBar(proto):
     return True
 
 def insertPreloadHeader(proto, links):
-    msg = proto.response.body
-    # msg = getPlainText(proto, True)
+    # msg = proto.response.body
+    msg = getPlainText(proto, True)
     linkTemplate="<link rel='preload' href='{url}' as='{type}'>"
     print "Inserting", len(links)
     _linkStr = [linkTemplate.format(url=l[0], type=l[1]) for l in links]
@@ -234,10 +234,11 @@ def insertAtInd(src, idx, str):
     return src[:idx]+ str + src[idx:]
 
 
-def isMainFile(first_line, url):
-    rts = removeTrailingSlash
-    _url = "".join(url.split('www.'))
-    return rts(first_line).endswith(rts(_url))
+def isMatch(first_line, url):
+    # rts = removeTrailingSlash
+    # _url = "".join(url.split('www.'))
+    # return rts(first_line).endswith(rts(_url))
+    return url.endswith(first_line)
 
 def patchHttpData(root, http_orig_data, urlMap, patches, url, allUrls, file):
         try:
@@ -262,19 +263,24 @@ def patchHttpData(root, http_orig_data, urlMap, patches, url, allUrls, file):
                     _patchRedirects(orig_data_copy, redirectData)
                     # removeToolBar(orig_data_copy)
 
-                    if "toolbar" in patches and isMainFile(curUrl, url):
-                        try:
-                            removeToolBar(orig_data_copy)
-                        except:
-                            print 'Exception while removing toolbar'
+                    # TODO fix fetching main file
+                    # if "toolbar" in patches and isMatch(curUrl, url):
+                    #     try:
+                    #         removeToolBar(orig_data_copy)
+                    #     except:
+                    #         print 'Exception while removing toolbar'
                         # print orig_data_copy
                     
-                    if "sp" in patches and isMainFile(curUrl, url):
+                    if "sp" in patches:
                         if not allUrls:
                             raise Exception('Missing --allUrls flags with the server push patch')
                         # try:
-                        urls = json.loads(open(allUrls,'r').read())
-                        insertPreloadHeader(orig_data_copy, urls)
+                        urlToLinks = json.loads(open(allUrls,'r').read())
+                        for u in urlToLinks:
+                            if isMatch(curUrl, str(u)):
+                                print "SP: Found match for ", str(u)
+                                insertPreloadHeader(orig_data_copy, urlToLinks[u])
+                                break
                         # except :
                             # print "Exception while inserting link preloads"
                     # try:
@@ -332,7 +338,10 @@ def main(args):
     urlMapData = open(args.urlMap,'r').read()
 
     urlMap = json.loads(urlMapData)
-    # print urlMap
+    
+    #Create output directory if it doesn't exist
+    if not os.path.exists(args.output):
+        os.mkdir(args.output)
     for root, folder, files in os.walk(args.original):
         # pool = mp.Pool(mp.cpu_count())
 

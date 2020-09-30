@@ -99,7 +99,11 @@ function parseNetworkLogs(netLog){
 
     }
 
-    var sortedNetworkEntries = Object.entries(requestIdToObject).map(e=>e[1]).sort((a,b)=>{return a.startTime - b.startTime});
+    var sortedNetworkEntries = Object.entries(requestIdToObject).map(e=>e[1]).sort((a,b)=>{
+        var aStart = a.redirectResponse ? a.redirectFetch : a.requestFetch;
+        var bStart = b.redirectResponse ? b.redirectFetch : b.requestFetch;
+        return aStart - bStart;
+    });
     return sortedNetworkEntries;
 }
 
@@ -112,6 +116,7 @@ function NetworkEvent(data){
     this.sendStart = 0;
     this.requestId = data.requestId;
     this.protocol = "";
+    this.request = isRequest ? data.request : null;
     this.url = isRequest ? data.request.url : data.response.url
     this.redirectResponse = data.redirectResponse;
     this.initiator = isRequest ? data.initiator : null;

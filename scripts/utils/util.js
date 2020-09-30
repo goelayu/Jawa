@@ -3,7 +3,8 @@
  */
 
  const fs = require('fs'),
-    program = require('commander');
+    program = require('commander'),
+    netParser = require('parser/networkParser');
 
 
 program
@@ -25,5 +26,46 @@ var pruneDB = function(d){
     });
 }
 
-if (program.type == "prune")
-    pruneDB(parse(program.input));
+var getQueueTime = function(data){
+    var net = netParser.parseNetworkLogs(parse(data));
+    for (var n of net){
+        var startTime = n.requestStart_o;
+        if (n.redirectResponse){
+            console.log(n.redirectResponse.timing.requestTime - n.requestStart_o);
+            startTime = n.redirectStart_o;
+        } 
+        if (n.response)
+            console.log(n.response.timing.requestTime - startTime);
+    }
+}
+
+var getStallTime = function(data){
+    var net = netParser.parseNetworkLogs(parse(data));
+    for (var n of net){
+        if (!n.response) continue;
+        if (n.redirectResponse){
+            console.log(n.redirectResponse.timing.sendStart - n.redirectResponse.timing.sslEnd);
+        } 
+        if (n.response)
+            console.log(n.response.timing.sendStart - n.response.timing.sslEnd);
+    }
+}
+
+var getNetSize = function(data){
+    var net = netParser.parseNetworkLogs(data);
+    var total = 0;
+    for (var n of net){
+        if (!n.size) continue;
+        total += n.size;
+    }
+    console.log(total);
+}
+
+
+
+switch (program.type){
+    case "prune": pruneDB(parse(program.input)); break
+    case "netSize": getNetSize(parse(program.input)); break;
+    case "stall": getStallTime(program.input); break;
+    case "queue" : getQueueTime(program.input); break;
+}
