@@ -31,11 +31,11 @@ var getQueueTime = function(data){
     for (var n of net){
         var startTime = n.requestStart_o;
         if (n.redirectResponse){
-            console.log(n.redirectResponse.timing.requestTime - n.requestStart_o);
+            console.log( (n.redirectResponse.timing.requestTime - n.requestStart_o)*1000 );
             startTime = n.redirectStart_o;
         } 
         if (n.response)
-            console.log(n.response.timing.requestTime - startTime);
+            console.log(( n.response.timing.requestTime - startTime)*1000);
     }
 }
 
@@ -61,6 +61,11 @@ var getNetSize = function(data){
     console.log(total);
 }
 
+var getNetLen = function(data){
+    var net = netParser.parseNetworkLogs(parse(data));
+    console.log(net.length);
+}
+
 
 
 switch (program.type){
@@ -68,4 +73,5 @@ switch (program.type){
     case "netSize": getNetSize(parse(program.input)); break;
     case "stall": getStallTime(program.input); break;
     case "queue" : getQueueTime(program.input); break;
+    case "len": getNetLen(program.input); break;
 }
