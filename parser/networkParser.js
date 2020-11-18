@@ -21,6 +21,12 @@ function parseNetworkv2(netLog){
 
 }
 
+var getPreviousReq = function(n){
+    if (!n.redirects.length) return n;
+    var lastRedirect = n.redirects[n.redirects.length - 1];
+    return lastRedirect;
+}
+
 
 function parseNetworkLogs(netLog){
 
@@ -42,16 +48,23 @@ function parseNetworkLogs(netLog){
                     Is a redirect response
                     */
                     var netObject = requestIdToObject[requestId];
-                    netObject.redirectResponse = payLoad.redirectResponse;
-                    if (!netObject.redirectResponse.headers.location)
-                        netObject.redirectResponse.headers.location = netObject.redirectResponse.headers.Location
-                    netObject.redirectStart_o = payLoad.timestamp;
-                    netObject.requestStart = payLoad.redirectResponse.timing.requestTime;
-                    netObject.requestCS = payLoad.redirectResponse.timing.sslEnd == -1 ? 0 : payLoad.redirectResponse.timing.sslEnd/1000
-                    netObject.requestFetch = netObject.requestStart + payLoad.redirectResponse.timing.sendStart/1000;
+                    var redirect = new Object;
+                    redirect.response = payLoad.redirectResponse;
+                    if (!redirect.response.headers.location)
+                        redirect.response.headers.location = redirect.response.headers.Location
+                    redirect.requestStart_o = payLoad.timestamp;
+                    redirect.url = redirect.response.headers.location;
 
+                    //update the timing of the previous network request
+                    var prevReq = getPreviousReq(netObject);
+                    prevReq.responseTime = payLoad.timestamp;
+                    prevReq.requestStart = payLoad.redirectResponse.timing.requestTime;
+                    prevReq.requestCS = payLoad.redirectResponse.timing.sslEnd == -1 ? 0 : payLoad.redirectResponse.timing.sslEnd/1000
+                    prevReq.requestFetch = prevReq.requestStart + payLoad.redirectResponse.timing.sendStart/1000;
 
-                    // netObject.fetchRedirectStart = netObject.redirectStartTime + payLoad.redirectResponse.timing.sendStart/1000
+                    prevReq.timing = payLoad.redirectResponse.timing;
+
+                    netObject.redirects.push(redirect);
                    }
                    continue;
                 }
@@ -69,20 +82,15 @@ function parseNetworkLogs(netLog){
                     requestIdToObject[requestId] = netObject;
                 }
                 var netObject = requestIdToObject[requestId];
-                netObject.ttfb = payLoad.timestamp;
-                if (netObject.redirectResponse){
-                    netObject.redirectStart = payLoad.response.timing.requestTime;
-                    netObject.redirectCS = payLoad.response.timing.sslEnd == -1 ? 0 : payLoad.response.timing.sslEnd/1000
-                    netObject.redirectFetch = netObject.redirectStart + payLoad.response.timing.sendStart/1000;
-                } else {
-                    netObject.requestStart = payLoad.response.timing.requestTime;
-                    netObject.requestCS = payLoad.response.timing.sslEnd == -1 ? 0 : payLoad.response.timing.sslEnd/1000
-                    netObject.requestFetch = netObject.requestStart + payLoad.response.timing.sendStart/1000;
-                }
-                // netObject.fetchStart = netObject.startTime + payLoad.response.timing.sendStart/1000
+                var timing = payLoad.response.timing;
+                var prevReq = getPreviousReq(netObject);
+                prevReq.responseTime = payLoad.timestamp;
+                prevReq.requestStart = timing.requestTime;
+                prevReq.requestCS = timing.sslEnd == -1 ? 0 : timing.sslEnd/1000
+                prevReq.requestFetch = prevReq.requestStart + timing.sendStart/1000;  
+                prevReq.timing = timing;          
                 netObject.protocol = payLoad.response.protocol;
                 netObject.response = payLoad.response;
-                netObject.type = payLoad.type;
                 break;
             case 'Network.dataReceived':
                 if (!(requestId in requestIdToObject))
@@ -120,6 +128,10 @@ function NetworkEvent(data){
     this.url = isRequest ? data.request.url : data.response.url
     this.redirectResponse = data.redirectResponse;
     this.initiator = isRequest ? data.initiator : null;
+    this.documentURL = isRequest ? data.documentURL : null;
+    this.redirects = [];
+    this.frameId = data.frameId;
+    this.type = data.type;
 }
 
 module.exports = {

@@ -49,7 +49,7 @@ var parseFlags = function(f){
 var sanitizeUrlToDir = function(url){
     if (url[url.length - 1] == "/")
         url = url.slice(0,-1);
-    return url.replace(/https?:\/\//,'').replace(/\//g,'_')
+    return url.replace(/https?:\/\//,'').replace(/\//g,'_').replace(/\&/g,'-');
     // var surl = url.split('www')[1].replace('/','_');
     // return `www${surl}`;
 }
@@ -97,7 +97,7 @@ var loadChrome = async function(wUrl,ts, url){
     // fs.ensureDirSync(outputDir,{recursive:true});
     switch(program.mahimahi){
         case 'record':
-            var pathSuffix = `${program.url}/${sn(url)}//${ts}/`;
+            var pathSuffix = `${program.url}/${sn(url)}/${ts}/`;
             var outputDir = `${program.output}/${pathSuffix}`;
             console.log('making directory', outputDir)
             fs.ensureDirSync(outputDir,{recursive:true});
@@ -143,7 +143,7 @@ var loadChrome = async function(wUrl,ts, url){
     }
 
     // chromeCMD += `node ${CHROME_LOADER_OLD} -u ${wUrl} -l -o ${outputDir} -n --log --mode std -p ${port} --chrome-conf ../chromeConfigs/debug ` + (program.chromeFlags ? parseFlags(program.chromeFlags) : "")
-    chromeCMD += `sleep 5 && node ${CHROME_LOADER} -u '${wUrl}' -l -o '${outputDir}' -n --timeout 200000 --screenshot`;
+    chromeCMD += `node ${CHROME_LOADER} -u '${wUrl}' -l -o '${outputDir}' -n --timeout 200000 --screenshot`;
     console.log(chromeCMD);
     var chromeps = spawnSync(chromeCMD,{shell:true});
 
@@ -179,7 +179,7 @@ var parseResponse = async function(res){
             var ts = entry[1], url = entry[2];
             var waybackurl = `https://web.archive.org/web/${ts}/${url}`;
             // console.log(waybackurl)
-            await loadChrome('http://www.google.com', ts, url);
+            await loadChrome(waybackurl, ts, url);
         }
     })
 }

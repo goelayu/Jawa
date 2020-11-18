@@ -21,17 +21,26 @@ class Crawler:
         with open(ADDRESS_FILE,'r') as f:
             a = f.readlines()
             cls.addresses = [i.strip() for i in a]
+        print cls.addresses
 
     def __init__(self, logDir):
-        # self.address = Crawler.addresses[Crawler.next_available_address]
+        self.id = Crawler.next_available_address
+        self.address = Crawler.addresses[Crawler.next_available_address]
         self._log_file = '{}/crawler_{}'.format(logDir,str(Crawler.next_available_address))
         Crawler.next_available_address+=1
 
     def run(self, url, output, mmpath):
-        print 'currently processing site', url
-        cmd='node ../crawlWayBack.dedup.js -u {} -o {} -m record -p {}'.format(url, output, mmpath)
+        # cmd='node ../crawlWayBack.dedup.js -u {} -o {} -m record -p {}'.format(url, output, mmpath)
+        cmd='ssh -o StrictHostKeyChecking=no {} bash ./init-crawler.sh {}'.format(self.address, url)
+        # cmd='echo job'
         print 'Running', cmd
+        l = open(self._log_file,'a')
+        l.write('Processing url {}\n'.format(url))
+        l.write('Running remote cmd {}\n'.format(cmd))
+        l.close()
+
         log_file = open(self._log_file,'a')
+        # sleep(randint(1,5))
         subprocess.call(cmd, stdout=log_file, shell=True)
 
 def init_crawlers(count, logDir):
@@ -56,10 +65,10 @@ def crawl(sites, idx, crawler, out, mmpath):
             idx.value+=1
         crawler.run(cur_site, out, mmpath )
         # sleep(randint(10,20))
-    print 'crawler finished'
+    print 'crawler {} finished'.format(crawler.id)
 
 def distribute(args):
-    # Crawler.init_addresses()
+    Crawler.init_addresses()
     crawlers = init_crawlers(int(args.count), args.logDir)
     idx = mp.Value('i',0)
     sites = read_sites(args.sites)

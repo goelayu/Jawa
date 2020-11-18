@@ -7,12 +7,9 @@
 
 # set -v
 
-mmwebreplay_old=/home/goelayu/research/hotOS/origMahimahi/mahimahi/buildDir/bin/mm-webreplay
 mmwebreplay=/home/goelayu/research/mahimahi/build/bin/mm-webreplay
 mmnoop=/home/goelayu/research/mahimahi/build/bin/mm-noop
-mmwebrecord_old=/home/goelayu/research/hotOS/Mahimahi/buildDir/bin/mm-webrecord
 mmwebrecord=/home/goelayu/research/mahimahi/build/bin/mm-webrecord
-mmdelay=/home/goelayu/research/hotOS/Mahimahi/buildDir/bin/mm-delay
 
 # ipfilePrefix=/home/goelayu/research/WebPeformance/output/unmodified/trace_5_15_record_v76_ssl1.0_c69/
 ipfilePrefix=/home/goelayu/research/WebPeformance/traces/vaspol/record/devtools_logs/0/
@@ -53,7 +50,7 @@ replay(){
 		echo "done waiting"
 		return
 	elif [[ $5 == *"record"* ]]; then
-		cmd="mm-webrecord $1"
+		cmd="$mmwebrecord $1"
 		echo "RECORD MODE";
 	fi;
 	#avoid 9600 range because a certain kworker runs on port 9645

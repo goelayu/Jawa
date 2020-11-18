@@ -226,7 +226,7 @@ function computeTimings(entry) {
     const blockedStart = firstNonNegative([
         timing.dnsStart, timing.connectStart, timing.sendStart
     ]);
-    const blocked = blockedBase + (blockedStart === -1 ? 0 : blockedStart);
+    const blocked = (blockedStart === -1 ? 0 : blockedStart);
     const _blocked_queueing = blockedBase;
     let dns = -1;
     if (timing.dnsStart >= 0) {
