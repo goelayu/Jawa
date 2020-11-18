@@ -15,12 +15,18 @@ program
     .option('-j, --js-profile', 'capture jsProfile')
     .option('-u, --url [url]','url of the page')
     .option('--timeout [value]', 'timeout value for page navigation')
+    .option('--response-body','capture network response body')
+    .option('--screenshot', 'capture screenshot')
+    .option('--pac-url [value]', 'path to the proxy pac url file')
     .parse(process.argv);
 
 async function launch(){
     const options = {
         executablePath: "/usr/bin/google-chrome",
-        // headless: false,
+        headless: false,
+        args : [ '--ignore-certificate-errors']
+        // '--no-first-run'],
+        // ignoreDefaultArgs: true,
     }
     var outDir = program.output;
     const browser = await puppeteer.launch(options);
@@ -28,6 +34,8 @@ async function launch(){
     var nLogs = [], cLogs = [], jProfile;
     var cdp = await page.target().createCDPSession();
     await initCDP(cdp);
+    console.log(await browser.userAgent());
+    await page.setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36");
     if (program.network){
         initNetHandlers(cdp, nLogs)
     }
@@ -39,6 +47,8 @@ async function launch(){
         await cdp.send('Profiler.start');
     }
 
+    //Set global timeout to force kill the browser
+    var globalTimer = globalTimeout(browser, cdp);
     await page.goto(program.url,{
         timeout: program.timeout,
     }).catch(err => {
@@ -57,16 +67,20 @@ async function launch(){
     }
 
     await extractPLT(page);
-    await page.screenshot({path: `${outDir}/screenshot.png`, fullPage: true});
+    if (program.screenshot)
+        await page.screenshot({path: `${outDir}/screenshot.png`, fullPage: true});
     browser.close();
+
+    //delete the timeout and exit script
+    clearTimeout(globalTimer);
 }
 
-var initTimeout = function(browser,cdp){
-    setTimeout(function(){
-        console.log('Timer fired before site could be loaded');
-        cdp.detach();
-        // browser.close();
-    },5000)
+var globalTimeout = function(browser,cdp){
+    return setTimeout(function(){
+        console.log('Site navigation did not time out. Force KILL.');
+        // cdp.detach();
+        browser.close();
+    },220000)
 }
 
 var initCDP = async function(cdp){
@@ -113,4 +127,8 @@ var dump = function(data, file){
     fs.writeFileSync(file, JSON.stringify(data));
 }
 
-launch();
+launch()
+    .catch(err =>{
+        console.log(`error while launchig ${err}`);
+        process.exit();
+    });
