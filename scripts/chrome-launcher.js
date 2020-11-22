@@ -18,12 +18,13 @@ program
     .option('--response-body','capture network response body')
     .option('--screenshot', 'capture screenshot')
     .option('--pac-url [value]', 'path to the proxy pac url file')
+    .option('--testing', 'debug mode')
     .parse(process.argv);
 
 async function launch(){
     const options = {
         executablePath: "/usr/bin/google-chrome",
-        headless: false,
+        headless: program.testing? false : true,
         args : [ '--ignore-certificate-errors']
         // '--no-first-run'],
         // ignoreDefaultArgs: true,
@@ -48,7 +49,9 @@ async function launch(){
     }
 
     //Set global timeout to force kill the browser
-    var globalTimer = globalTimeout(browser, cdp);
+    var gTimeoutValue = program.testing ? Number.parseInt(program.timeout)*100 : Number.parseInt(program.timeout) + 20000;
+    console.log('global time out value', gTimeoutValue, program.timeout, program.testing);
+    var globalTimer = globalTimeout(browser, cdp, gTimeoutValue);
     await page.goto(program.url,{
         timeout: program.timeout,
     }).catch(err => {
@@ -69,18 +72,22 @@ async function launch(){
     await extractPLT(page);
     if (program.screenshot)
         await page.screenshot({path: `${outDir}/screenshot.png`, fullPage: true});
-    browser.close();
+    
+    console.log('Site loaded');
+    if (!program.testing)
+        browser.close();
 
     //delete the timeout and exit script
-    clearTimeout(globalTimer);
+    if (!program.testing)
+        clearTimeout(globalTimer);
 }
 
-var globalTimeout = function(browser,cdp){
+var globalTimeout = function(browser,cdp, timeout){
     return setTimeout(function(){
         console.log('Site navigation did not time out. Force KILL.');
         // cdp.detach();
         browser.close();
-    },220000)
+    },timeout)
 }
 
 var initCDP = async function(cdp){
