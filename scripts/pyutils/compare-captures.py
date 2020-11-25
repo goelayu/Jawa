@@ -54,14 +54,23 @@ def getSourceDir(dir, idx):
     logging.info('src directory is {}'.format(first_ts))
     return first_ts
 
+def fileName(url):
+    return url.split('/')[-1]
+
 def _compare(srcFile, dstObjs):
-    for d in dstObjs:
+    potentialDsts = [d for d in dstObjs if fileName(d.getUrl()) == fileName(srcFile.getUrl())]
+    for d in potentialDsts:
         logging.debug('Comparing srcFile {} with dstFile {}'.format(srcFile.getUrl(), d.getUrl()))
         if srcFile == d:
-            logging.info('{} matched with  {}'.format(srcFile.getUrl(), d.getUrl()))
+            logging.info('{} matched with {} with type {} {}'.format(srcFile.getUrl(), d.getUrl(), \
+                getType(srcFile.getHeader('content-type')), len(srcFile.getBody()) ))
             return True
 
     return False
+
+def getTotalSize(files):
+    sizes = [len(i.getBody()) for i in files]
+    return sum(sizes)
 
 def getDedupRatio(origFiles, matchedFiles):
     logging.info('dedup files: {} , all files: {}'.format(len(matchedFiles), len(origFiles) ))
@@ -72,6 +81,13 @@ def getDedupRatio(origFiles, matchedFiles):
     logging.info('dedup size : {} , all size :{}'.format(matchSize, origSize));
     return matchSize*1.0/origSize
 
+def getType(longType):
+    if not longType:
+        return
+    types = ['javascript', 'html', 'image', 'css']
+    for t in types:
+        if t in longType:
+            return t
 
 def compare(args):
     # src_idx_count = 0
@@ -85,6 +101,7 @@ def compare(args):
     # dedup_files = copy.deepcopy(src_files)
     all_files = []
     dedup_files = []
+    type_to_files = {'javascript':[], 'html':[], 'image':[], 'css':[], None:[]}
     # logging.info('DedupRatio: {}'.format(getDedupRatio(all_files, dedup_files)))
     for root, folder, files in os.walk(args.directory):
         # if root == src_dir:
@@ -97,16 +114,20 @@ def compare(args):
             if not isValidDir(dst_objs):
                 continue
             all_files.extend(dst_objs)
+            logging.info('{}/{}'.format(root,folder))
             logging.info("Comparing {} with {} with url {}".format(len(dedup_files), len(dst_objs), dst_dir ))
             matches = []
             unmatches = []
             for file in dst_objs:
+                type = getType(file.getHeader('content-type'))
+                # logging.info('type is {}'.format(type))
                 match = _compare(file, dedup_files)
                 match and matches.append(file)
-                not match and unmatches.append(file)
-            dedup_files.extend(unmatches)
-            
-            logging.info('DedupRatio: {}'.format(getDedupRatio(all_files, dedup_files)))
+                if not match:
+                    unmatches.append(file)
+                    type_to_files[type].append(file)
+            dedup_files.extend(unmatches)   
+            logging.info('Status: {} {} {} {}'.format(len(dedup_files), len(type_to_files['javascript']), getTotalSize(dedup_files), getTotalSize(type_to_files['javascript'])))
 
 
 def init_logger():
