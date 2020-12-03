@@ -146,6 +146,24 @@ var getSizePerType = function(data){
     return type2size;
 }
 
+var getNumPerType = function(data){
+    var net = netParser.parseNetworkLogs((data));
+    var type2num = {};
+    for (var n of net){
+        if (!n.type || !isCriticalReq(n)) continue;
+
+        if (!(n.type in type2num))
+            type2num[n.type] = 0;
+        type2num[n.type] += 1+ n.redirects.length;
+    };
+    var totalSize = Object.values(type2num).reduce((acc,cur)=>{return acc + cur;},0);
+    // Object.keys(type2size).forEach((t)=>{
+    //     console.log(`${t} ${type2size[t]/totalSize}`);
+    // });
+    console.log(type2num['Script'], totalSize);
+    // return type2size;
+}
+
 var estimateSnapshotSize = function(dir){
     var dom = `${dir}/DOM`;
     var net = `${dir}/network`;
@@ -245,35 +263,61 @@ var filler = function(data){
     }
 }
 
+var _getQueryParamsLen = function(url){
+    return url.split('&').length
+}  
+
+var ignoreUrl = function(n, net){
+    const VALID_MIMES = ["image", "document", "script", "stylesheet","xhr"];
+    const INVALID_URL_DOMAINS = ["googletag", "archiveteam", "ping-meta-prd.jwpltx.com","prd.jwpltx.com","eproof.drudgereport.com","idsync.rlcdn.com","cdn.filestackcontent.com","connect.facebook.net","e.cdnwidget.com","nr-events.taboola.com","pixel.quantserve.com","pixel.wp.com","res.akamaized.net","sync.adkernel.com","certify.alexametrics.com","pixel.adsafeprotected.com","px.ads.linkedin.com","s.w-x.co","bat.bing.com","beacon.krxd.net","googleads.g.doubleclick.net","metrics.brightcove.com","ping.chartbeat.net","www.google-analytics.com","trc-events.taboola.com","px.moatads.com","www.facebook.com","sb.scorecardresearch.com","nexus.ensighten.com","odb.outbrain.com"];
+    const QUERY_PARAMS_LIMIT = 10;
+    var type = n.type;
+    // return false
+    return n.request.method != "GET"
+        || n.frameId != net[0].frameId
+        || !VALID_MIMES.filter(e=>type.toLowerCase() == e).length
+        || INVALID_URL_DOMAINS.filter(e=>n.url.indexOf(e)>=0).length
+        ||  n.url.indexOf('data') == 0
+        || _getQueryParamsLen(n.url) > QUERY_PARAMS_LIMIT;
+        
+}
+
 var getResOnPage = function(data){
     var net = netParser.parseNetworkLogs(parse(data)),
         total = 0;
-    var isfirstReq = true, firstReq;
+    var urlSeen = [], typePrefix = ["js_","im_","cs_","if_"];
     for (var n of net){
-        if (isfirstReq){
-            firstReq = n;
-            isfirstReq = false;
-        }
-        if (program.siteType == "archive" && !isCriticalReq(n))
+        if (ignoreUrl(n, net))
             continue;
+        if (program.siteType == "archive"){
+            if (!isCriticalReq(n))
+                continue;
+            var _oUrl = n.url; 
+            for (var t of typePrefix){
+                _oUrl = _oUrl.replace(t,'');
+            }
+            if (urlSeen.indexOf(_oUrl)>=0)
+                continue;
+            urlSeen.push(_oUrl);
+        }
 
         if (n.response && n.response.status == 200){
-            if (program.siteType == "live" && isMainFrame(n, firstReq)){
-                console.log(n.url);
-                total++;
-            }
-            else if(program.siteType != "live"){
-                console.log(n.url)
-                total++;
-            }
+            console.log(n.url, n.type)
+            total++;
+            // else if(program.siteType != "live"){
+            //     console.log(n.url)
+            //     total++;
+            // }
         }
     }
     console.log(total);
 }
+console.log(program.input)
 
 switch (program.type){
     case "prune": pruneDB(parse(program.input)); break
     case "netSize": getNetSize(parse(program.input)); break;
+    case "netLen": getNumPerType(parse(program.input)); break;
     case "stall": getStallTime(program.input); break;
     case "queue" : getQueueTime(program.input); break;
     case "len": getNetLen(program.input); break;
