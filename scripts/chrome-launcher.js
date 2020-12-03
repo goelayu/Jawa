@@ -126,7 +126,7 @@ var extractDOM = async function(page){
     var evalStyles = await page.evaluateHandle((s) => eval(s),inlineStyles);
     var domHandler = await page.evaluateHandle(() => document.documentElement.serializeWithStyles());
     var domString = await domHandler.jsonValue();
-    dump(domString, `${program.output}/DOM1`);
+    dump(domString, `${program.output}/DOM`);
 }
 
 var initConsoleHandlers = function(cdp, cLogs){
