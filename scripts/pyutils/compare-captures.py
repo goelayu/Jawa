@@ -8,6 +8,7 @@ import sys
 import logging
 import copy
 import multiprocessing as mp
+import tarfile
 
 from pyutils.mahimahi import Mahimahi
 
@@ -63,7 +64,7 @@ def _compare(srcFile, dstObjs):
         logging.debug('Comparing srcFile {} with dstFile {}'.format(srcFile.getUrl(), d.getUrl()))
         if srcFile == d:
             logging.info('{} matched with {} with type {} {}'.format(srcFile.getUrl(), d.getUrl(), \
-                getType(srcFile.getHeader('content-type')), len(srcFile.getBody()) ))
+                getType(srcFile.getHeader('content-type'), srcFile), len(srcFile.getBody()) ))
             return True
 
     return False
@@ -81,13 +82,22 @@ def getDedupRatio(origFiles, matchedFiles):
     logging.info('dedup size : {} , all size :{}'.format(matchSize, origSize));
     return matchSize*1.0/origSize
 
-def getType(longType):
+def getType(longType, file):
     if not longType:
+        # determine type using other heuristics
+        url = file.getUrl()
+        if 'woff' in url:
+            return 'font'
         return
-    types = ['javascript', 'html', 'image', 'css']
+    types = ['javascript', 'html', 'image', 'css', 'font']
     for t in types:
         if t in longType:
             return t
+
+# def uncompress(dir):
+#     t = tarfile.open(dir)
+#     t.extractall()
+#     return t
 
 def compare(args):
     # src_idx_count = 0
@@ -119,7 +129,7 @@ def compare(args):
             matches = []
             unmatches = []
             for file in dst_objs:
-                type = getType(file.getHeader('content-type'))
+                type = getType(file.getHeader('content-type'), file)
                 # logging.info('type is {}'.format(type))
                 match = _compare(file, dedup_files)
                 match and matches.append(file)

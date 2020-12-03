@@ -2,8 +2,8 @@
 # $1 -> path to the recorded pages
 # $2 -> path to the output directory
 # $3 -> Mode ( record or replay)
-# $4 -> path to the list of pages
-#$5 -> chrome config mode
+# $4 -> live or archive
+# $5 -> list of pages
 
 # set -v
 
@@ -39,7 +39,7 @@ replay(){
 	mkdir -p $3
 	echo "Launching chrome"
 	cmd=""
-	if [[ $5 == "mmreplay" ]]; then
+	if [[ $5 == *"replay"* ]]; then
 		cmd="mm-webreplay $1"
 		echo "REPLAY MODE"
 	elif [[ $5 == "nginx" ]]; then
@@ -56,7 +56,9 @@ replay(){
 	#avoid 9600 range because a certain kworker runs on port 9645
 	port=`shuf -i 9600-9900 -n 1`
 	echo "Running on port" $port
-    $cmd node inspectChrome.js -u $2 -o $3 -p $port --mode $mode --chrome-conf $6 $DATAFLAGS
+	echo "$cmd node chrome-launcher.js -u $2 -l -o $3 -n --timeout 30000 --screenshot $DATAFLAGS"
+    $cmd node chrome-launcher.js -u $2 -l -o $3 -n --timeout 60000 --screenshot $DATAFLAGS
+	# $cmd node inspectChrome.js -u $2 -o $3 -p $port --mode std -l --chrome-conf $6 $DATAFLAGS
     # sleep 4
 	replay_pid=$!
 	#waitForNode
@@ -110,12 +112,18 @@ while read url; do
 	echo "replaying url: " $url
 	clean_url=`echo $url | cut -d'/' -f3-`
 	clean_url=`echo ${clean_url} | sed 's/\//_/g' | sed 's/\&/-/g'`
-	mmpath=$1
-	out=$2
-	echo "clean url is " ${clean_url}
+	if [[ $4 == 'live' ]]; then
+		mmpath=$1/${clean_url}
+		out=$2/${clean_url}
+	else 
+		new_url=`echo $url | cut -d/ -f6`
+		echo 'new url is ' $new_url
+		mmpath=$1/${new_url}
+		out=$2/${new_url}
+	fi
 	toolmode=$3
 	conf=./chromeConfigs/$4
-	replay $mmpath//${clean_url} $url $out//${clean_url} $clean_url $toolmode $conf
+	replay $mmpath $url $out $clean_url $toolmode $conf
 	# replay $mmpath/1/${clean_url} $url $out/1/${clean_url} $clean_url $4
 	sleep 2
 done<"$5"

@@ -7,6 +7,23 @@ import brotli
 import zlib
 import re
 import hashlib
+import subprocess
+
+def _zipContent(body, zip_type):
+        TEMP_FILE_I='tmp_i'
+        TEMP_FILE_O='tmp_o'
+        with open(TEMP_FILE_I,'w') as f:
+            f.write(body)
+        zip_util = None
+        if zip_type.lower() != "br":
+            zip_util = "gzip"
+        else: zip_util = "brotli"
+        zipCommand = "{} -c {} > {}".format(zip_util, TEMP_FILE_I, TEMP_FILE_O)
+        subprocess.call(zipCommand, shell=True)
+        result = None
+        with open(TEMP_FILE_O,'r') as f:
+            result = f.read()
+        return result
 
 class Mahimahi:
     """ Represents a mahimahi protobuf file"""
@@ -68,6 +85,9 @@ class Mahimahi:
             if header.key.lower() == "content-encoding":
                 return header.value
         return False;
+    
+    def getHTTPObj(self):
+        return self.http_obj
 
     def getStatus(self):
         return self.http_obj.response.first_line.split()[1]
@@ -97,6 +117,15 @@ class Mahimahi:
 
         return False
 
+    def updateHeader(self, h, v):
+        for header in self.http_obj.response.header:
+            if header.key.lower() == h:
+                header.value = v
+    
+    def deleteHeader(self, h):
+        for header in self.http_obj.response.header:
+            if header.key.lower() == h:
+                self.http_obj.response.header.remove(header)
 
     def getPlainText(self):
         orig_body = self.http_obj.response.body
@@ -111,8 +140,20 @@ class Mahimahi:
 
         return orig_body
 
+    def updateResponseBody(self, new_body):
+        if self.isChunked():
+            self.deleteHeader('transfer-encoding')
+        
+        zip_type = self.isZipped()
+        new_body_zip = _zipContent(new_body, zip_type) if zip_type else new_body
+        self.http_obj.response.body = new_body_zip
+        self.updateHeader('content-length', str(len(new_body_zip)))
 
+    
+        
     def __eq__(self, other): 
+        if self.getUrl() == other.getUrl():
+            return True
         match_headers = ['content-type', 'content-length']
         for h in match_headers:
             if self.getHeader(h) != other.getHeader(h):

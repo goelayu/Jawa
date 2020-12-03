@@ -31,7 +31,7 @@ class Crawler:
 
     def run(self, url, output, mmpath):
         # cmd='node ../crawlWayBack.dedup.js -u {} -o {} -m record -p {}'.format(url, output, mmpath)
-        cmd='ssh -o StrictHostKeyChecking=no {} bash ./init-crawler.sh {}'.format(self.address, url)
+        cmd='ssh -Y -o StrictHostKeyChecking=no {} bash ./init-crawler.sh {}'.format(self.address, url)
         # cmd='echo job'
         print 'Running', cmd
         l = open(self._log_file,'a')

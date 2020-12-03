@@ -19,7 +19,10 @@ program
     .option('--screenshot', 'capture screenshot')
     .option('--pac-url [value]', 'path to the proxy pac url file')
     .option('--testing', 'debug mode')
+    .option('-c, --custom [value]','fetch custom data')
     .parse(process.argv);
+
+const SERIALIZESTYLES="/home/goelayu/research/webArchive/scripts/serializeWithStyle.js"
 
 async function launch(){
     const options = {
@@ -50,7 +53,7 @@ async function launch(){
 
     //Set global timeout to force kill the browser
     var gTimeoutValue = program.testing ? Number.parseInt(program.timeout)*100 : Number.parseInt(program.timeout) + 20000;
-    console.log('global time out value', gTimeoutValue, program.timeout, program.testing);
+    console.log('global time out value', gTimeoutValue, program.timeout);
     var globalTimer = globalTimeout(browser, cdp, gTimeoutValue);
     await page.goto(program.url,{
         timeout: program.timeout,
@@ -72,6 +75,9 @@ async function launch(){
     await extractPLT(page);
     if (program.screenshot)
         await page.screenshot({path: `${outDir}/screenshot.png`, fullPage: true});
+
+    if (program.custom)
+        await extractDOM(page);
     
     console.log('Site loaded');
     if (!program.testing)
@@ -113,6 +119,14 @@ var initNetHandlers = function(cdp, nLogs){
             nLogs.push({[method]:params})
         })
     })
+}
+
+var extractDOM = async function(page){
+    var inlineStyles = fs.readFileSync(SERIALIZESTYLES, 'utf-8');
+    var evalStyles = await page.evaluateHandle((s) => eval(s),inlineStyles);
+    var domHandler = await page.evaluateHandle(() => document.documentElement.serializeWithStyles());
+    var domString = await domHandler.jsonValue();
+    dump(domString, `${program.output}/DOM1`);
 }
 
 var initConsoleHandlers = function(cdp, cLogs){

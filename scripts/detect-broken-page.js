@@ -9,6 +9,7 @@
 
 program
     .option('-n, --network [network]','path to the network file')
+    .option('--is-archive','true for archive page analysis')
     .option('-l, --log [log]', 'path to the log file')
     .parse(process.argv);
 
@@ -57,17 +58,17 @@ var _checkBrokenNet = function(n){
     var isValidDomain = VALID_DOMAINS.filter(e=> (n.url.indexOf(`http://${e}`)==0 || 
         n.url.indexOf(`https://${e}`)== 0) ).length == 1;
     
-    if (!isValidDomain){
+    if (program.isArchive && !isValidDomain){
         return reasons.CSP
     }
 
     // Now eliminate non page resources
-    if (!isCriticalReq(n)) return false;
+    if (program.isArchive && !isCriticalReq(n)) return false;
     
     if (n.response && Number.parseInt(n.response.status/100)*100 != 200)
         return reasons.NF;
     
-    if (n.size < EMPTY_THRESHOLD )
+    if (program.isArchive && n.size < EMPTY_THRESHOLD )
         return reasons.EMPTY;
 
     return false;
@@ -87,7 +88,8 @@ var ignoreUrl = function(n, net){
         || !VALID_MIMES.filter(e=>type.toLowerCase() == e).length
         || INVALID_URL_DOMAINS.filter(e=>n.url.indexOf(e)>=0).length
         ||  n.url.indexOf('data') == 0
-        || _getQueryParamsLen(n.url) > QUERY_PARAMS_LIMIT;
+        || _getQueryParamsLen(n.url) > QUERY_PARAMS_LIMIT
+        || (type.toLowerCase() != "script" && type.toLowerCase() != "image" &&  n.initiator.type != 'script');
         
 }
 
@@ -99,6 +101,7 @@ var checkBrokenNet = function(data){
             continue;
         var isBroken = _checkBrokenNet(n);
         if (isBroken){
+            console.log(n.url, n.type,  n.initiator.type, isBroken)
             bCount++;
             // console.log(n.url, isBroken, n.request.method, n.type);
         }
