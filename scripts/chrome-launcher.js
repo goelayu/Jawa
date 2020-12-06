@@ -20,6 +20,7 @@ program
     .option('--pac-url [value]', 'path to the proxy pac url file')
     .option('--testing', 'debug mode')
     .option('-c, --custom [value]','fetch custom data')
+    .option('--mhtml', 'capture the mhtml version of the page')
     .parse(process.argv);
 
 const SERIALIZESTYLES="/home/goelayu/research/webArchive/scripts/serializeWithStyle.js"
@@ -79,6 +80,9 @@ async function launch(){
     if (program.custom)
         await extractDOM(page);
     
+    if (program.mhtml)
+        await getMhtml(cdp);
+    
     console.log('Site loaded');
     if (!program.testing)
         browser.close();
@@ -101,6 +105,11 @@ var initCDP = async function(cdp){
     await cdp.send('Network.enable');
     await cdp.send('Runtime.enable');
     await cdp.send('Profiler.enable');
+}
+
+var getMhtml = async function(cdp){
+    var { data } = await cdp.send('Page.captureSnapshot', { format: 'mhtml' });
+    dump(data, `${program.output}/mhtml`);
 }
 
 var initNetHandlers = function(cdp, nLogs){
