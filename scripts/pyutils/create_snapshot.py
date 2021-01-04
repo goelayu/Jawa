@@ -39,8 +39,11 @@ def create_new_body(body):
     # tree = etree.fromstring(body[1:-1])
     # etree.strip_elements(tree, 'script')
     soup = bs(unescaped_body,'lxml')
-    for s in soup(['script']):
-        s.extract()
+    for s in soup(['script','style','link']):
+        if s.name != 'link' or \
+            ('as' in s.attrs and s.attrs['as'] == 'script') or\
+            ('rel' in s.attrs and 'stylesheet' in s.attrs['rel'] ):
+            s.extract()
     return str(soup)
     # cl = Cleaner()
     # cl.scripts = True

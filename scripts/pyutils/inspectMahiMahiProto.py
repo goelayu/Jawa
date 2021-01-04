@@ -63,6 +63,11 @@ def isJS(headers):
 
     return False
 
+def removeHeader(headers, key):
+    for header in headers:
+        if header.key.lower() == key:
+            headers.remove(header)
+
 def isChunked(headers):
     for header in headers:
         if header.key.lower() == "transfer-encoding" and header.value == "chunked":
@@ -76,6 +81,10 @@ def isZipped(headers):
             return header.value
     return False
 
+def createOutputProtoFile(data, file):
+    f = open(file,'w')
+    f.write(data.SerializeToString())
+    f.close()
 
 def getPlainText(msg):
     orig_body = msg.response.body
@@ -112,10 +121,14 @@ def main(args):
             f_orig.close()
 
             reqUrl = http_response_orig.request.first_line.split()[1]
-            # print reqUrl, http_response_orig.request.first_line
+            # print reqUrl, http_response_orig.response
+            print reqUrl, http_response_orig.request.first_line, http_response_orig.response.first_line, file, 
+            # removeHeader(http_response_orig.response.header, 'link')
+            # createOutputProtoFile(http_response_orig, os.path.join(args.modified,file))
+            # print http_response_orig.request.header
             for h in http_response_orig.response.header:
-                if h.key.lower() == 'content-length':
-                    print h.value, len(http_response_orig.response.body)
+                if h.key.lower() == 'content-type':
+                    print h.value
                 # if reqUrl in args.url:
                 #     # body = getPlainText(http_response_orig)
                 #     print len(http_response_orig.response.body)
@@ -130,7 +143,6 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('original', help='path to input directory')
-    parser.add_argument('url',help='url to be matched against')
     # parser.add_argument('modified', help='path to input directory')
     # parser.add_argument('url',help='path to output directory')
     args = parser.parse_args()

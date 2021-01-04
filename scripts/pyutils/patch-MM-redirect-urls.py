@@ -61,6 +61,11 @@ def isChunked(headers,del_header):
             return True
 
     return False
+def getHeaderVal(headers, key):
+    for header in headers:
+        if header.key.lower() == key:
+            return header.value
+    return ""
 
 def isZipped(headers):
     for header in headers:
@@ -270,28 +275,27 @@ def patchHttpData(root, http_orig_data, urlMap, patches, url, allUrls, file):
                     #     except:
                     #         print 'Exception while removing toolbar'
                         # print orig_data_copy
-                    
-                    if "sp" in patches:
-                        if not allUrls:
-                            raise Exception('Missing --allUrls flags with the server push patch')
-                        # try:
-                        urlToLinks = json.loads(open(allUrls,'r').read())
-                        for u in urlToLinks:
-                            if isMatch(curUrl, str(u)):
-                                print "SP: Found match for ", str(u)
-                                insertPreloadHeader(orig_data_copy, urlToLinks[u])
-                                break
+                    # print getHeaderVal(orig_data_copy.response.header, "content-type"), curUrl
+            if "sp" in patches and "html" in getHeaderVal(orig_data_copy.response.header, "content-type") and "30" not in http_orig_data.response.first_line:
+                if not allUrls:
+                    raise Exception('Missing --allUrls flags with the server push patch')
+                # try:
+                urlToLinks = json.loads(open(allUrls,'r').read())
+                for u in urlToLinks:
+                    # print "Comparing {} with {}".format(curUrl, str(u))
+                    if isMatch(curUrl, str(u)):
+                        print "Comparing {} with {}".format(curUrl, str(u))
+                        print "SP: Found match for ", str(u)
+                        insertPreloadHeader(orig_data_copy, urlToLinks[u])
+                        break
                         # except :
                             # print "Exception while inserting link preloads"
                     # try:
                     #     os.mkdir(args.output)
                     # except OSError as e:
                     #     pass
-                    dst_f = os.path.join(args.output,file)
-                    createOutputFile(orig_data_copy, dst_f)
-                else:
-                    dst_f = os.path.join(args.output,file)
-                    createOutputFile(http_orig_data, dst_f)
+            dst_f = os.path.join(args.output,file)
+            createOutputFile(orig_data_copy, dst_f)
 
             # if "toolbar" in patches:
             #     # print curUrl, http_orig_data.response.first_line

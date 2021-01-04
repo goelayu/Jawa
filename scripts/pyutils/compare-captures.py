@@ -62,10 +62,13 @@ def _compare(srcFile, dstObjs):
     potentialDsts = [d for d in dstObjs if fileName(d.getUrl()) == fileName(srcFile.getUrl())]
     for d in potentialDsts:
         logging.debug('Comparing srcFile {} with dstFile {}'.format(srcFile.getUrl(), d.getUrl()))
-        if srcFile == d:
-            logging.info('{} matched with {} with type {} {}'.format(srcFile.getUrl(), d.getUrl(), \
-                getType(srcFile.getHeader('content-type'), srcFile), len(srcFile.getBody()) ))
-            return True
+        try:
+            if srcFile == d:
+                logging.info('{} matched with {} with type {} {}'.format(srcFile.getUrl(), d.getUrl(), \
+                    getType(srcFile.getHeader('content-type'), srcFile), len(srcFile.getBody()) ))
+                return True
+        except:
+            return False
 
     return False
 
@@ -99,6 +102,14 @@ def getType(longType, file):
 #     t.extractall()
 #     return t
 
+def dump_log(log_data):
+    _s = getTotalSize
+    str = 'Total: {}, Dedup: {} '.format(_s(log_data['all_files']), _s(log_data['dedup_files']))
+    for k in log_data['type_to_files_all']:
+        str = str + ',{} : {} '.format(k, _s(log_data['type_to_files_all'][k]))
+        str = str + ',{}_dedup : {} '.format(k, _s(log_data['type_to_files_dedup'][k]))
+    logging.info(str)
+
 def compare(args):
     # src_idx_count = 0
     # src_dir = getSourceDir(args.directory, src_idx_count)
@@ -111,7 +122,8 @@ def compare(args):
     # dedup_files = copy.deepcopy(src_files)
     all_files = []
     dedup_files = []
-    type_to_files = {'javascript':[], 'html':[], 'image':[], 'css':[], None:[]}
+    type_to_files_dedup = {'javascript':[], 'html':[], 'image':[], 'css':[], None:[], 'font':[]}
+    type_to_files_all = {'javascript':[], 'html':[], 'image':[], 'css':[], None:[], 'font':[]}
     # logging.info('DedupRatio: {}'.format(getDedupRatio(all_files, dedup_files)))
     for root, folder, files in os.walk(args.directory):
         # if root == src_dir:
@@ -135,9 +147,12 @@ def compare(args):
                 match and matches.append(file)
                 if not match:
                     unmatches.append(file)
-                    type_to_files[type].append(file)
-            dedup_files.extend(unmatches)   
-            logging.info('Status: {} {} {} {}'.format(len(dedup_files), len(type_to_files['javascript']), getTotalSize(dedup_files), getTotalSize(type_to_files['javascript'])))
+                    type_to_files_dedup[type].append(file)
+                type_to_files_all[type].append(file)
+            dedup_files.extend(unmatches) 
+            dump_log({'all_files':all_files, 'dedup_files':dedup_files, 'type_to_files_dedup': type_to_files_dedup, 'type_to_files_all':type_to_files_all})  
+            # logging.info('Status: {} {} {} {} {}'.format(len(dedup_files), len(type_to_files['javascript']), \
+            #     getTotalSize(all_files), getTotalSize(dedup_files), getTotalSize(type_to_files['javascript'])))
 
 
 def init_logger():
