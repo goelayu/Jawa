@@ -21,15 +21,17 @@ program
     .option('--testing', 'debug mode')
     .option('-c, --custom [value]','fetch custom data')
     .option('--mhtml', 'capture the mhtml version of the page')
+    .option('--memory','get the total memory footprint of the JS heap')
     .parse(process.argv);
 
-const SERIALIZESTYLES="/home/goelayu/research/webArchive/scripts/serializeWithStyle.js"
+const SERIALIZESTYLES="/home/goelayu/research/webArchive/scripts/chrome-ctx-scripts/serializeWithStyle.js"
+const HANDLERS="/home/goelayu/research/webArchive/scripts/chrome-ctx-scripts/fetch-listeners.js"
 
 async function launch(){
     const options = {
         executablePath: "/usr/bin/google-chrome",
-        headless: program.testing? false : true,
-        args : [ '--ignore-certificate-errors']
+        headless: program.testing ? false : true,
+        args : [ '--ignore-certificate-errors'/*, '--blink-settings=scriptEnabled=false'*/, '--auto-open-devtools-for-tabs']
         // '--no-first-run'],
         // ignoreDefaultArgs: true,
     }
@@ -73,15 +75,26 @@ async function launch(){
         dump(prof.profile, `${outDir}/jsProfile`);
     }
 
-    await extractPLT(page);
+    // await extractPLT(page);
     if (program.screenshot)
         await page.screenshot({path: `${outDir}/screenshot.png`, fullPage: true});
 
-    if (program.custom)
-        await extractDOM(page);
+    if (program.custom){
+        let cstmEntries =  program.custom.split(',');
+        for (var c of cstmEntries){
+            switch (c) {
+                 case 'Handlers': await extractHandlers(page,cdp); break;
+                 case 'DOM' : await extractDOM(page); break; 
+            }
+        }
+    }
+        // await extractDOM(page);
     
     if (program.mhtml)
         await getMhtml(cdp);
+
+    if (program.memory)
+        await getMemory(page);
     
     console.log('Site loaded');
     if (!program.testing)
@@ -107,6 +120,12 @@ var initCDP = async function(cdp){
     await cdp.send('Profiler.enable');
 }
 
+var getMemory = async function(page){
+    var _mem = await page.evaluateHandle(() => performance.memory.usedJSHeapSize);
+    var mem = await _mem.jsonValue();
+    dump(mem, `${program.output}/memory`)
+}
+
 var getMhtml = async function(cdp){
     var { data } = await cdp.send('Page.captureSnapshot', { format: 'mhtml' });
     dump(data, `${program.output}/mhtml`);
@@ -128,6 +147,15 @@ var initNetHandlers = function(cdp, nLogs){
             nLogs.push({[method]:params})
         })
     })
+}
+
+var extractHandlers = async function(page,cdp){
+    console.log('extracting handlers')
+    var handlerCode = fs.readFileSync(HANDLERS, 'utf-8');
+    await cdp.send('Runtime.evaluate',{expression:handlerCode, includeCommandLineAPI:true})
+    var _handlers = await page.evaluateHandle(()=> archive_listeners);
+    var handlers = await _handlers.jsonValue();
+    dump(handlers, `${program.output}/handlers`);
 }
 
 var extractDOM = async function(page){
