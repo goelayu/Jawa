@@ -1,4 +1,6 @@
 *
+!dom-distill/
+!dom-distill/*/
 !scripts/
 !scripts/*/
 !parser/
