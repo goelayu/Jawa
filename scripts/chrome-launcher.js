@@ -25,6 +25,7 @@ program
     .parse(process.argv);
 
 const SERIALIZESTYLES="/home/goelayu/research/webArchive/scripts/chrome-ctx-scripts/serializeWithStyle.js"
+const DISTILLDOM="/home/goelayu/research/webArchive/dom-distill/lib/domdistiller.js"
 const HANDLERS="/home/goelayu/research/webArchive/scripts/chrome-ctx-scripts/fetch-listeners.js"
 
 async function launch(){
@@ -85,6 +86,7 @@ async function launch(){
             switch (c) {
                  case 'Handlers': await extractHandlers(page,cdp); break;
                  case 'DOM' : await extractDOM(page); break; 
+                 case 'Distill' : await distillDOM(page); break;
             }
         }
     }
@@ -147,6 +149,15 @@ var initNetHandlers = function(cdp, nLogs){
             nLogs.push({[method]:params})
         })
     })
+}
+
+var distillDOM = async function(page){
+    var distillCode = fs.readFileSync(DISTILLDOM,'utf-8');
+    var runCmd=`var __distill_res__ = org.chromium.distiller.DomDistiller.apply();`
+    var evalDC = await page.evaluateHandle((s) => eval(s), distillCode + runCmd);
+    var _dcRes = await page.evaluateHandle(()=> org.chromium.distiller.DomDistiller.apply())
+    var dcRes = await _dcRes.jsonValue();
+    dump(dcRes, `${program.output}/distill_dom`);
 }
 
 var extractHandlers = async function(page,cdp){
