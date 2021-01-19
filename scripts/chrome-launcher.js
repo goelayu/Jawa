@@ -155,8 +155,9 @@ var distillDOM = async function(page){
     var distillCode = fs.readFileSync(DISTILLDOM,'utf-8');
     var runCmd=`var __distill_res__ = org.chromium.distiller.DomDistiller.apply();`
     var evalDC = await page.evaluateHandle((s) => eval(s), distillCode + runCmd);
-    var _dcRes = await page.evaluateHandle(()=> org.chromium.distiller.DomDistiller.apply())
-    var dcRes = await _dcRes.jsonValue();
+    var _dcResFull = await page.evaluateHandle(()=> org.chromium.distiller.DomDistiller.apply())
+    var _dcResTrim = await page.evaluateHandle((s) => window.finalResult = {2:s[2], 10:s[10]},_dcResFull);
+    var dcRes = await _dcResTrim.jsonValue();
     dump(dcRes, `${program.output}/distill_dom`);
 }
 
