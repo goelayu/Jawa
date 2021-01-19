@@ -133,16 +133,16 @@ var getSizePerType = function(data){
     var type2size = {};
     for (var n of net){
         if (!n.type || !n.size
-            || !isCriticalReq(n)) continue;
+            /*|| !isCriticalReq(n)*/) continue;
 
         if (!(n.type in type2size))
             type2size[n.type] = 0;
         type2size[n.type] += n.size;
     };
     var totalSize = Object.values(type2size).reduce((acc,cur)=>{return acc + cur;},0);
-    // Object.keys(type2size).forEach((t)=>{
-    //     console.log(`${t} ${type2size[t]/totalSize}`);
-    // });
+    Object.keys(type2size).forEach((t)=>{
+        (t == 'Script') && console.log(`${t} ${type2size[t]/totalSize}`);
+    });
     return type2size;
 }
 
@@ -284,11 +284,12 @@ var ignoreUrl = function(n, net){
 
 var getResOnPage = function(data){
     var net = netParser.parseNetworkLogs(parse(data)),
-        total = 0;
+        total = 0, size=0;
     var urlSeen = [], typePrefix = ["js_","im_","cs_","if_"];
     for (var n of net){
-        if (ignoreUrl(n, net))
+        if (ignoreUrl(n, net)){
             continue;
+        }
         if (program.siteType == "archive"){
             if (!isCriticalReq(n))
                 continue;
@@ -302,17 +303,18 @@ var getResOnPage = function(data){
         }
 
         if (n.response && n.response.status == 200){
-            console.log(n.url, n.type)
+            // console.log(n.url, n.type)
+            var encoding = n.response.headers['Content-Encoding'];
             total++;
+            size+= encoding ? n.size : n.size/3;
             // else if(program.siteType != "live"){
             //     console.log(n.url)
             //     total++;
             // }
         }
     }
-    console.log(total);
+    console.log(size);
 }
-console.log(program.input)
 
 switch (program.type){
     case "prune": pruneDB(parse(program.input)); break

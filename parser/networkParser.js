@@ -85,9 +85,9 @@ function parseNetworkLogs(netLog){
                 var timing = payLoad.response.timing;
                 var prevReq = getPreviousReq(netObject);
                 prevReq.responseTime = payLoad.timestamp;
-                prevReq.requestStart = timing.requestTime;
-                prevReq.requestCS = timing.sslEnd == -1 ? 0 : timing.sslEnd/1000
-                prevReq.requestFetch = prevReq.requestStart + timing.sendStart/1000;  
+                prevReq.requestStart = timing? timing.requestTime:0
+                prevReq.requestCS = timing ? timing.sslEnd == -1 ? 0 : timing.sslEnd/1000 : 0;
+                prevReq.requestFetch = prevReq.requestStart + timing ? timing.sendStart/1000 : 0;  
                 prevReq.timing = timing;          
                 netObject.protocol = payLoad.response.protocol;
                 netObject.response = payLoad.response;

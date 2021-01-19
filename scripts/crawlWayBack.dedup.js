@@ -25,7 +25,7 @@ program
 
 
 const WAYBACK_CDX="https://web.archive.org/cdx/search/cdx",
-    CHROME_LOADER="/home/goelayu/research/webArchive/scripts/chrome-launcher.js",
+    CHROME_LOADER="/home/goelayu/webArchive/scripts/chrome-launcher.js",
     CHROME_LOADER_OLD="/home/goelayu/research/webArchive/scripts/inspectChrome.js"
     mmwebreplay="mm-webreplay",
     mmwebrecord="mm-webrecord",
@@ -49,9 +49,10 @@ var parseFlags = function(f){
 var sanitizeUrlToDir = function(url){
     if (url[url.length - 1] == "/")
         url = url.slice(0,-1);
-    return url.replace(/https?:\/\//,'').replace(/\//g,'_').replace(/\&/g,'-');
-    // var surl = url.split('www')[1].replace('/','_');
-    // return `www${surl}`;
+    let _url = url.replace(/https?:\/\//,'').replace(/\//g,'_').replace(/\&/g,'-');
+    if (_url.length > 150)
+        return _url.slice(0,150) + (Math.random() * 1000);
+    return _url;
 }
 
 var getRSPID = function(path, grp){
@@ -92,22 +93,24 @@ var loadChrome = async function(wUrl,ts, url){
     }, chromeCMD = '';
     var mahimahipath, replayServer,
     port = 9222 + Math.round(Math.random()*9222);
-    var pathSuffix = `${sn(url)}/${ts}/`;
+    var sanUrl = sn(url);
+    var pathSuffix = `${sanUrl}/${ts}/`;
     var outputDir = `${program.output}/${pathSuffix}`;
     // fs.ensureDirSync(outputDir,{recursive:true});
     switch(program.mahimahi){
         case 'record':
-            var pathSuffix = `${program.url}/${sn(url)}/${ts}/`;
+            var pathSuffix = `${program.url}/${sanUrl}/${ts}/`;
             var outputDir = `${program.output}/${pathSuffix}`;
             console.log('making directory', outputDir)
             fs.ensureDirSync(outputDir,{recursive:true});
             program.path && (mahimahipath = `${path.resolve(program.path)}/${pathSuffix}`);
-            fs.ensureDirSync(`${path.resolve(program.path)}/${program.url}/${sn(url)}`);
+            fs.ensureDirSync(`${path.resolve(program.path)}/${program.url}/${sanUrl}`);
             chromeCMD += `${mahimahiConf[program.mahimahi]} ${mahimahipath} `;
             break;
         case 'replay':
-            var outputDir = `${program.output}/${sanitizeUrlToDir(url)}/${ts}/`
-            var mahimahipath = `${program.path}/${sn(url)}//`
+            var pathSuffix = `${program.url}/${sanUrl}/${ts}/`;
+            var outputDir = `${program.output}/${pathSuffix}`;
+            program.path && (mahimahipath = `${path.resolve(program.path)}/${pathSuffix}`);
             console.log('making directory', outputDir)
             fs.ensureDirSync(outputDir,{recursive:true});
             // Start the nginx server separately
@@ -139,11 +142,11 @@ var loadChrome = async function(wUrl,ts, url){
             spawnSync('sudo pkill dnsmasq',{shell:true});
             return;
         }
-        chromeCMD = `mm-delay ${WAYBACK_SERVER_RTT/2} ` + chromeCMD;
+        // chromeCMD = `mm-delay ${WAYBACK_SERVER_RTT/2} ` + chromeCMD;
     }
 
     // chromeCMD += `node ${CHROME_LOADER_OLD} -u ${wUrl} -l -o ${outputDir} -n --log --mode std -p ${port} --chrome-conf ../chromeConfigs/debug ` + (program.chromeFlags ? parseFlags(program.chromeFlags) : "")
-    chromeCMD += `node ${CHROME_LOADER} -u '${wUrl}' -l -o '${outputDir}' -n --timeout 200000 --screenshot`;
+    chromeCMD += `node ${CHROME_LOADER} -u '${wUrl}' -l -o '${outputDir}' -n --timeout 200000 --screenshot --mhtml`;
     console.log(chromeCMD);
     var chromeps = spawnSync(chromeCMD,{shell:true});
 

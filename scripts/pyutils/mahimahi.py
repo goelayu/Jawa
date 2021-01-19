@@ -8,6 +8,8 @@ import zlib
 import re
 import hashlib
 import subprocess
+import os
+import difflib
 
 def _zipContent(body, zip_type):
         TEMP_FILE_I='tmp_i'
@@ -33,6 +35,7 @@ class Mahimahi:
         f = open(file,'rb').read() 
         self.http_obj.ParseFromString(f)
         self._src = file
+        self._plainText = self.getPlainText()
 
     def unchunk(self,body):
         new_body = ""
@@ -101,7 +104,7 @@ class Mahimahi:
         return self.http_obj.request.first_line.split()[1]
 
     def getSrcHash(self):
-        msg = self.getPlainText()
+        msg = self._plainText
         m = hashlib.sha256()
         m.update(msg)
         return m.digest()
@@ -148,6 +151,42 @@ class Mahimahi:
         new_body_zip = _zipContent(new_body, zip_type) if zip_type else new_body
         self.http_obj.response.body = new_body_zip
         self.updateHeader('content-length', str(len(new_body_zip)))
+
+    def getDiffSize(self, dst):
+        TEMP_FILE = str(os.getpid())
+
+        srcMesg = self._plainText
+        dstMesg = dst._plainText
+
+        with open(TEMP_FILE+'_src','w') as f:
+            f.write(srcMesg)
+
+        with open(TEMP_FILE+'_dst','w') as f:
+            f.write(dstMesg)
+
+
+
+        diffCmd = 'diff {} {}'.format(TEMP_FILE+'_src', TEMP_FILE+'_dst')
+        diffOut = subprocess.Popen(diffCmd, shell=True, stdout=subprocess.PIPE)
+        diffStr = diffOut.stdout.read()
+
+        return len(diffStr)
+
+    def getDiffSize_inmem(self, dst, logger):
+        # TEMP_FILE = str(os.getpid())
+
+        logger.info('splitting input data')
+        srcMesg = self._plainText.splitlines()
+        dstMesg = dst._plainText.splitlines()
+
+        logger.info('Compute diff between data')
+        diff = difflib.ndiff(srcMesg, dstMesg)
+        logger.info('Compute precise delta')        
+        # delta = ''.join(x for x in diff if x.startswith('- ') or x.startswith('+ '))
+        delta = ''.join(diff)
+        logger.info('Done')   
+        return len(delta)
+
 
     
         

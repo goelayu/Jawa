@@ -40,7 +40,7 @@ replay(){
 	echo "Launching chrome"
 	cmd=""
 	if [[ $5 == *"replay"* ]]; then
-		cmd="mm-webreplay $1"
+		cmd="$mmwebreplay $1"
 		echo "REPLAY MODE"
 	elif [[ $5 == "nginx" ]]; then
 		echo "NGINX replay mode"
@@ -57,7 +57,7 @@ replay(){
 	port=`shuf -i 9600-9900 -n 1`
 	echo "Running on port" $port
 	echo "$cmd node chrome-launcher.js -u $2 -l -o $3 -n --timeout 30000 --screenshot $DATAFLAGS"
-    $cmd node chrome-launcher.js -u $2 -l -o $3 -n --timeout 60000 --screenshot $DATAFLAGS
+    $cmd node chrome-launcher.js -u $2 -l -o $3 -n --timeout 60000 $DATAFLAGS
 	# $cmd node inspectChrome.js -u $2 -o $3 -p $port --mode std -l --chrome-conf $6 $DATAFLAGS
     # sleep 4
 	replay_pid=$!
@@ -118,8 +118,10 @@ while read url; do
 	else 
 		new_url=`echo $url | cut -d/ -f6`
 		echo 'new url is ' $new_url
-		mmpath=$1/${new_url}
-		out=$2/${new_url}
+		ts=`echo $url | cut -d/ -f5`
+		# mmpath=$1/${new_url}
+		mmpath=$1
+		out=$2
 	fi
 	toolmode=$3
 	conf=./chromeConfigs/$4
