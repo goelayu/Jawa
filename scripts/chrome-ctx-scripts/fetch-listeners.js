@@ -4,8 +4,11 @@
  */
 
 var getElemId = function(elem){
-    return elem.nodeName + (elem.id ? `#${elem.id}` : '') +
+    var id =  elem.nodeName + (elem.id ? `#${elem.id}` : '') +
      (elem.className ? `.${elem.className}` :'');
+    if (elem.nodeName == 'A')
+        id += `#href:${elem.href}`;
+    return id;
 }
 
 /**
