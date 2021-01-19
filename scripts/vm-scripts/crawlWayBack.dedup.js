@@ -146,7 +146,7 @@ var loadChrome = async function(wUrl,ts, url){
     }
 
     // chromeCMD += `node ${CHROME_LOADER_OLD} -u ${wUrl} -l -o ${outputDir} -n --log --mode std -p ${port} --chrome-conf ../chromeConfigs/debug ` + (program.chromeFlags ? parseFlags(program.chromeFlags) : "")
-    chromeCMD += `node ${CHROME_LOADER} -u '${wUrl}' -l -o '${outputDir}' -n --timeout 200000 --screenshot --mhtml -j --memory`;
+    chromeCMD += `node ${CHROME_LOADER} -u '${wUrl}' -l -o '${outputDir}' -n --timeout 200000 --screenshot --mhtml -j --memory -c`;
     console.log(chromeCMD);
     var chromeps = spawnSync(chromeCMD,{shell:true});
 
