@@ -43,4 +43,49 @@ var archive_listeners = (function listAllEventListeners() {
     return listeners;
   })();
   
+  var verbose_listeners = (function listAllEventListeners() {
+    let listeners = [], pl = processListeners;
+    const allElements = document.querySelectorAll('*');
+    const types = [];
+  
+    for (let i = 0; i < allElements.length; i++) {
+      const currentElement = allElements[i];
+      var eventListeners = getEventListeners(currentElement);
+      Object.keys(eventListeners).length != 0 &&
+      (listeners.push([currentElement, eventListeners]))
+  
+    }
+    return listeners;
+  })();
+
+function isHidden(elem){
+    try {
+        var rect = elem.getBoundingClientRect()
+        return elem.style.display == 'none'
+            || elem.style.visibility == 'hidden'
+            || rect.left >= window.innerWidth 
+            || rect.right <= 0
+            || rect.top >= window.innerHeight 
+            || rect.bottom <= 0
+    } catch (e) {
+        return true;
+    }
+}
+
+function getClickableElements(listeners){
+    var elems = [];
+    listeners.forEach((l)=>{
+        var [el, handler] = l;
+        if (el.click && Object.keys(handler).indexOf('click')>=0
+            && el.nodeName != "A" && !isHidden(el))
+            elems.push(el);
+    });
+    return elems;
+}
+
+var elems = getClickableElements(verbose_listeners);
+elems.forEach((e)=>{
+    e.click();
+});
+
   

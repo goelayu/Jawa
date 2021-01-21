@@ -22,6 +22,7 @@ program
     .option('-c, --custom [value]','fetch custom data')
     .option('--mhtml', 'capture the mhtml version of the page')
     .option('--memory','get the total memory footprint of the JS heap')
+    .option('--coverage', 'get the js coverage information')
     .parse(process.argv);
 
 const SERIALIZESTYLES="/home/goelayu/research/webArchive/scripts/chrome-ctx-scripts/serializeWithStyle.js"
@@ -55,6 +56,9 @@ async function launch(){
         await cdp.send('Profiler.start');
     }
 
+    if (program.coverage)
+        await page.coverage.startJSCoverage();
+
     //Set global timeout to force kill the browser
     var gTimeoutValue = program.testing ? Number.parseInt(program.timeout)*100 : Number.parseInt(program.timeout) + 20000;
     console.log('global time out value', gTimeoutValue, program.timeout);
@@ -64,6 +68,16 @@ async function launch(){
     }).catch(err => {
         console.log('Timer fired before page could be loaded')
     })
+
+    if (program.coverage){
+        await getCoverage(page, 'preload');
+        await page.coverage.startJSCoverage();
+        await extractHandlers(page,cdp); 
+        await getCoverage(page, 'postLoad');
+    }
+
+
+    // await autoScroll(page);
 
     if (program.network){
         dump(nLogs, `${outDir}/network`);
@@ -107,6 +121,25 @@ async function launch(){
         clearTimeout(globalTimer);
 }
 
+async function autoScroll(page){
+    await page.evaluate(async () => {
+        await new Promise((resolve, reject) => {
+            var totalHeight = 0;
+            var distance = 500;
+            var timer = setInterval(() => {
+                var scrollHeight = document.body.scrollHeight;
+                window.scrollBy(0, distance);
+                totalHeight += distance;
+
+                if(totalHeight >= scrollHeight){
+                    clearInterval(timer);
+                    resolve();
+                }
+            }, 200);
+        });
+    });
+}
+
 var globalTimeout = function(browser,cdp, timeout){
     return setTimeout(function(){
         console.log('Site navigation did not time out. Force KILL.');
@@ -120,6 +153,24 @@ var initCDP = async function(cdp){
     await cdp.send('Network.enable');
     await cdp.send('Runtime.enable');
     await cdp.send('Profiler.enable');
+}
+
+var getCoverage = async function(page, f){
+    var jsCoverage = await page.coverage.stopJSCoverage();
+    let totalBytes = 0;
+    let usedBytes = 0;
+    for (const entry of jsCoverage) {
+
+        if (entry.url.indexOf('.js') > 0) {
+            totalBytes += entry.text.length;
+            let singleUsedBytes = 0
+            for (const range of entry.ranges) {
+                usedBytes += range.end - range.start - 1;
+                singleUsedBytes += range.end - range.start - 1;
+            }
+        }
+    }
+    dump({used:usedBytes, total: totalBytes},`${program.output}/coverage_${f}`);
 }
 
 var getMemory = async function(page){

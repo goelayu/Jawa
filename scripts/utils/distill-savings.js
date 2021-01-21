@@ -17,7 +17,8 @@ const fs = require('fs'),
     netParser = require('parser/networkParser');
 const { exception } = require('console');
 
-
+const INVALID_URL_DOMAINS = ["google","analytics","pubmatic","doubleclick","adsrvr","googletag", "archiveteam", "ping-meta-prd.jwpltx.com","prd.jwpltx.com","eproof.drudgereport.com","idsync.rlcdn.com","cdn.filestackcontent.com","connect.facebook.net","e.cdnwidget.com","nr-events.taboola.com","pixel.quantserve.com","pixel.wp.com","res.akamaized.net","sync.adkernel.com","certify.alexametrics.com","pixel.adsafeprotected.com","px.ads.linkedin.com","s.w-x.co","bat.bing.com","beacon.krxd.net","googleads.g.doubleclick.net","metrics.brightcove.com","ping.chartbeat.net","www.google-analytics.com","trc-events.taboola.com","px.moatads.com","www.facebook.com","sb.scorecardresearch.com","nexus.ensighten.com","odb.outbrain.com"];
+const TRACKER_IMAGE_SIZE = 1000; //1000 BYTES
 program
     .option('-d, --distilled-dom [input]', 'path to the input file')
     .option('-n, --network [input]', 'path to network file')
@@ -49,8 +50,13 @@ var validDistillation = function (res) {
      * If article isn't greater than threshold length then invalid distillation
      */
     const MINLENGTH = 50;
+    program.verbose && console.log(`article content length: ${res[2][1].length}`)
     return res[2][1].length > MINLENGTH;
 }
+
+var _getQueryParamsLen = function(url){
+    return url.split('&').length
+}  
 
 var extractImageUrls = function (res) {
     /**
@@ -67,7 +73,10 @@ var getImageSizes = function (netData) {
     var imageSizes = {};
     for (var n of net) {
         if (!n.type || !n.size ||
-            n.type != 'Image') continue;
+            n.type != 'Image' || 
+        _getQueryParamsLen(n.url)>10 ||
+        INVALID_URL_DOMAINS.filter(e=>n.url.toLowerCase().indexOf(e.toLowerCase())>=0).length ||
+        n.size < TRACKER_IMAGE_SIZE) continue;
 
         imageSizes[n.url] = n.size;
     }
@@ -76,11 +85,19 @@ var getImageSizes = function (netData) {
 
 var calcSavings = function (mainImgs, imageSizes) {
     var mainImageSize = totalImageSize = 0;
+    // var images = Object.keys(imageSizes);
     mainImgs.forEach((img) => {
         if (!(img in imageSizes)) return;
         mainImageSize += imageSizes[img];
+    //     var matchImg = null;
+    //     images.forEach((i,)=>{
+    //         if (i.indexOf(img)>=0)
+    //             matchImg = i;
+    //     })
+    //     if (!matchImg) return;
+    //     mainImageSize += imageSizes[matchImg];
     });
-
+    !mainImageSize && mainImgs.length && console.error(`image size is zero and number of images is non zero`);
     totalImageSize = Object.values(imageSizes).reduce((acc, cur) => { return acc + cur; }, 0);
     console.log(mainImageSize, totalImageSize);
 }
