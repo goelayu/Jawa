@@ -72,6 +72,44 @@ function isHidden(elem){
     }
 }
 
+var all_handlers = ["abort", "blur", "change", "click", "close", "contextmenu", "dblclick", "focus",
+    "input", "keydown", "keypress", "keyup", "mouseenter", "mousedown", "mouseleave", "mousemove", "mouseout",
+    "mouseover", "mouseup", "reset", "resize", "scroll", "select", "submit" ];
+
+var IGNORE_ELEMENTS = ['SCRIPT', 'IFRAME', 'BODY','LINK','IMG'
+    ,'INPUT','FORM','A','HTML']
+
+function _triggerEvent(el, evt){
+    var event = new Event(evt);
+    el.dispatchEvent && el.dispatchEvent(event);
+}
+
+function triggerEvents(elems){
+    elems.forEach((_e)=>{
+        var [elem, handlers] = _e;
+        handlers.forEach((h)=>{
+            _triggerEvent(elem, h);
+        })
+    })
+}
+
+function getCandidateElements(listeners){
+    var elems = []; // each entry is a two-tupe [1st,2nd] where 1st is element, and 2nd is list of events
+    listeners.forEach((l)=>{
+        var [el, handler] = l;
+        if (IGNORE_ELEMENTS.filter(e=>el.nodeName == e).length == 0){
+            var e = [el, []];
+            Object.keys(handler).forEach((h)=>{
+                if (all_handlers.indexOf(h)>=0)
+                    e[1].push(h);
+            });
+            if (!e[1].length) return;
+            elems.push(e);
+        }
+    })
+    return elems;
+}
+
 function getClickableElements(listeners){
     var elems = [];
     listeners.forEach((l)=>{
@@ -83,9 +121,11 @@ function getClickableElements(listeners){
     return elems;
 }
 
-var elems = getClickableElements(verbose_listeners);
-elems.forEach((e)=>{
-    e.click();
-});
+var elems = getCandidateElements(verbose_listeners);
+triggerEvents(elems);
+// var elems = getClickableElements(verbose_listeners);
+// elems.forEach((e)=>{
+//     e.click();
+// });
 
   
