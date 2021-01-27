@@ -9,11 +9,13 @@
 
 const fs = require('fs'),
     program = require('commander'),
-    idExtractor = require('./fn-ids.js');
+    idExtractor = require('./fn-ids.js')
+    cgPatcher = require('./patch-fg-cg');
 
 program 
     .option('--src [src]', 'input source file')
     .option('--cfg [cfg]', 'static cfg')
+    .option('--fg [fg]','static flow graph')
     .parse(process.argv);
 
 var parseCFG = function(strCfg){
@@ -97,12 +99,16 @@ var patchCFG = function(cfg, fnIds){
 
 function main(){
     var staticCfg = parse(program.cfg),
-        source = parse(program.src);
+        source = parse(program.src),
+        staticFg = parse(program.fg);
 
     var fnIds = idExtractor.parse(source);
     var parsedCfg = parseCFG(staticCfg);
-
-    patchCFG(parsedCfg, fnIds);
+    var parsedFg = parseCFG(staticFg);
+    console.log(parsedCfg);
+    cgPatcher.findMissingCallees(parsedCfg, parsedFg);
+    console.log(parsedCfg);
+    // patchCFG(parsedCfg, fnIds);
 }
 
 main();

@@ -1,0 +1,3 @@
+[submodule "program_analysis/analyzers/javascript-call-graph"]
+	path = program_analysis/analyzers/javascript-call-graph
+	url = https://github.com/goelayu/javascript-call-graph.git
