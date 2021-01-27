@@ -105,9 +105,8 @@ function main(){
     var fnIds = idExtractor.parse(source);
     var parsedCfg = parseCFG(staticCfg);
     var parsedFg = parseCFG(staticFg);
-    console.log(parsedCfg);
     cgPatcher.findMissingCallees(parsedCfg, parsedFg);
-    console.log(parsedCfg);
+
     // patchCFG(parsedCfg, fnIds);
 }
 

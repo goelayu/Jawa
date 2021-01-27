@@ -7,9 +7,9 @@ const falafel = require('falafel'),
     fs = require('fs'),
     program = require('commander');
 
-// program
-//     .option('-i, --input [input]','path to the input file')
-//     .parse(process.argv);
+program
+    .option('-i, --input [input]','path to the input file')
+    .parse(process.argv);
 
 var makeId = function(path, node){
     var loc = node.loc;
@@ -28,7 +28,7 @@ var parse = function(src){
         ranges: true
     }, function(node){
         if (node.type == 'FunctionDeclaration' || node.type == 'FunctionExpression'){
-            // console.log(makeId('test', node));
+            console.log(makeId('test', node));
             fnIds.push(makeId('test', node));
         }
     });
@@ -40,7 +40,7 @@ function main(){
     parse(input);
 }
 
-// main();
+main();
 
 module.exports = {
     parse: parse
