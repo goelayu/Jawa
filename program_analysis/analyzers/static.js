@@ -20,7 +20,7 @@ var makeId = function(path, node){
 
 function instrument(src, options){
     var filename = options.filename;
-
+    var rewrite = options.rewrite;
     /**
      * Construct AST from the source string
      */
@@ -31,11 +31,8 @@ function instrument(src, options){
     try {
         ASTNodes.forEach((node)=>{
             if (node.type == 'FunctionDeclaration' || node.type == 'FunctionExpression'){
-                node.body.update(`
-                    {//inserting comment\n
-                    ${node.source()}\n
-                    } 
-                `)
+                var nodeBody = node.body.source().substring(1, node.body.source().length-1);
+                node.body.update(`{\n//fn inside file: ${filename}\n${nodeBody}}`)
             }
         });
     } catch (e) {

@@ -29,18 +29,22 @@ def parse_dir(dir):
                 pass
     return objs
 def filename(url):
-    return url.split('/')[-1]
+    return url.replace('/','_');
 
-def dump_file_contents(file):
+def dump_file_contents(file,name):
     src = file._plainText
-    output_file = '{}/{}'.format(TEMP_FILE_DIR,filename(file.getUrl()))
+    output_file = '{}/{}'.format(TEMP_FILE_DIR,filename(name))
     open(output_file,'w').write(src)
 
 def extract_imp_files(all_files, imp_file_names):
+    # print 'imp files', imp_file_names
     for a in all_files:
+        # print 'checking for', a.getUrl()
         for i in imp_file_names:
-            if a.getUrl() in i:
-                dump_file_contents(a)
+            if i in a.getUrl():
+                print 'found file', i
+                dump_file_contents(a,i)
+                break
 
 def init_logger():
     log_level = getattr(logging, os.environ.get('LOGLEVEL') or 'INFO')
