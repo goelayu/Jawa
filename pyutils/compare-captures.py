@@ -72,8 +72,31 @@ def _compare(srcFile, dstObjs):
 
     return False
 
+def getTotalDiffSize(files):
+    total = 0
+    count=0
+    for f in files:
+        count += 1
+        origLen = len(f._plainText)
+        shortestDiff = len(f._plainText)
+        logging.info('Starting {} out of {} with name {}'.format(count, len(files), f.getUrl()))
+        dcount = 0
+        potentialDsts = [d for d in files if fileName(d.getUrl()) == fileName(f.getUrl())]
+        for d in potentialDsts:
+            logging.info('comparing against {}'.format(dcount))
+            dcount += 1
+            if f != d:
+                diffLen = f.getDiffSize(d)
+                shortestDiff = diffLen if shortestDiff > diffLen else shortestDiff
+
+        total += shortestDiff
+        logging.info('{} out of {} done'.format(count, len(files)))
+    return total
+
+
 def getTotalSize(files):
-    sizes = [len(i.getBody()) for i in files]
+    sizes = [len(i._plainText) for i in files]
+    # sizes = [len(i.getBody()) for i in files]
     return sum(sizes)
 
 def getDedupRatio(origFiles, matchedFiles):
@@ -97,17 +120,15 @@ def getType(longType, file):
         if t in longType:
             return t
 
-# def uncompress(dir):
-#     t = tarfile.open(dir)
-#     t.extractall()
-#     return t
 
 def dump_log(log_data):
     _s = getTotalSize
+    _d = getTotalDiffSize
     str = 'Total: {}, Dedup: {} '.format(_s(log_data['all_files']), _s(log_data['dedup_files']))
     for k in log_data['type_to_files_all']:
         str = str + ',{} : {} '.format(k, _s(log_data['type_to_files_all'][k]))
         str = str + ',{}_dedup : {} '.format(k, _s(log_data['type_to_files_dedup'][k]))
+        str = str + ',{}_diff : {} '.format(k, _d(log_data['type_to_files_dedup'][k]))
     logging.info(str)
 
 def compare(args):
@@ -135,13 +156,18 @@ def compare(args):
             dst_objs = parseDir(dst_dir)
             if not isValidDir(dst_objs):
                 continue
-            all_files.extend(dst_objs)
+
+            html_css_files = [d for d in dst_objs if getType(d.getHeader('content-type'), d) == 'css' or getType(d.getHeader('content-type'), d) == 'html' ]
+            all_files.extend(html_css_files)
             logging.info('{}/{}'.format(root,folder))
             logging.info("Comparing {} with {} with url {}".format(len(dedup_files), len(dst_objs), dst_dir ))
             matches = []
             unmatches = []
             for file in dst_objs:
                 type = getType(file.getHeader('content-type'), file)
+                
+                if type != 'css' and type != 'html':
+                    continue
                 # logging.info('type is {}'.format(type))
                 match = _compare(file, dedup_files)
                 match and matches.append(file)
@@ -150,7 +176,7 @@ def compare(args):
                     type_to_files_dedup[type].append(file)
                 type_to_files_all[type].append(file)
             dedup_files.extend(unmatches) 
-            dump_log({'all_files':all_files, 'dedup_files':dedup_files, 'type_to_files_dedup': type_to_files_dedup, 'type_to_files_all':type_to_files_all})  
+    dump_log({'all_files':all_files, 'dedup_files':dedup_files, 'type_to_files_dedup': type_to_files_dedup, 'type_to_files_all':type_to_files_all})  
             # logging.info('Status: {} {} {} {} {}'.format(len(dedup_files), len(type_to_files['javascript']), \
             #     getTotalSize(all_files), getTotalSize(dedup_files), getTotalSize(type_to_files['javascript'])))
 
