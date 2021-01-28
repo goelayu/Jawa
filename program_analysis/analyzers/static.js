@@ -1,6 +1,8 @@
-const falafel = require('falafel');
+const falafel = require('falafel'),
+    beautifier = require('js-beautify');
 
 var getNodes = function(src, arr){
+    src = beautifier.js(src);
     return falafel(src, {
         loc: true, 
         range: true
