@@ -40,15 +40,25 @@ var parseCfgId = function(strLoc){
     return [file,Number.parseInt(loc)];
 }
 
-var findBoundingFn = function(strLoc, fns){
+var preprocessFnIds = function(fns){
+    var fnLns = {};
+    Object.keys(fns).forEach((file)=>{
+        var lns = Object.keys(fns[file]).map(e=>Number.parseInt(e));
+        fnLns[file] = lns;
+    });
+    return fnLns;
+}
+
+var findBoundingFn = function(strLoc, fns, fnLns){
     /**
      * Find the immediately bounding function for this LOC
      */
     var curFnLn = Number.MIN_VALUE, curFn = null;
     var [file,loc] = parseCfgId(strLoc);
-    var fileFns = fns[file], lns = Object.keys(fileFns), idx = 0;
+    var fileFns = fns[file], lns = fnLns[file], idx = 0; //Object.keys converts all keys to strings
     while (lns[idx] < loc && idx < lns.length) {
-        var fn = fileFns[lns[idx]];
+        // the final fn is a two tuple of id and source.length, just need id here
+        var fn = fileFns[lns[idx]][0];
         var lnStart = lns[idx],
             idLen = fn.split('-').length;
             lnEnd = Number.parseInt(fn.split('-')[idLen - 2]);
@@ -78,18 +88,14 @@ var findBoundingFn = function(strLoc, fns){
 var findMatchingFn = function(strLoc, fns){
     /**
      * Find matching function based on line number
+     * Doesn't need preprocessed fnIds since its a direct lookup
      */
     if (!strLoc) return null;
     var [file, loc] = parseCfgId(strLoc);
     if (loc == 'NATIVE') return strLoc;
-    var curFn = fns[file][loc];
+    var curFn = fns[file][loc][0]; // first index is the id, 2nd is the source length
 
-    // fns.forEach((fn)=>{
-    //     var ln = fn.split('-')[1];
-    //     if (ln == loc)
-    //         curFn = fn;
-    // });
-    if (!curFn) console.error(`no matching function found for ${strLoc}`);
+    if (!curFn) throw new Error(`no matching function found for ${strLoc}`);
     return curFn;
 }
 
@@ -99,9 +105,10 @@ var parse = function(f){
 
 var patchCFG = function(cfg, fnIds){
     var res = [];
+    var fnLns = preprocessFnIds(fnIds);
     cfg.forEach((entry)=>{
         var caller, callee;
-        caller = findBoundingFn(entry[0], fnIds),
+        caller = findBoundingFn(entry[0], fnIds, fnLns),
         callee = findMatchingFn(entry[1], fnIds);
         // console.log(`${entry} becomes ${[caller, callee]}`);
         res.push([caller, callee]);

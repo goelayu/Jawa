@@ -4,20 +4,21 @@ const falafel = require('falafel'),
 var getNodes = function(src, arr){
     src = beautifier.js(src);
     return falafel(src, {
-        loc: true, 
-        range: true
+        locations: true, 
+        ranges: true
     }, function(node){
         arr.push(node);
     });
 }
 
-var makeId = function(path, node){
-    var loc = node.id ? node.id.loc : node.loc;
-    if (!loc){
+var makeId = function (path, node) {
+    var loc = node.loc;
+    if (!loc) {
         console.error(`No location for node`);
         return;
     }
-    return `${path}-${loc.start.row}-${loc.start.column}-${node.end.row}-${node.end.column}`;
+    // console.log(loc)
+    return `${path}-${loc.start.line}-${loc.start.column}-${loc.end.line}-${loc.end.column}`;
 }
 
 function instrument(src, options){
@@ -34,7 +35,7 @@ function instrument(src, options){
         ASTNodes.forEach((node)=>{
             if (node.type == 'FunctionDeclaration' || node.type == 'FunctionExpression'){
                 var nodeBody = node.body.source().substring(1, node.body.source().length-1);
-                node.body.update(`{\n//fn inside file: ${filename}\n${nodeBody}}`)
+                node.body.update(`{\n//fnId: ${makeId(filename,node)}. fn inside file: ${filename}\n${nodeBody}}`)
             }
         });
     } catch (e) {

@@ -45,7 +45,7 @@ var parse = function (src, options) {
             var id = makeId(filename, node);
             var idLen = id.split('-').length;
             var ln = Number.parseInt(id.split('-')[idLen - 4])
-            allFnIds[ln] =id;
+            allFnIds[ln] =[id,node.source().length];
             var nodeIndex = inArray(options.fns, node.source());
             if (options.fns && nodeIndex == -1)
                 return;

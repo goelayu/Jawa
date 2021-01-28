@@ -15,6 +15,7 @@ const fs = require('fs'),
     path = require("path"),
     fnIds = require('../utils/fn-ids'),
     cgPatcher = require('../utils/patch-cfg');
+const { getDefaultSettings } = require('http2');
 
 const JSSRCFILES = `${__dirname}/../../JS_FILES`;
 const STATICANALYSER = `${__dirname}/javascript-call-graph/main.js`
@@ -139,8 +140,9 @@ var buildCFG = function(filenames){
     var cfgCMD = baseCMD + `--cg ${cmdArgs} > ${JSSRCFILES}/cg`;
     var fgCMD = baseCMD + `--fg ${cmdArgs} > ${JSSRCFILES}/fg`;
     //create cfg
-    var _cmdOut = spawnSync(cfgCMD, {shell:true} );
     program.verbose && console.log(`creating cfg: ${cfgCMD}`)
+    var _cmdOut = spawnSync(cfgCMD, {shell:true} );
+    
     program.verbose && console.log(_cmdOut.stderr.toString())
     //create fg
     program.verbose && console.log(`creating fg: ${fgCMD}`)
@@ -161,11 +163,16 @@ var cvtToDictCG = function(cg){
     return dCg;
 }
 
+var isNativeFn = function(fnId){
+    return fnId.split('-').length < 4;
+}
+
 var buildEvtCFG = function(completeCg, evtHandlers){
     // parse evt handlers as a list of ids
-    var handlers = [];
+    var handlers = [],
+        missingEdges = 0;
     Object.values(evtHandlers).forEach((h)=>{
-        //h is a dict with key as ln and values as ids
+        //h is a dict with key as ln and values as id
         handlers = handlers.concat(Object.values(h));
     });
 
@@ -177,23 +184,41 @@ var buildEvtCFG = function(completeCg, evtHandlers){
         if (!callers) return;
         
         callers.forEach((c)=>{
-            if (handlerCFG[handler].has(c)) return;
-            handlerCFG[handler].add(c);
+            if (!c) {
+                missingEdges++;
+                return; // if missing edge, ignore for now TODO handle missing edges
+            }
+            var fnType = isNativeFn(c) ? 'native' : 'user';
+            if (handlerCFG[handler][fnType].has(c)) return;
+            handlerCFG[handler][fnType].add(c);
             var childCallers = dCg[c];
             traverseCFG(handler,childCallers);
         });
     }
 
     handlers.forEach((h)=>{
-        handlerCFG[h] = new Set;
+        handlerCFG[h] = {native: new Set, user: new Set};
         traverseCFG(h, dCg[h]);
     });
-
+    program.verbose && console.log(`Found ${missingEdges} missing edges`)
     return handlerCFG;
 }
 
-var cgStats = function(completeCG, evtCG){
-    var total = new Set, evt = new Set;
+var getIdLen = function(allIds){
+    // returns all ids an array
+    var idSrcLen = {};
+    Object.values(allIds).forEach((idDict)=>{
+        //idDict is a dict with key as ln and values as id, source length tuple
+        Object.values(idDict).forEach((idLen)=>{
+            idSrcLen[idLen[0]] = idLen[1];
+        });
+    });
+    return idSrcLen;
+}
+
+var cgStats = function(completeCG, evtCG, allIds){
+    var total = new Set, evt = new Set, 
+        evtSrcSize = 0;
 
     completeCG.forEach((f)=>{
         total.add(f[0]);
@@ -204,10 +229,15 @@ var cgStats = function(completeCG, evtCG){
     // })
 
     Object.values(evtCG).forEach((f)=>{
-        f.forEach(evt.add, evt);
+        f.user.forEach(evt.add, evt);
     });
 
-    console.log(total.size, evt.size);
+    var idSrcLen = getIdLen(allIds);
+    evt.forEach((val)=>{
+        evtSrcSize += idSrcLen[val];
+    });
+
+    console.log(total.size, evt.size, evtSrcSize);
 
 }
 
@@ -220,19 +250,24 @@ var patchCFG = function(allIds){
 }
 
 function main(){
+    // 1) clean JS dir
+    program.verbose && console.log(`----------Cleaning the JS dir ${JSSRCFILES}-------------`)
     cleanJSDir();
-
+    program.verbose && console.log(`----------Extracting evt handlers and filenames----------- `)
     var handlers = extractEvtHandlers(program.evt);
     var filenames = extractFileNames(handlers);
     fs.writeFileSync(`${JSSRCFILES}/filenames`,JSON.stringify(Object.keys(filenames)))
+    program.verbose && console.log(`---------Parsing mm directory to get JS src files-----------`);
     extractSrcFiles(program.directory, `${JSSRCFILES}/filenames`);
     var [handlerIds, allIds] = buildHandlersId(handlers, filenames);
+    program.verbose && console.log(`-------Build static call graph--------------`)
     buildCFG(filenames);
+    program.verbose && console.log(`----------Patch CG with missing edges------------`)
     var completeCg = patchCFG(allIds);
-
+    program.verbose && console.log(`----------Build final evt CG------------`)
     var evtCG = buildEvtCFG(completeCg, handlerIds);
 
-    cgStats(completeCg, evtCG);
+    cgStats(completeCg, evtCG, allIds);
 }
 
 main();
