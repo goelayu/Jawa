@@ -5,7 +5,8 @@
 
  const puppeteer = require('puppeteer'),
     program = require('commander'),
-    fs = require('fs');
+    fs = require('fs'),
+    chromeFns = require('./chrome-ctx-scripts/fns')
 const { createDeflate } = require('zlib');
 
 program
@@ -101,6 +102,7 @@ async function launch(){
                  case 'Handlers': await extractHandlers(page,cdp); break;
                  case 'DOM' : await extractDOM(page); break; 
                  case 'Distill' : await distillDOM(page); break;
+                 case 'CG' : await chromeFns.getCallGraph(page, program); break
             }
         }
     }

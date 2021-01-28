@@ -20,7 +20,7 @@ deflate_compress = zlib.compressobj(9, zlib.DEFLATED, -zlib.MAX_WBITS)
 zlib_compress = zlib.compressobj(9, zlib.DEFLATED, zlib.MAX_WBITS)
 gzip_compress = zlib.compressobj(9, zlib.DEFLATED, zlib.MAX_WBITS | 16)
 
-analyzer_script = 'rewriter.js'
+analyzer_script = 'instrument.js'
 
 def copy(source, destination):
     subprocess.Popen("cp -r {} {}/".format(source, destination), shell=True)
@@ -122,7 +122,7 @@ def instrument(root, fileType, output_directory,args,file):
             # os._exit(0)
     else: f.write(http_response.response.body)
     f.close()
-    command = " {} -i {} -n '{}' -t {}".format(analyzer_script,TEMP_FILE, url + ";;;;" + origPath,fileType)
+    command = " {} -i {} -n '{}' -t {} -r {}".format(analyzer_script,TEMP_FILE, url + ";;;;" + origPath,fileType, args.rewriter)
 
     if (args.debug) and fileType == args.debug:
         command = "node --inspect-brk={}".format(node_debugging_port) + command
@@ -269,8 +269,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help='path to input directory')
     parser.add_argument('output', help='path to output directory')
-    # parser.add_argument('instOutput', help='type of instrumentation to perform',
-    #  default="record", choices=["cg","record", "replay","timing"])
+    parser.add_argument('rewriter', help='type of instrumentation to perform', default="comments", choices=["comments","dynamic-cfg"])
     parser.add_argument('logDir', help='path to log output directory')
     parser.add_argument('--jsProfile', help='path to the js profile')
     parser.add_argument('--cgInfo',help="path to the cg info")

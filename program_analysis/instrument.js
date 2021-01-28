@@ -1,17 +1,19 @@
 
 
 const fs = require('fs'),
-    program = require('commander'),
-    static_analyzer = require('./analyzers/static.js');
+    program = require('commander');
 
 program
     .version("0.1.0")
     .option("-i, --input [input]","path to the input file")
     .option("-n, --name [name]", "name of the file being instrumented")
     .option("-t , --type [type]", "[HTML | Javascript (js)]", "html")
+    .option('-r, --rewriter [rewriter]', 'type of static rewriter to use')
     .parse(process.argv)
 
 
+
+var rewriter = null;
 
 function IsJsonString(str) {
     try {
@@ -22,7 +24,35 @@ function IsJsonString(str) {
     return true;
 }
 
+function initRewriter(){
+    rewriter = require(`./analyzers/rewriters/${program.rewriter}`);
+}
+
+function getTracerObj(){
+    return fs.readFileSync('./analyzers/runtime/tracer.js','utf-8');
+}
+
 function instrumentHTML(src){
+    //insert the tracer object at top of the html
+    var doctypeMatch = /<!DOCTYPE[^>[]*(\[[^]]*\])?>/i.exec(src);
+    var headIndx = src.indexOf('<head>');
+
+    var preStr = postStr = "";
+    if (doctypeMatch){
+        preStr = doctypeMatch[0];
+        postStr = src.slice(preStr.length);
+    } else if (headIndx){
+        preStr = src.slice(0,headIndx+6);
+        postStr = src.slice(headIndx+6,)
+    } else {
+        preStr = '';
+        postStr = src;
+    }
+
+    var tracerStr = `<script> ${getTracerObj()} </script>`;
+
+    src = preStr + tracerStr + postStr;
+
     return src;
 
 }
@@ -33,12 +63,13 @@ function instrumentJavaScript(src, filename, jsInHTML){
             return src.replace(/^\s+|\s+$/g, '');
         else return src;
     }
-    src = static_analyzer.instrument(src, {filename: filename});
+    src = rewriter.instrument(src, {filename: filename});
     console.log(`returned: ${JSON.stringify(src)}`);
     return src;
 }
 
 function main(){
+    initRewriter();
     var url = program.name.split(';;;')[0];
     var _filename = program.name.split(';;;;')[1];
     _filename = _filename == "/" ? url + _filename : _filename;

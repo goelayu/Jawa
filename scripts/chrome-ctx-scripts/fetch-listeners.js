@@ -43,7 +43,7 @@ var archive_listeners = (function listAllEventListeners() {
     return listeners;
   })();
   
-  var verbose_listeners = (function listAllEventListeners() {
+var verbose_listeners = (function listAllEventListeners() {
     let listeners = [], pl = processListeners;
     const allElements = document.querySelectorAll('*');
     const types = [];
@@ -85,12 +85,19 @@ function _triggerEvent(el, evt){
 }
 
 function triggerEvents(elems){
+    // turn on the tracer logging
+    window.__tracer.setTracingMode(true);
     elems.forEach((_e)=>{
-        var [elem, handlers] = _e;
-        handlers.forEach((h)=>{
-            _triggerEvent(elem, h);
-        })
-    })
+        try {
+            var [elem, handlers] = _e;
+            handlers.forEach((h)=>{
+                _triggerEvent(elem, h);
+            })
+        } finally {
+            /**no op */
+        }
+    });
+    window.__tracer.setTracingMode(false);
 }
 
 function getCandidateElements(listeners){
