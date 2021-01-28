@@ -1,6 +1,8 @@
 # This script would start the nginx based
 # replay server 
 
+# trap "exit" INT TERM
+# trap "kill 0" EXIT
 
 SERVERROOTDIR=/home/goelayu/research/blaze/
 cur_dir=${PWD}
@@ -26,11 +28,17 @@ cd $SERVERROOTDIR;
 # sudo -s <<EOF
 source .blaze_env/bin/activate
 cmd="blaze replay --key_path $SERVERROOTDIR/certs/server.key --cert_path $SERVERROOTDIR/certs/server.cert $1 ${@:2}"
+# cmd="sleep 10000"
 echo $cmd;
 $cmd
+# _pid=$!
+
 # EOF
 
-# _pid=$!
+# cd -
+# echo Blaze server pid is $_pid 
+# echo $_pid > BLAZEPID
+# wait
 # echo 'pid of process' $_pid and serverpid is $SERVERPID
 # echo $_pid > ${cur_dir}/${SERVERPID} 
 # echo "Started replay server.."

@@ -7,8 +7,7 @@ var {netEvents} = require('parser/networkParser_v2'),
 
 
 program
-    .option('-i, --input [input]','path to the input network file')
-    .option('-p, --plt [plt]','path to the plt number')
+    .option('-i, --input [input]','path to main log directory')
     .option('-o, --output [output]', 'path to the output file')
     .parse(process.argv);
 
@@ -20,8 +19,8 @@ var parse = function(f){
 }
 
 function main(){
-    var net = parse(program.input);
-    var plt = parse(program.plt);
+    var net = parse(`${program.input}/network`);
+    var plt = parse(`${program.input}/plt`);
     var pNet = new netEvents(net, plt);
     pNet.processEvents();
     var harLog = har.create([pNet]);

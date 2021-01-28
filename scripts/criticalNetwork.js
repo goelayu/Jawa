@@ -5,7 +5,8 @@ Computes the network events on the critical path
 const netParser = require('parser/networkParser'),
     fs = require('fs'),
     program = require('commander'),
-    util = require('util');
+    util = require('util'),
+    moment = require('moment');
 const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 
 program
@@ -155,6 +156,9 @@ var slowestST = function (st) {
 }
 
 var timeStampInURL = function (url) {
+    // Only extract timestamp from the main part of the url
+    var idx = url.indexOf('?') ;
+    url = idx >= 0 ? url.slice(0,idx) : url;
     var hasNumbers = url.match(/\d+/g);
     if (hasNumbers) {
         for (var num of hasNumbers) {
@@ -180,8 +184,63 @@ var getSizePerType = function(net){
     });
 }
 
+var smallUtil = function(net){
+    var total = 0;
+    for (var n of net){
+        if (n.redirectResponse)
+            total+=2
+        else total++;
+    };
+    process.stdout.write(util.format(total + " "));
+}
+
+var getResponseHeader = function(n,h){
+    return n.headers[h];
+}
+
+var serverTimingEntry = function(resp, entry){
+    var serverTiming = getResponseHeader(resp, 'Server-Timing');
+    if (!serverTiming) return null;
+    var ret;
+    var entries = serverTiming.split(',');
+    entries.forEach((e,idx)=>{
+        var [r,t] = e.split(';dur=');
+        if (r.trim() == entry)
+            ret = t;
+    });
+    return ret;
+}
+
+var getTopKExpensive = function(k, resp){
+    var serverTiming = getResponseHeader(resp, 'Server-Timing');
+    if (!serverTiming) return [];
+    var entries = serverTiming.split(',');
+    entries.forEach((e,idx)=>{
+        entries[idx] = e.split(';dur=');
+    });
+    entries = entries.sort((a,b)=>{ return b[1] - a[1]});
+    return entries.length >= k ? entries.slice(0,k) : entries;
+}
+
+var fromSamePage = function(resSrcs, res){
+    var [crawl,ts] = res,
+        tsFmt = "YYYYMMDDhhmmss",
+        SAMEPAGEDUR = 1;
+    var srcTs = moment(ts,tsFmt)
+    var matchCrawls = resSrcs.filter(e=>e[0]==crawl);
+    var foundMatch = false
+    matchCrawls.forEach((m)=>{
+        var dstTs = moment(m[1],tsFmt);
+        if (Math.abs(
+            srcTs.diff(dstTs,'minute')
+        )<=SAMEPAGEDUR)
+            foundMatch = true;
+    });
+    return foundMatch;
+}
+
 var scanTTFB = function (net, url, plt, ts) {
-    var mainReq = computeMainFileReq(net, url);
+    // var mainReq = computeMainFileReq(net, url);
     // var ts = removeTrailingSlash;
     // if (mainReq.redirectResponse){
     //     var rr = mainReq.redirectResponse;
@@ -193,95 +252,127 @@ var scanTTFB = function (net, url, plt, ts) {
     // if (mainReqTime === null) return false;
     // console.log((mainReqTime.ttfb - mainReqTime.fetchRedirectStart)*1000)
     // console.log(mainReqTime.redirectResponse == null);
-    var own = script = 0;
-    var typeToSize = {};
+    var server2count = {}, count2latency = {};
+    var allResData = [], nlen = 0, coldcount = hotcount = 0;
+    var nARCFiles = new Set();
     for (var n of net) {
         if (!n.ttfb) continue;
-        // if (n == mainReq){
-        //     ttfb = (n.ttfb - n.redirectFetch)*1000;
-        //     endTime = (n.endTime - n.redirectFetch)*1000;
-        //     var delay = 190 + endTime;
-        //     console.log(n.url, delay);
-        //     return
-        //     // ttfb = _ttfb = (n.redirectStart_o - n.requestFetch)*1000;
-        // }
-        var tag = n.redirectResponse ? "redirect" : "direct";
-
-        // var reason = n.redirectResponse.headers["x-archive-redirect-reason"];
-        // var newLoc = reason.split('at ')[1];
-        //     if (n.redirectResponse.url.indexOf(newLoc)>=0){
-        //         console.log(n.redirectResponse.url, n.redirectResponse.headers.location
-        //             , n.redirectResponse.url+'/' ==  n.redirectResponse.headers.location);
-        //     }
-        //     totalDirect++;   
-        //     var t =  (n.ttfb - n.fetchStart)*1000;
-        //     if (t>=mainReqTime)
-        //         slowInDirect++;  
-        // }
-
-        // var resST =  n.response.headers["server-timing"];
-        // var st = slowestST(resST);
+        var tag = n.redirectResponse ? "redirect" : "direct", 
+            type; 
         var parsedTs = timeStampInURL(n.url);
-        if (!parsedTs)
-            console.log(n.url, url);
-        continue;
-        if (tag == "direct") {
-            // continue;
+        if (!parsedTs){
+            type = "toolbar"
+            continue;
+        }
+        else if (n.url.indexOf(`https://web.archive.org/web/${parsedTs}`)<0){
+            type = "toolbar"
+            continue;
+        }
+        else type = "critical"   
 
+        var status = Number.parseInt(n.response.status/100)*100;
+        // if (status == 400)
+        //     continue;
+        if (tag == "direct") {
+
+            var ld_resource = serverTimingEntry(n.response, "load_resource");
             var ttfb = (n.ttfb - n.requestFetch) * 1000;
 
-            if (!parsedTs) {
-                console.log(n.url);
-                // console.log(ttfb, "no_ts");
-            } else {
-                // if (parsedTs in seen){
-                //     console.log(ttfb, "seen",n.url);
-                // }
-                // else {
-                //     console.log(ttfb, "unseen", n.url)
-                //     seen[parsedTs] = true;
-                // }
-            }
-            continue;
-            // tag += `_${n.response.status}`
+            tag += `_${n.response.status}`
             // var ttfb = (n.ttfb - n.requestFetch)*1000;
             // total++;
             // // console.log((n.requestStart - (n.requestStart_o ))*1000, n.protocol)
             // if (tag.indexOf("200")>=0)
-            //     console.log(ttfb, tag, n.url);
+            var age;
+            // if (!(parsedTs in seen)) {
+            //     // seen[parsedTs] = true;
+            //     age = "cold";
+            // } else age = "hot"; 
+            // console.log(ttfb, age, n.url, program.url);
+            var _origFile = getResponseHeader(n.response, 'X-Archive-Src');
+            // console.log(ttfb, `direct_${Number.parseInt(n.response.status/100)*100}`,n.url, ts, parsedTs, type);
+            // console.log(parsedTs, getResponseHeader(n.response, 'x-app-server'))
+            // if (!(parsedTs in server2count))
+            //     server2count[parsedTs] = 0;
+            // server2count[parsedTs]++;
+            // var expST = getTopKExpensive(3, n.response);
+            // expST.forEach((e)=>{
+            //     console.log(ttfb, parsedTs, server2count[parsedTs], ...e, program.url);
+            // });
         } else {
-            console.log(n.url);
-            continue;
-            // if (n == mainReq){
-            //     var redirectTime = (n.redirectStart_o - n.requestFetch)*1000;
-            //     console.log(redirectTime, n.url, "first")
-            // }
+            var ld_resource = serverTimingEntry(n.redirectResponse, "load_resource");
             var redirectTime = (n.redirectStart_o - n.requestFetch) * 1000;
             var ttfb = (n.ttfb - n.redirectFetch) * 1000;
-            var firstTs = timeStampInURL(n.url);
-            var firstTag = firstTs ? (seen[firstTs] ? "seen" : "unseen") : "no_ts"
-            if (firstTag == "unseen") {
-                //mainReq has an expensive 2nd rtt, even though the same ts was seen. Therefore to eliminate that from the median number, don't 
-                //mark it as seen
-                if (n != mainReq)
-                    seen[firstTs] = true;
-            }
-            console.log(redirectTime, firstTag, n.url);
-
+            var _origFile = getResponseHeader(n.redirectResponse, 'X-Archive-Src');
+            // var firstTs = timeStampInURL(n.url);
+            // var firstTag = firstTs ? (seen[firstTs] ? "seen" : "unseen") : "no_ts"
+            // if (firstTag == "unseen") {
+            //     //mainReq has an expensive 2nd rtt, even though the same ts was seen. Therefore to eliminate that from the median number, don't 
+            //     //mark it as seen
+            //     if (n != mainReq)
+            //         seen[firstTs] = true;
+            // }
+            var age = "cold";
             var secondTs = timeStampInURL(n.redirectResponse.headers.location);
-            var secondTag = secondTs ? (seen[secondTs] ? "seen" : "unseen") : "no_ts"
-            if (secondTag == "unseen")
-                seen[secondTs] = true;
-            console.log(ttfb, secondTag, n.redirectResponse.headers.location);
+            // if (!(parsedTs in seen)){
+            //     if (secondTs != parsedTs)
+            //         seen[parsedTs] = true;
+            //     age = "cold";
+            // } else age = "hot"; 
+            // console.log(redirectTime, age, ts, parsedTs, n.url ,program.url );
+
+            tag += `_${n.response.status}`;
+            if (!(parsedTs in server2count))
+                server2count[parsedTs] = 0;
+            server2count[parsedTs]++;
+            if (!(secondTs in server2count))
+                server2count[secondTs] = 0;
+            server2count[secondTs]++;
+            // var expST = getTopKExpensive(3, n.response);
+            // expST.forEach((e)=>{
+            //     console.log(redirectTime, parsedTs, server2count[parsedTs], ...e, program.url);
+            // });
+            // // console.log(redirectTime, parsedTs, server2count[parsedTs], getResponseHeader(n.redirectResponse, 'server-timing'));
+            // var expST = getTopKExpensive(3, n.redirectResponse);
+            // expST.forEach((e)=>{
+            //     console.log(ttfb, secondTs, server2count[secondTs], ...e, program.url);
+            // });
+            // console.log(ttfb, secondTs, server2count[secondTs]);
+            // console.log(secondTs, getResponseHeader(n.redirectResponse, 'x-app-server'))
+            // console.log(parsedTs, getResponseHeader(n.response, 'x-app-server'))
+            // console.log(ttfb, tag, n.redirectResponse.headers.location);
             // console.log((n.requestStart - (n.requestStart_o ))*1000, n.protocol)
             // console.log((n.redirectStart - (n.redirectStart_o))*1000, n.protocol)
-            // console.log(redirectTime,`redirect_302_${Number.parseInt(n.response.status/100)*100}`, n.url);
-            // console.log(ttfb, `redirect_${Number.parseInt(n.response.status/100)*100}`,n.redirectResponse.headers.location);
+            var age;
+            var _origFile = getResponseHeader(n.response, 'x-archive-src');
+            var appServer = getResponseHeader(n.response, 'X-App-Server')
+            if (!_origFile) continue;
+            var origFile = _origFile.split('/')[0];
+            var resData = [origFile,secondTs];
+            if (!(fromSamePage(allResData, resData))) {
+                allResData.push(resData);
+                age = "cold";
+                coldcount++;
+                ttfb2 = n.response.timing.receiveHeadersEnd - n.response.timing.sendEnd;
+                // console.log(ttfb2);
+            } else {
+                hotcount++;
+                // var cold_time = seen[key];
+                age = "hot";
+            }
+            // console.log(redirectTime, 'direct_302', n.url, secondTs, parsedTs, age, age);
+            // console.log(ttfb, age, n.redirectResponse.headers.location, program.url);
+            // if (!secondTs)
+            //     continue;
+            var st = getResponseHeader(n.response, 'Server-Timing');
+            var ld_resource = serverTimingEntry(n.response, "load_resource");
+            var server = getResponseHeader(n.response, 'Server');
+            // console.log(ttfb, `redirect_${Number.parseInt(n.response.status/100)*100}`,n.redirectResponse.headers.location, ts, secondTs, key, age, ld_resource, server);
         }
         // total++;
 
     }
-    process.stdout.write(util.format(script / totalSize));
+    process.stdout.write(util.format(coldcount/(coldcount+hotcount)));
 }
 
 function main() {
@@ -294,9 +385,8 @@ function main() {
     program.debug && fs.writeFileSync(DEBUG_FILE, JSON.stringify(processNetLogs));
 
 
-    getSizePerType(processNetLogs);
-    // console.log(processNetLogs.length);
-    // scanTTFB(processNetLogs, program.url, plt, program.ts);
+    // smallUtil(processNetLogs);
+    scanTTFB(processNetLogs, program.url, plt, program.ts);
     // printTTFB(processNetLogs);
     // console.log(isMainReqSlowest(processNetLogs, program.url))
     // computeTTFBPercentage(processNetLogs);

@@ -26,13 +26,14 @@ program
 	.option('--log', 'extract console log')
     .option('--coverage', 'extract coverage information')
 	.option('-n, --network','extract network information')
-    .option('-m, --mobile','running chrome on mobile')
     .option('-e, -error [errpr]','file containing errorous urls')
-    .option('--sim [sim]','enable network simulation')
+    .option('--sim [sim]','enable cpu simulation')
+    .option('--netsim [netsim]','enable network simulation')
     .option('--mem','extract heap memory trace')
     .option('--testing','testing means dont kill chrome after page load')
     .option('--mode [mode]', "Can be run in record or replay mode or std mode")
     .option('--correctness',"Eval string to check for correctness post replay")
+    .option('--chrome-conf [chromeConf]','path to the chrome runtime flags')
 	.parse(process.argv)
 
 pageLoadTime = {}
@@ -51,9 +52,11 @@ evalStringFile = "./EVALFile"
 loadErrors = [], fetchErrors = [];
 
 var fatalKill = function(){
-    if (program.mobile)
-        process.exit();
-    else spawnSync("ps aux | grep " +  program.port + " | grep chrom* | awk '{print $2}' | xargs kill -9",{shell:true});
+   
+        killcmd = spawnSync("ps aux | grep " +  program.port + " | grep remote | awk '{print $2}' | xargs kill -9",{shell:true});
+        console.log(killcmd.stdout.toString())
+        console.log(killcmd.stderr.toString());
+
 }
 
 var safeKill = function(){
@@ -62,8 +65,6 @@ var safeKill = function(){
 
 function navigate(launcher){
 	let local = false;
-    if (program.mobile)
-        local = true;
 	Chrome({port:Number(program.port), local: local},async function (chrome) {
         try {
             console.log("Connected to remote chrome");
@@ -74,9 +75,6 @@ function navigate(launcher){
 			await Network.enable();
 			await Log.enable();
             await Performance.enable();
-            // await Debugger.enable();
-            // await HeapProfiler.enable();
-
 
 
             Target.attachedToTarget(({sessionId, targetInfo: {url}}) => {
@@ -181,30 +179,24 @@ function navigate(launcher){
             if (!program.testing) {
                 pltTimer = setTimeout(function(){
                     console.log("Timer fired before site could be loaded");
-                    if (program.log) {
-                        fs.writeFileSync(program.output + "/logs", JSON.stringify(consoleLog));
-                        console.log("Console data logged");
-                    };
-
-                    fs.appendFileSync("./loadErrors", '\n' + program.output);
-
+                    program.log && fs.writeFileSync(program.output + "/logs", JSON.stringify(consoleLog));    
+                    program.network && fs.writeFileSync(program.output +"/network", JSON.stringify(NetworkLog));
                     chrome.close();
                     fatalKill();
-                }, 100000)
+                }, 250000)
             }
 
             if (program.sim){
-                var simConfig = JSON.parse(fs.readFileSync(program.sim, "utf-8"));
-                console.log("Loading sim data: " + JSON.stringify(simConfig))
-                Network.emulateNetworkConditions(simConfig);
+                // var simConfig = JSON.parse(fs.readFileSync(program.sim, "utf-8"));
+                console.log('Throttling CPU by 3x')
+                await Emulation.setCPUThrottlingRate({rate: 3.0});
             }
 
-            // if (!program.mobile) {
-            //     console.log("emulating mobile on desktop")
-            //     // Network.setUserAgentOverride({userAgent: "Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.99 Mobile Safari/537.36"});
-            //     Network.setUserAgentOverride({userAgent: "Mozilla/5.0 (Linux; Android 8.0.0; Pixel 2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.90 Mobile Safari/537.36"}); 
-            //     Emulation.setDeviceMetricsOverride({width:411, height: 731, mobile:true, deviceScaleFactor:0 })
-            // }
+            if (program.netsim){
+                console.log('Emulating 4g network conditions')
+                var netConfig = JSON.parse(fs.readFileSync('4g.config', "utf-8"));
+                await Network.emulateNetworkConditions(netConfig);
+            }
 
 			if (program.jsProfiling) 
 				await Profiler.start()
@@ -243,35 +235,6 @@ function navigate(launcher){
             	consoleLog.push(entry);
             })
 
-            Runtime.consoleAPICalled((entry) =>{
-                if (entry.type == "error")
-                    consoleLog.push(entry);
-                if (entry.type == "log" && entry.args[0].value == "Cache saved.."){
-                    console.log("Alert received from web worker, finishing...")
-                    dataReceived = true;
-                    if (alldataReceived && !program.testing) {
-                        collectLogs(program);
-                        // if (program.mode == "record")
-                        //     customCodes.getStorageOverhead(Runtime, program.output + "/cacheSize");
-                        // setTimeout(function(){
-                            if (!program.mobile){
-                                chrome.close();
-                                safeKill();
-                            } else {
-                                Page.close();
-                                chrome.close();
-                            }
-                            process.exit();
-                        // },1000);
-                    }
-
-                }
-            })
-
-            // HeapProfiler.addHeapSnapshotChunk((chunk)=>{
-            //     heapChunks.push(chunk.chunk);
-            // })
-
             Log.entryAdded((entry)=>{
                 // consoleLog.push(entry)
             })
@@ -298,7 +261,7 @@ function navigate(launcher){
             console.log("Main load event fired");
             pageLoaded = true;
               // Pause the page is stop any further javascript computation
-            // Runtime.evaluate({expression:"debugger;"});
+            Runtime.evaluate({expression:"debugger;"});
             console.log("Page has been paused");
 
             var perfData = await Performance.getMetrics();
@@ -328,7 +291,7 @@ function navigate(launcher){
                     chrome.close();
                     fatalKill();
 
-                }, 60000)
+                }, 110000)
             }
 
             var fetchStart = performance.now();
@@ -336,7 +299,7 @@ function navigate(launcher){
                    await extractCustomInformation(Runtime, program,1);
             } else 
                 dataReceived=true
-            await extractPageLoadTime(Runtime, "plt");
+            await extractPageLoadTime(Runtime, "/plt");
             await takePageScreenshot(Page, '/screenshot.png');
 
             if (program.coverage) {
@@ -418,14 +381,11 @@ function navigate(launcher){
                 // if (program.mode == "record")
                 //     await customCodes.getStorageOverhead(Runtime, program.output + "/cacheSize");
                 setTimeout(function(){
-                    if (!program.mobile){
-                        chrome.close();
-                        safeKill();
-                    } else {
-                        console.log("closing page");
-                        Page.close();
-                        chrome.close();
-                    }
+                    console.log("closing page");
+                    Page.close();
+                    chrome.close();
+                    fatalKill();
+                    
                     process.exit();
                 },1000);
             }
@@ -450,6 +410,11 @@ function collectLogs(program){
 async function pausePage(Runtime){
     await Runtime.evaluate({expression: 'debugger'});
     console.log("Page paused to process data");
+}
+
+async function takePageScreenshot(Page, outputFile){
+    var image = await Page.captureScreenshot();
+    fs.writeFileSync(program.output + outputFile, JSON.stringify(image.data), 'base64');
 }
 
 // async function getJSCoverage()
@@ -495,7 +460,7 @@ async function extractCustomInformation(Runtime, program, path){
 
         } else {
             fs.appendFileSync("./fetchErrors"  , '\n' + program.url + "\n" + runPostLoadScripts);
-            consoleLog.push(runPostLoadScripts);
+            // consoleLog.push(runPostLoadScripts);
         }
         // await customCodes.getInvocationProperties(Runtime, program.output + "/dc" + path, '__tracer.getDC()',0);
        // await customCodes.getInvocationProperties(Runtime, program.output + "/timingInfo" + path, '__tracer.getTimingInfo()',);
@@ -521,15 +486,15 @@ async function extractCustomInformation(Runtime, program, path){
         await customCodes.getInvocationProperties(Runtime, program.output + "/setupStateTime", 'window.top.setupStateTime');
         // await customCodes.getDOM(Runtime, program.output +"/DOM");
    } else {
-        // await customCodes.getInvocationProperties(Runtime, program.output + "/leafNodes" + path, 'leafNodes',1);
+        // await customCodes.getInvocationProperties(Runtime, program.output + "/ND", '__tracer.getND()');
         // await customCodes.getInvocationProperties(Runtime, program.output + "/timingInfo", '__tracer.getTimingInfo()');
         // await customCodes.getInvocationProperties(Runtime, program.output + "/cg", '__tracer.getCallGraph()');
-        await customCodes.getDOM(Runtime, program.output +"/DOM");
+        // await customCodes.getInvocationProperties(Runtime, program.output + "/roots", '__tracer.getRootInvocs()');
         // await customCodes.getInvocationProperties(Runtime, program.output + "/rc", 'window.proxyReadCount');
         // await customCodes.getInvocationProperties(Runtime, program.output + "/wc", 'window.proxyWriteCount');
         // await customCodes.getInvocationProperties(Runtime, program.output + "/parentNodes", '__tracer.getParentNodes()');
         // await customCodes.getInvocationProperties(Runtime, program.output + "/nonLeafNodes", '__tracer.getNonLeafNodes()');
-        // await customCodes.getInvocationProperties(Runtime, program.output + "/minHeap", 'minHeap');
+        await customCodes.getInvocationProperties(Runtime, program.output + "/minHeap", 'minHeap');
    }
    // await customCodes.getInvocationProperties(Runtime, program.output  + "/callgraph", 'Object.keys(__tracer.getCallGraph())');
    console.log("Custom data logged");
@@ -553,13 +518,19 @@ async function extractPageLoadTime(Runtime, outputFile){
 
 }
 
-async function takePageScreenshot(Page, outputFile){
-    var image = await Page.captureScreenshot();
-    fs.writeFileSync(program.output + outputFile, JSON.stringify(image.data), 'base64');
-}
-
 function escapeBackSlash(str){
 	return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\^\$\|\'\_]/g, "\\$&");
+}
+
+var parseChromeFlags = function(conf){
+    var _content = fs.readFileSync(conf, 'utf-8'),
+        content = _content.split('\n');
+    var flags = [];
+    for (var c of content){
+        if (c.indexOf('//')>=0) continue;
+        flags.push(c);
+    }
+    return flags;
 }
 
 
@@ -582,28 +553,15 @@ if (program.launch) {
         fs.writeFileSync(chromeUserDir, chromeUserDirExt);
         // process.exit();
     }
+    var chromeFlags = parseChromeFlags(program.chromeConf);
+    chromeFlags.push(`--user-data-dir=/tmp/nonexistent + ${chromeUserDirExt}`);
     chromeLauncher.launch({
-	 port:Number(program.port),
-	 chromeFlags: [
-		'--ignore-certificate-errors',
-        '--disable-web-security',
-        '--disable-extensions ',
-        // '--js-flags="--expose-gc"',
-        // '--auto-open-devtools-for-tabs',
-        // '--enable-devtools-experiments',
-        '--disable-features=IsolateOrigins,site-per-process,CrossSiteDocumentBlockingAlways,CrossSiteDocumentBlockingIfIsolating',
-        '--disable-site-isolation-trials',
-        '--allow-running-insecure-content',
-		//  '--headless',
-         // '--v8-cache-options=off',
-         // '--js-flags="--compilation-cache false"',
-         // '--user-data-dir=/tmp/chromeProfiles/' + program.url.split('//')[1]
-		 '--user-data-dir=/tmp/nontstent' + chromeUserDirExt,
-	]
-}).then(chrome => {
-	console.log("chrome is launched, navigating page");
-	navigate(chrome);
-});
+        port:Number(program.port),
+        chromeFlags: chromeFlags
+    }).then(chrome => {
+        console.log("chrome is launched, navigating page");
+        navigate(chrome);
+    });
 } else {
 	// spawnSync("chromium-browser --remote-debugging-port=9222 --ignore-certificate-errors --user-data-dir=/tmp/nonexistent$(date +%s%N) ; sleep 6");
 	console.log("chrome launched");

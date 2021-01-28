@@ -25,9 +25,9 @@ program
     .option('--coverage', 'get the js coverage information')
     .parse(process.argv);
 
-const SERIALIZESTYLES="/home/goelayu/research/webArchive/scripts/chrome-ctx-scripts/serializeWithStyle.js"
-const DISTILLDOM="/home/goelayu/research/webArchive/dom-distill/lib/domdistiller.js"
-const HANDLERS="/home/goelayu/research/webArchive/scripts/chrome-ctx-scripts/fetch-listeners.js"
+const SERIALIZESTYLES=`${__dirname}/chrome-ctx-scripts/serializeWithStyle.js`
+const DISTILLDOM=`${__dirname}/../dom-distill/lib/domdistiller.js`
+const HANDLERS=`${__dirname}/chrome-ctx-scripts/fetch-listeners.js`
 
 async function launch(){
     const options = {
@@ -73,7 +73,7 @@ async function launch(){
         await getCoverage(page, 'preload');
         await page.coverage.startJSCoverage();
         await extractHandlers(page,cdp); 
-        await getCoverage(page, 'postLoad');
+        await getCoverage(page, 'postLoad', true);
     }
 
 
@@ -155,13 +155,15 @@ var initCDP = async function(cdp){
     await cdp.send('Profiler.enable');
 }
 
-var getCoverage = async function(page, f){
+var getCoverage = async function(page, f, extractFileNames){
     var jsCoverage = await page.coverage.stopJSCoverage();
     let totalBytes = 0;
     let usedBytes = 0;
+    let fileUrls = [];
     for (const entry of jsCoverage) {
 
         if (entry.url.indexOf('.js') > 0) {
+            fileUrls.push(entry.url);
             totalBytes += entry.text.length;
             let singleUsedBytes = 0
             for (const range of entry.ranges) {
@@ -170,6 +172,7 @@ var getCoverage = async function(page, f){
             }
         }
     }
+    extractFileNames && dump(fileUrls, `${program.output}/coverage_files`);
     dump({used:usedBytes, total: totalBytes},`${program.output}/coverage_${f}`);
 }
 
