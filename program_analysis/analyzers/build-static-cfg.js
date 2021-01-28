@@ -149,11 +149,74 @@ var buildCFG = function(filenames){
 
 }
 
+var cvtToDictCG = function(cg){
+    // converts the given cg to a dict
+    var dCg = {};
+    cg.forEach((entry)=>{
+        var [caller, callee] = entry;
+        if (!(caller in dCg))
+            dCg[caller] = [];
+        dCg[caller].push(callee);
+    });
+    return dCg;
+}
+
+var buildEvtCFG = function(completeCg, evtHandlers){
+    // parse evt handlers as a list of ids
+    var handlers = [];
+    Object.values(evtHandlers).forEach((h)=>{
+        //h is a dict with key as ln and values as ids
+        handlers = handlers.concat(Object.values(h));
+    });
+
+    dCg = cvtToDictCG(completeCg);
+
+    var handlerCFG = {};
+
+    var traverseCFG = function(handler, callers){
+        if (!callers) return;
+        
+        callers.forEach((c)=>{
+            if (handlerCFG[handler].has(c)) return;
+            handlerCFG[handler].add(c);
+            var childCallers = dCg[c];
+            traverseCFG(handler,childCallers);
+        });
+    }
+
+    handlers.forEach((h)=>{
+        handlerCFG[h] = new Set;
+        traverseCFG(h, dCg[h]);
+    });
+
+    return handlerCFG;
+}
+
+var cgStats = function(completeCG, evtCG){
+    var total = new Set, evt = new Set;
+
+    completeCG.forEach((f)=>{
+        total.add(f[0]);
+        total.add(f[1]);
+    });
+    // Object.values(completeCG).forEach((f)=>{
+    //     total.add(f);
+    // })
+
+    Object.values(evtCG).forEach((f)=>{
+        f.forEach(evt.add, evt);
+    });
+
+    console.log(total.size, evt.size);
+
+}
+
 var patchCFG = function(allIds){
     var cg = `${JSSRCFILES}/cg`,
         fg = `${JSSRCFILES}/fg`;
     
-    cgPatcher.findMissingCallees(cg, fg, allIds);
+    var completeCg = cgPatcher.findMissingCallees(cg, fg, allIds);
+    return completeCg;
 }
 
 function main(){
@@ -165,9 +228,11 @@ function main(){
     extractSrcFiles(program.directory, `${JSSRCFILES}/filenames`);
     var [handlerIds, allIds] = buildHandlersId(handlers, filenames);
     buildCFG(filenames);
-    patchCFG(allIds);
+    var completeCg = patchCFG(allIds);
 
+    var evtCG = buildEvtCFG(completeCg, handlerIds);
 
+    cgStats(completeCg, evtCG);
 }
 
 main();
