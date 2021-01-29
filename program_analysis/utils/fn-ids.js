@@ -34,8 +34,7 @@ var inArray = function(arr, val){
 var parse = function (src, options) {
     src = beautifier.js(src);
     var filename = options.filename;
-    var fns = options.fns; // return the id of the only these fns
-    var fnIds = {}, allFnIds = {};
+    var allFnIds = {};
     falafel(src, {
         locations: true,
         ranges: true
@@ -46,16 +45,10 @@ var parse = function (src, options) {
             var idLen = id.split('-').length;
             var ln = Number.parseInt(id.split('-')[idLen - 4])
             allFnIds[ln] =[id,node.source().length];
-            var nodeIndex = inArray(options.fns, node.source());
-            if (options.fns && nodeIndex == -1)
-                return;
-            // console.log(makeId('test', node));
-            fns[nodeIndex].found = true;
-            fnIds[ln] = id;
+            
         }
     });
-    console.log(`Found ids for ${Object.keys(fnIds).length}`)
-    return [fnIds, allFnIds];
+    return allFnIds;
 }
 
 function main() {

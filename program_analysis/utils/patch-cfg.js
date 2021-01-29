@@ -53,8 +53,12 @@ var findBoundingFn = function(strLoc, fns, fnLns){
     /**
      * Find the immediately bounding function for this LOC
      */
+    var _cache = {}; // caches ln to boundingFn
     var curFnLn = Number.MIN_VALUE, curFn = null;
     var [file,loc] = parseCfgId(strLoc);
+    var cachedFn;
+    if (cachedFn = _cache[loc])
+        return cachedFn;
     var fileFns = fns[file], lns = fnLns[file], idx = 0; //Object.keys converts all keys to strings
     while (lns[idx] < loc && idx < lns.length) {
         // the final fn is a two tuple of id and source.length, just need id here
@@ -80,8 +84,10 @@ var findBoundingFn = function(strLoc, fns, fnLns){
     // });
     if (curFnLn == Number.MIN_VALUE) {
         // the current caller location is in the global scope
+        _cache[loc] = 'GLOBAL';
         return 'GLOBAL'
     }
+    _cache[loc] = curFn;
     return curFn;
 }
 
@@ -106,12 +112,18 @@ var parse = function(f){
 var patchCFG = function(cfg, fnIds){
     var res = [];
     var fnLns = preprocessFnIds(fnIds);
-    cfg.forEach((entry)=>{
+    var uniqueCallers = {};
+    cfg.forEach((entry,id)=>{
+        if (entry[0] in uniqueCallers)
+            return;
         var caller, callee;
+        var perc = id/cfg.length;
+        // console.log(`${perc}% done...`)
         caller = findBoundingFn(entry[0], fnIds, fnLns),
         callee = findMatchingFn(entry[1], fnIds);
         // console.log(`${entry} becomes ${[caller, callee]}`);
         res.push([caller, callee]);
+        uniqueCallers[entry[0]] = true;
     });
     return res;
 }
@@ -134,7 +146,8 @@ var read = function(f){
 function findMissingCallees(cg, fg, allIds){
     var parsedCfg = parseCFG(read(cg));
     var parsedFg = parseCFG(read(fg));
-    _findMissingCallees(parsedCfg, parsedFg);
+    console.log(`done parsing cg and fg\n Patching cg and fg now`)
+    // _findMissingCallees(parsedCfg, parsedFg);
 
     return patchCFG(parsedCfg, allIds);
 }

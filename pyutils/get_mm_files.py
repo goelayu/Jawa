@@ -38,13 +38,15 @@ def dump_file_contents(file,name):
 
 def extract_imp_files(all_files, imp_file_names):
     # print 'imp files', imp_file_names
-    for a in all_files:
-        # print 'checking for', a.getUrl()
-        for i in imp_file_names:
+    for i in imp_file_names:
+        found = False
+        for a in all_files:
             if i in a.getUrl():
-                print 'found file', i
+                found = True
                 dump_file_contents(a,i)
                 break
+        if not found:
+            raise Exception('file {} not found'.format(i))
 
 def init_logger():
     log_level = getattr(logging, os.environ.get('LOGLEVEL') or 'INFO')

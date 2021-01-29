@@ -14,15 +14,16 @@ const fs = require('fs'),
     {spawnSync} = require('child_process'),
     path = require("path"),
     fnIds = require('../utils/fn-ids'),
-    cgPatcher = require('../utils/patch-cfg');
-const { getDefaultSettings } = require('http2');
+    cgPatcher = require('../utils/patch-cfg'),
+    util = require('../utils/util');
+const { getDefaultSettings } = require('http2'); 
+const dynamicCfg = require('./rewriters/dynamic-cfg');
 
 const JSSRCFILES = `${__dirname}/../../JS_FILES`;
 const STATICANALYSER = `${__dirname}/javascript-call-graph/main.js`
 
 program
-    .option('--evt [evt]', 'path to list of event handlers')
-    .option('--filenames [filenames]','filenames containing event handlers')
+    .option('-p , --performance [performance]', 'path to performance directory')
     .option('-d, --directory [directory]','mahimahi directory')
     .option('-v, --verbose', 'verbose logging')
     .parse(process.argv);
@@ -42,60 +43,17 @@ var extractSrcFiles = function(dir, filenames){
     console.error(cmdOut.stderr.toString());
 }
 
-var all_handlers = ["abort", "blur", "change", "click", "close", "contextmenu", "dblclick", "focus",
-    "input", "keydown", "keypress", "keyup", "mouseenter", "mousedown", "mouseleave", "mousemove", "mouseout",
-    "mouseover", "mouseup", "reset", "resize", "scroll", "select", "submit" ];
 
-var IGNORE_ELEMENTS = ['SCRIPT', 'IFRAME', 'BODY','LINK','IMG'
-    ,'INPUT','FORM','A','HTML']
-
-function getCandidateElements(listeners){
-    var elems = []; // each entry is a two-tupe [1st,2nd] where 1st is element, and 2nd is list of events
-    listeners.forEach((l)=>{
-        var [el, handler] = l;
-        if (IGNORE_ELEMENTS.filter(e=>el.startsWith(e)).length == 0){
-            var e = [el, []];
-            Object.keys(handler).forEach((h)=>{
-                if (all_handlers.indexOf(h)>=0)
-                    e[1] = e[1].concat(handler[h]);
-            });
-            if (!e[1].length) return;
-            elems.push(e);
-        }
+var extractFileNames = function(dynamicCfg){
+    /**
+     * Parses the dynamic cfg and creates a filename array
+     */
+    var filenames = [];
+    dynamicCfg.forEach((id)=>{
+        var _filename =  id.split('-').slice(0,id.split('-').length - 4).join('-');
+        if (filenames.indexOf(_filename)<0)
+            filenames.push(_filename);
     })
-    return elems;
-}
-
-var extractEvtHandlers = function(evtFile){
-    var handlers = [],
-        handlerInfo = JSON.parse(fs.readFileSync(evtFile));
-    
-    var candidateHandlers = getCandidateElements(handlerInfo);
-    candidateHandlers.forEach((hndls)=>{
-            handlers = handlers.concat(hndls[1]);
-        });
-    return handlers;
-}
-
-var extractFileNames = function(handlers){
-    var filenames = {};
-    handlers.forEach((h)=>{
-        var file;
-        var hlines = h.split('\n');
-        for (var i=0;i<hlines.length;i++){
-            var line = hlines[i];
-            if (line.indexOf('fn inside file')>=0){
-                file = line.split(':')[1].trim();
-                break;
-            }
-        }
-        !file && program.verbose && console.log(`No filename found inside handler: ${h}`);
-        if (file){
-            if (!(file in filenames))
-                filenames[file] = [];
-            filenames[file].push(h);
-        }
-    });
     return filenames;
 }
 
@@ -103,38 +61,30 @@ var escapefilename = function(fn){
     return fn.replace(/\//g,'_');
 }
 
-var buildHandlersId = function(handlers, filenames){
-    var jsSrcs = fs.readdirSync(JSSRCFILES);
-    var handlerIds = {}, allIds = {};
+var getAllIds = function(filenames){
+    var allIds = {};
     // TODO unique handlers are different by their location
     // not by their source code
-    Object.keys(filenames).forEach((file)=>{
-        var noIdHandlers = [...new Set(filenames[file])];
-        program.verbose && console.log(`finding ids for ${noIdHandlers.length} handlers`);
+    filenames.forEach((file)=>{
         var content = fs.readFileSync(`${JSSRCFILES}/${escapefilename(file)}`,'utf-8');
 
-        var [_handlerIds, _allIds] = [[],[]];
+        var _allIds = [];
         try {
-            [_handlerIds, _allIds]  = fnIds.parse(content, {filename:file, fns:noIdHandlers});
+            _allIds  = fnIds.parse(content, {filename:file});
         } catch (e){
-            program.verbose && console.error(`Error while parsing file: ${jsSrc}`);
+            program.verbose && console.error(`Error while parsing file: ${file}`);
         }
         
-        //update list of ids
-        handlerIds[escapefilename(file)] = _handlerIds;
         allIds[escapefilename(file)] = _allIds;
-
-        //update noHandlerId list to remove the handlers already found
-        // noIdHandlers = noIdHandlers.filter(e=>!e.found);
     });
-    return [handlerIds, allIds];
+    return allIds;
 }
 
-var buildCFG = function(filenames){
+var execCFGModule = function(filenames){
     var baseCMD = `node ${STATICANALYSER} `;
     var cmdArgs = ' ';
     // var jsSrcs = fs.readdirSync(JSSRCFILES);
-    Object.keys(filenames).forEach((file)=>{
+    filenames.forEach((file)=>{
         cmdArgs += ` ${JSSRCFILES}/${escapefilename(file)}`;
     });
     var cfgCMD = baseCMD + `--cg ${cmdArgs} > ${JSSRCFILES}/cg`;
@@ -167,14 +117,9 @@ var isNativeFn = function(fnId){
     return fnId.split('-').length < 4;
 }
 
-var buildEvtCFG = function(completeCg, evtHandlers){
+var buildEvtCFG = function(completeCg, handlers){
     // parse evt handlers as a list of ids
-    var handlers = [],
-        missingEdges = 0;
-    Object.values(evtHandlers).forEach((h)=>{
-        //h is a dict with key as ln and values as id
-        handlers = handlers.concat(Object.values(h));
-    });
+    var missingEdges = 0;
 
     dCg = cvtToDictCG(completeCg);
 
@@ -216,9 +161,16 @@ var getIdLen = function(allIds){
     return idSrcLen;
 }
 
-var cgStats = function(completeCG, evtCG, allIds){
+var cgStats = function(completeCG, static, dynamic, allIds){
     var total = new Set, evt = new Set, 
-        evtSrcSize = 0;
+        staticSize = dynamicSize = 0;
+    
+    var idSrcLen = getIdLen(allIds);
+
+    dynamic.forEach((d)=>{
+        dynamicSize += idSrcLen[d];
+    });
+    console.log(`dynamic size: ${dynamicSize}`)
 
     completeCG.forEach((f)=>{
         total.add(f[0]);
@@ -228,16 +180,16 @@ var cgStats = function(completeCG, evtCG, allIds){
     //     total.add(f);
     // })
 
-    Object.values(evtCG).forEach((f)=>{
+    Object.values(static).forEach((f)=>{
         f.user.forEach(evt.add, evt);
     });
 
-    var idSrcLen = getIdLen(allIds);
+    
     evt.forEach((val)=>{
-        evtSrcSize += idSrcLen[val];
+        staticSize += idSrcLen[val];
     });
 
-    console.log(total.size, evt.size, evtSrcSize);
+    console.log(total.size, evt.size, staticSize);
 
 }
 
@@ -253,21 +205,27 @@ function main(){
     // 1) clean JS dir
     program.verbose && console.log(`----------Cleaning the JS dir ${JSSRCFILES}-------------`)
     cleanJSDir();
+    program.verbose && console.log(`----------Parsing dynamic CFG----------- `)
+    var dynamicCfgDict = JSON.parse(fs.readFileSync(`${program.performance}/cg`,'utf-8'));
+    var dynamicCfg = util.mergeValsArr(dynamicCfgDict);
     program.verbose && console.log(`----------Extracting evt handlers and filenames----------- `)
-    var handlers = extractEvtHandlers(program.evt);
-    var filenames = extractFileNames(handlers);
-    fs.writeFileSync(`${JSSRCFILES}/filenames`,JSON.stringify(Object.keys(filenames)))
+    // var evtFile = `${program.performance}/handlers`
+    // var handlers = extractEvtHandlers(evtFile);
+    var filenames = extractFileNames(dynamicCfg);
+    var handlerIds = Object.keys(dynamicCfgDict);
+    fs.writeFileSync(`${JSSRCFILES}/filenames`,JSON.stringify(filenames));
     program.verbose && console.log(`---------Parsing mm directory to get JS src files-----------`);
     extractSrcFiles(program.directory, `${JSSRCFILES}/filenames`);
-    var [handlerIds, allIds] = buildHandlersId(handlers, filenames);
+    var allIds = getAllIds(filenames);
     program.verbose && console.log(`-------Build static call graph--------------`)
-    buildCFG(filenames);
-    program.verbose && console.log(`----------Patch CG with missing edges------------`)
+    execCFGModule(filenames);
+    // program.verbose && console.log(`----------Patch CG with missing edges------------`)
     var completeCg = patchCFG(allIds);
-    program.verbose && console.log(`----------Build final evt CG------------`)
-    var evtCG = buildEvtCFG(completeCg, handlerIds);
-
-    cgStats(completeCg, evtCG, allIds);
+    // program.verbose && console.log(`----------Build final evt CG------------`)
+    var staticCfg = buildEvtCFG(completeCg, handlerIds);
+    
+    // cgStats(null, null, dynamicCfg, allIds);
+    cgStats(completeCg, staticCfg, dynamicCfg, allIds);
 }
 
 main();
