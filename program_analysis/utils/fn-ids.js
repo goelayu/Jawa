@@ -6,7 +6,8 @@
 const falafel = require('falafel'),
     fs = require('fs'),
     program = require('commander'),
-    beautifier = require('js-beautify');
+    beautifier = require('js-beautify'),
+    astutils = require('./astutils');
 
 // program
 //     .option('-i, --input [input]','path to the input file')
@@ -31,20 +32,37 @@ var inArray = function(arr, val){
     return -1;
 }
 
+var addFnLen = function(fn){
+    fn.attr.totalLen = fn.source().length;
+    var childLen = 0;
+    fn.attr.childFns.forEach((c)=>{
+
+    })
+}
+
 var parse = function (src, options) {
     src = beautifier.js(src);
     var filename = options.filename;
-    var allFnIds = {};
+    var allFnIds = {}, nodes = [];
     falafel(src, {
         locations: true,
         ranges: true
     }, function (node) {
+        nodes.push(node);
+    });
+
+    var prgNode = nodes[nodes.length - 1];
+    prgNode.attr = {filename: filename};
+    astutils.addMetadata(prgNode);
+
+    nodes.forEach((node)=>{
         if (node.type == 'FunctionDeclaration' || node.type == 'FunctionExpression'
             || node.type == 'ArrowFunctionExpression') {
             var id = makeId(filename, node);
             var idLen = id.split('-').length;
             var ln = Number.parseInt(id.split('-')[idLen - 4])
-            allFnIds[ln] =[id,node.source().length];
+            var nodeAttr = node.attr;
+            allFnIds[ln] =[id,nodeAttr.totalLen, nodeAttr.selfLen];
             
         }
     });

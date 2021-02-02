@@ -72,7 +72,7 @@ var getAllIds = function(filenames){
         try {
             _allIds  = fnIds.parse(content, {filename:file});
         } catch (e){
-            program.verbose && console.error(`Error while parsing file: ${file}`);
+            program.verbose && console.error(`Error while parsing file: ${file}\nError: ${e}`);
         }
         
         allIds[escapefilename(file)] = _allIds;
@@ -157,7 +157,7 @@ var getIdLen = function(allIds){
     Object.values(allIds).forEach((idDict)=>{
         //idDict is a dict with key as ln and values as id, source length tuple
         Object.values(idDict).forEach((idLen)=>{
-            idSrcLen[idLen[0]] = idLen[1];
+            idSrcLen[idLen[0]] = [idLen[1],idLen[2]];
         });
     });
     return idSrcLen;
@@ -174,7 +174,7 @@ var cgStats = function(completeCG, static, dynamic, allIds){
     var idSrcLen = getIdLen(allIds);
 
     dynamic.forEach((d)=>{
-        dynamicSize += idSrcLen[d];
+        dynamicSize += idSrcLen[d][1];
     });
     console.log(`dynamic size: ${dynamicSize}`)
 
@@ -227,6 +227,8 @@ function main(){
     program.verbose && console.log(`---------Parsing mm directory to get JS src files-----------`);
     // extractSrcFiles(program.directory, `${JSSRCFILES}/filenames`);
     var allIds = getAllIds(filenames);
+    cgStats(null, null, dynamicCfg, allIds);
+    return;
     program.verbose && console.log(`-------Build static call graph--------------`)
     // execCFGModule(filenames);
     // program.verbose && console.log(`----------Patch CG with missing edges------------`)
