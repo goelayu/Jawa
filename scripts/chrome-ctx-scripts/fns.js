@@ -13,11 +13,18 @@ var getCallGraph = async function(page, program){
     dump(cg, `${program.output}/cg`);
 }
 
+var getAllFns = async function(page, program){
+    var _allFns = await page.evaluateHandle(() => window.__tracer.getAllFns());
+    var allFns = await _allFns.jsonValue();
+    dump(allFns, `${program.output}/allFns`);
+}
+
 var dump = function(data, file){
     fs.writeFileSync(file, JSON.stringify(data));
 }
 
 
 module.exports = {
-    getCallGraph : getCallGraph
+    getCallGraph : getCallGraph,
+    getAllFns : getAllFns
 }

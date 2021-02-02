@@ -87,6 +87,7 @@ function _triggerEvent(el, evt){
 function triggerEvents(elems){
     // turn on the tracer logging
     window.__tracer.setTracingMode(true);
+    window.__tracer.setCaptureMode('postload');
     elems.forEach((_e)=>{
         try {
             var [elem, handlers] = _e;

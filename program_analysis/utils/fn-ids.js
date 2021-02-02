@@ -32,13 +32,6 @@ var inArray = function(arr, val){
     return -1;
 }
 
-var addFnLen = function(fn){
-    fn.attr.totalLen = fn.source().length;
-    var childLen = 0;
-    fn.attr.childFns.forEach((c)=>{
-
-    })
-}
 
 var parse = function (src, options) {
     src = beautifier.js(src);

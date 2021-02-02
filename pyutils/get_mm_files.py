@@ -29,7 +29,9 @@ def parse_dir(dir):
                 pass
     return objs
 def filename(url):
-    return url.replace('/','_');
+    if len(url) > 50:
+        url = url[-50:]
+    return url.replace('/',';;');
 
 def dump_file_contents(file,name):
     src = file._plainText
@@ -48,6 +50,12 @@ def extract_imp_files(all_files, imp_file_names):
         if not found:
             raise Exception('file {} not found'.format(i))
 
+def extract_all_files(all_files):
+    for a in all_files:
+        type = a.getHeader('content-type');
+        if type and 'javascript' in type:
+            dump_file_contents(a,a.getUrl())
+        
 def init_logger():
     log_level = getattr(logging, os.environ.get('LOGLEVEL') or 'INFO')
     logging.basicConfig(level=log_level)
@@ -62,4 +70,5 @@ if __name__ == "__main__":
     init_output_directory()
     all_files = parse_dir(args.mm)
     imp_files = parse_files(args.evt_file)
-    extract_imp_files(all_files, imp_files)
+    # extract_imp_files(all_files, imp_files)
+    extract_all_files(all_files)

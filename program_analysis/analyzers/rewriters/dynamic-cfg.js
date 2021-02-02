@@ -33,7 +33,13 @@ function instrument(src, options){
 
     try {
         ASTNodes.forEach((node)=>{
-            if (node.type == 'FunctionDeclaration' || node.type == 'FunctionExpression'){
+            if (node.type == 'Program'){
+                var tracerCheck = `\n(function(){if (typeof __tracer == 'undefined' && typeof window != 'undefined')
+                    { __tracer = window.top.__tracer;
+                    }
+                    })();\n`;
+                node.update(`${tracerCheck} ${node.source()}`);
+            } else if (node.type == 'FunctionDeclaration' || node.type == 'FunctionExpression'){
                 var nodeBody = node.body.source().substring(1, node.body.source().length-1);
                 var id = makeId(filename,node);
                 node.body.update(
