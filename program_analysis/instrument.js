@@ -14,6 +14,7 @@ program
 
 
 var rewriter = null;
+var returnInfoFile = program.input + ".info";
 
 function IsJsonString(str) {
     try {
@@ -115,6 +116,11 @@ function instrumentHTML(src, filename){
 
 }
 
+function dumpMD(){
+    // dumps the metadata information post instrumentation
+    fs.writeFileSync(returnInfoFile, JSON.stringify(rewriter.metadata.allFnIds));
+}
+
 function instrumentJavaScript(src, filename, jsInHTML){
     if (IsJsonString(src)){
         if (jsInHTML)
@@ -131,9 +137,9 @@ function instrumentJavaScript(src, filename, jsInHTML){
 function main(){
     initRewriter();
     var url = program.name.split(';;;')[0];
-    var _filename = program.name.split(';;;;')[1];
-    _filename = _filename == "/" ? url + _filename : _filename;
-    var filename = _filename.length>50?_filename.substring(_filename.length-50,_filename.length) : _filename;
+    var filename = program.name.split(';;;;')[1];
+    // _filename = _filename == "/" ? url + _filename : _filename;
+    // var filename = _filename.length>50?_filename.substring(_filename.length-50,_filename.length) : _filename;
     
     var src = fs.readFileSync(program.input,"utf-8")
 
@@ -157,6 +163,7 @@ function main(){
     }
 
     fs.writeFileSync(program.input, src)
+    dumpMD();
 }
 
 main();

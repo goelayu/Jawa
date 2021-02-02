@@ -19,12 +19,13 @@ const fs = require('fs'),
 const { getDefaultSettings } = require('http2'); 
 const dynamicCfg = require('./rewriters/dynamic-cfg');
 
-const JSSRCFILES = `${__dirname}/../../JS_FILES`;
+const JSSRCFILES = `${__dirname}/`;
 const STATICANALYSER = `${__dirname}/javascript-call-graph/main.js`
 
 program
     .option('-p , --performance [performance]', 'path to performance directory')
     .option('-d, --directory [directory]','mahimahi directory')
+    .option('-s, --js-src [jsSrc]','javascript source file directory')
     .option('-v, --verbose', 'verbose logging')
     .parse(process.argv);
 
@@ -58,24 +59,36 @@ var extractFileNames = function(dynamicCfg){
 }
 
 var escapefilename = function(fn){
-    return fn.replace(/\//g,'_');
+    return fn.replace(/\//g,';;');
+}
+
+var unescapefilename = function(fn){
+    return fn.replace(/;;/g,'/');
 }
 
 var getAllIds = function(filenames){
+    var filenames = fs.readdirSync(program.jsSrc);
     var allIds = {};
-    // TODO unique handlers are different by their location
-    // not by their source code
     filenames.forEach((file)=>{
-        var content = fs.readFileSync(`${JSSRCFILES}/${escapefilename(file)}`,'utf-8');
-
-        var _allIds = [];
-        try {
-            _allIds  = fnIds.parse(content, {filename:file});
-        } catch (e){
-            program.verbose && console.error(`Error while parsing file: ${file}\nError: ${e}`);
+        try {    
+            var idFile = `${program.jsSrc}/${file}/ids`;
+            var ids = JSON.parse(fs.readFileSync(idFile, 'utf-8'));
+            allIds[file] = ids;
+        } catch (e) {
+            program.verbose && console.log(`Error while readings ids for ${file}`);
         }
+
+        // if (file == 'filenames') return;
+        // var content = fs.readFileSync(`${JSSRCFILES}/${escapefilename(file)}`,'utf-8');
+
+        // var _allIds = [];
+        // try {
+        //     _allIds  = fnIds.parse(content, {filename:unescapefilename(file)});
+        // } catch (e){
+        //     program.verbose && console.error(`Error while parsing file: ${file}\nError: ${e}`);
+        // }
         
-        allIds[escapefilename(file)] = _allIds;
+        // allIds[escapefilename(file)] = _allIds;
     });
     return allIds;
 }
@@ -163,20 +176,25 @@ var getIdLen = function(allIds){
     return idSrcLen;
 }
 
-var pruneStaticCg = function(staticCfg, dynamicCfg){
-    
-}
-
-var cgStats = function(completeCG, static, dynamic, allIds){
+var cgStats = function(completeCG, static, dynamic, allFns, allIds){
     var total = new Set, evt = new Set, 
-        staticSize = dynamicSize = 0;
+        staticSize = dynamicSize  = preloadSize = 0;
     
     var idSrcLen = getIdLen(allIds);
 
     dynamic.forEach((d)=>{
         dynamicSize += idSrcLen[d][1];
     });
-    console.log(`dynamic size: ${dynamicSize}`)
+
+    allFns.preload.forEach((f)=>{
+        if (!idSrcLen[f]) {
+            console.log(`${f} not found`)
+            return;
+        }
+        preloadSize += idSrcLen[f][1];
+    });
+
+    console.log(`dynamic size: ${dynamicSize} ${preloadSize}`)
 
     Object.keys(completeCG).forEach((caller)=>{
         total.add(caller);
@@ -210,13 +228,11 @@ var patchCFG = function(allIds){
 }
 
 function main(){
-    // 1) clean JS dir
-    program.verbose && console.log(`----------Cleaning the JS dir ${JSSRCFILES}-------------`)
-    // cleanJSDir();
     program.verbose && console.log(`----------Parsing dynamic CFG----------- `)
     var dynamicCfgDict = JSON.parse(fs.readFileSync(`${program.performance}/cg`,'utf-8'));
+    var allFns = JSON.parse(fs.readFileSync(`${program.performance}/allFns`,'utf-8'));
     var dynamicCfg = util.mergeValsArr(dynamicCfgDict);
-    console.log(`dynamic cfg nodes: ${dynamicCfg.length}.length`)
+    console.log(`dynamic cfg nodes: ${dynamicCfg.length}`)
     program.verbose && console.log(`----------Extracting evt handlers and filenames----------- `)
     // var evtFile = `${program.performance}/handlers`
     // var handlers = extractEvtHandlers(evtFile);
@@ -224,10 +240,10 @@ function main(){
     var handlerIds = Object.keys(dynamicCfgDict);
     console.log(`number of handlers: ${handlerIds.length}`)
     // fs.writeFileSync(`${JSSRCFILES}/filenames`,JSON.stringify(filenames));
-    program.verbose && console.log(`---------Parsing mm directory to get JS src files-----------`);
+    // program.verbose && console.log(`---------Parsing mm directory to get JS src files-----------`);
     // extractSrcFiles(program.directory, `${JSSRCFILES}/filenames`);
     var allIds = getAllIds(filenames);
-    cgStats(null, null, dynamicCfg, allIds);
+    cgStats(null, null, dynamicCfg, allFns, allIds);
     return;
     program.verbose && console.log(`-------Build static call graph--------------`)
     // execCFGModule(filenames);

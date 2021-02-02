@@ -1,5 +1,8 @@
 const falafel = require('falafel'),
-    beautifier = require('js-beautify');
+    beautifier = require('js-beautify'),
+    astutils = require('../../utils/astutils');
+
+var metadata = {allFnIds:{}};
 
 var getNodes = function(src, arr){
     src = beautifier.js(src);
@@ -28,8 +31,13 @@ function instrument(src, options){
      * Construct AST from the source string
      */
 
-    var ASTNodes = [];
+    var ASTNodes = [], 
+        allFnIds = metadata.allFnIds;
     var instSrc = getNodes(src, ASTNodes);
+
+    var prgNode = ASTNodes[ASTNodes.length - 1];
+    prgNode.attr = {filename: filename};
+    astutils.addMetadata(prgNode);
 
     try {
         ASTNodes.forEach((node)=>{
@@ -42,6 +50,10 @@ function instrument(src, options){
             } else if (node.type == 'FunctionDeclaration' || node.type == 'FunctionExpression'){
                 var nodeBody = node.body.source().substring(1, node.body.source().length-1);
                 var id = makeId(filename,node);
+                var idLen = id.split('-').length;
+                var ln = Number.parseInt(id.split('-')[idLen - 4])
+                var nodeAttr = node.attr;
+                allFnIds[ln] =[id,nodeAttr.totalLen, nodeAttr.selfLen];
                 node.body.update(
                     `{
                         try{
@@ -64,5 +76,6 @@ function instrument(src, options){
 
 
 module.exports = {
-    instrument: instrument
+    instrument: instrument,
+    metadata : metadata
 }

@@ -58,6 +58,7 @@ def get_valid_filename(s):
     >>> get_valid_filename("john's portrait in 2004.jpg")
     'johns_portrait_in_2004.jpg'
     """
+    # return s.replace('/',';;')
     s = str(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)
 
@@ -80,9 +81,10 @@ def instrument(root, fileType, output_directory,args,file):
 
     if len(filename) > 50:
         filename = filename[-50:]
-    # filename = get_valid_filename(filename)
     if filename == "/":
         filename = url+filename
+
+    filename = get_valid_filename(filename)
 
     node_debugging_port = random.randint(9300,9600)
     # pid = os.fork()
@@ -105,6 +107,7 @@ def instrument(root, fileType, output_directory,args,file):
 
     print "Instrumenting: {} is a {} file".format(file, fileType)
     f = open(TEMP_FILE, "w")
+    content = None
     if gzip:
         try:
             print "Decompressing {} ...with type {}".format(file, gzipType)
@@ -112,6 +115,7 @@ def instrument(root, fileType, output_directory,args,file):
                 decompressed_data = zlib.decompress(bytes(bytearray(http_response.response.body)), zlib.MAX_WBITS|32)
             else:
                 decompressed_data = brotli.decompress(http_response.response.body)
+            content = decompressed_data
             f.write(decompressed_data)
         except zlib.error as e:
             print "Corrupted decoding: " + file + str(e)
@@ -120,20 +124,28 @@ def instrument(root, fileType, output_directory,args,file):
             f.close()
             return
             # os._exit(0)
-    else: f.write(http_response.response.body)
+    else: 
+        content = http_response.response.body
+        f.write(http_response.response.body)
     f.close()
-    command = " {} -i {} -n '{}' -t {} -r {}".format(analyzer_script,TEMP_FILE, url + ";;;;" + origPath,fileType, args.rewriter)
+    command = " {} -i {} -n '{}' -t {} -r {}".format(analyzer_script,TEMP_FILE, url + ";;;;" + filename,fileType, args.rewriter)
 
     if (args.debug) and fileType == args.debug:
         command = "node --inspect-brk={}".format(node_debugging_port) + command
     else:
         command = "node " + command
-    _log_path = log_directory+"/"+output_directory+"/" + get_valid_filename(filename) + "/"
+    _log_path = log_directory+"/"+output_directory+"/" + filename + "/"
     subprocess.call("mkdir -p {}".format(_log_path), shell=True)
 
     log_file=open(_log_path+"logs","w")
     error_file=open(_log_path+"errors","w")
-    # if (args.instOutput != "ND" or fileType == "html"):
+    src_file = open(_log_path+'src','w')
+    id_file = open(_log_path+'ids','w')
+
+    src_file.write(content)
+    src_file.close()
+
+
     print "Executing ", command
     cmd = subprocess.call(command, stdout=log_file, stderr =error_file, shell=True)
     
@@ -141,7 +153,8 @@ def instrument(root, fileType, output_directory,args,file):
         returnInfoFile = TEMP_FILE + ".info";
         returnInfo = "".join(open(returnInfoFile,'r').readlines())
 
-        open(_log_path + "info","w").write(returnInfo)
+        id_file.write(returnInfo)
+        id_file.close()
     except IOError as e:
         print "Error while reading info file" + str(e)
 
