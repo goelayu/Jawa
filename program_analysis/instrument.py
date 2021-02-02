@@ -139,7 +139,7 @@ def instrument(root, fileType, output_directory,args,file):
 
     log_file=open(_log_path+"logs","w")
     error_file=open(_log_path+"errors","w")
-    src_file = open(_log_path+'src','w')
+    src_file = open(_log_path+'/'+filename,'w')
     id_file = open(_log_path+'ids','w')
 
     src_file.write(content)

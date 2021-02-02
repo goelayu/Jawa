@@ -19,7 +19,7 @@ const fs = require('fs'),
 const { getDefaultSettings } = require('http2'); 
 const dynamicCfg = require('./rewriters/dynamic-cfg');
 
-const JSSRCFILES = `${__dirname}/`;
+const JSSRCFILES = `${__dirname}`;
 const STATICANALYSER = `${__dirname}/javascript-call-graph/main.js`
 
 program
@@ -66,7 +66,7 @@ var unescapefilename = function(fn){
     return fn.replace(/;;/g,'/');
 }
 
-var getAllIds = function(filenames){
+var getAllIds = function(){
     var filenames = fs.readdirSync(program.jsSrc);
     var allIds = {};
     filenames.forEach((file)=>{
@@ -98,7 +98,7 @@ var execCFGModule = function(filenames){
     var cmdArgs = ' ';
     // var jsSrcs = fs.readdirSync(JSSRCFILES);
     filenames.forEach((file)=>{
-        cmdArgs += ` ${JSSRCFILES}/${escapefilename(file)}`;
+        cmdArgs += ` ${program.jsSrc}/${file}/${file}`;
     });
     var cfgCMD = baseCMD + `--cg ${cmdArgs} > ${JSSRCFILES}/cg`;
     var fgCMD = baseCMD + `--fg ${cmdArgs} > ${JSSRCFILES}/fg`;
@@ -212,7 +212,7 @@ var cgStats = function(completeCG, static, dynamic, allFns, allIds){
 
     
     evt.forEach((val)=>{
-        staticSize += idSrcLen[val];
+        staticSize += idSrcLen[val][1];
     });
 
     console.log(total.size, evt.size, staticSize);
@@ -242,9 +242,9 @@ function main(){
     // fs.writeFileSync(`${JSSRCFILES}/filenames`,JSON.stringify(filenames));
     // program.verbose && console.log(`---------Parsing mm directory to get JS src files-----------`);
     // extractSrcFiles(program.directory, `${JSSRCFILES}/filenames`);
-    var allIds = getAllIds(filenames);
-    cgStats(null, null, dynamicCfg, allFns, allIds);
-    return;
+    var allIds = getAllIds();
+    // cgStats(null, null, dynamicCfg, allFns, allIds);
+    // return;
     program.verbose && console.log(`-------Build static call graph--------------`)
     // execCFGModule(filenames);
     // program.verbose && console.log(`----------Patch CG with missing edges------------`)
@@ -253,7 +253,7 @@ function main(){
     var staticCfg = buildEvtCFG(completeCg, handlerIds);
     
     // cgStats(null, null, dynamicCfg, allIds);
-    cgStats(completeCg, staticCfg, dynamicCfg, allIds);
+    cgStats(completeCg, staticCfg, dynamicCfg, allFns, allIds);
 }
 
 main();

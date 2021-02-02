@@ -142,7 +142,7 @@ var dictStaticCFG = function(cfg, fnIds){
         var caller = findMatchingFn(entry[0], fnIds, true),
             callee = findMatchingFn(entry[1], fnIds, false);
         var perc = id/cfg.length;
-        console.log(`${perc*100}% done...`)
+        ((perc*100) % 10 == 0) && console.log(`${perc*100}% done...`)
         if (!(caller in res))
             res[caller] = [];
         res[caller].push(callee);

@@ -3,7 +3,7 @@
 !dom-distill/*/
 !program_analysis/
 !program_analysis/*/
-!program_analysis/*/*
+!program_analysis/**/
 !scripts/
 !scripts/*/
 !parser/
