@@ -36,8 +36,8 @@ var parseCFG = function(strCfg){
 var parseCfgId = function(strLoc){
     if (strLoc.indexOf('@')<0)
         return ['','NATIVE'];
-    var [file, _loc] = strLoc.split('@'), loc = _loc.split(':')[0]; 
-    return [file,Number.parseInt(loc)];
+    var [file, _loc, fnLoc] = strLoc.split('@'), loc = _loc.split(':')[0]; 
+    return [file,Number.parseInt(loc), fnLoc];
 }
 
 var preprocessFnIds = function(fns){
@@ -91,15 +91,22 @@ var findBoundingFn = function(strLoc, fns, fnLns){
     return curFn;
 }
 
-var findMatchingFn = function(strLoc, fns){
+var findMatchingFn = function(strLoc, fns, isCaller){
     /**
      * Find matching function based on line number
      * Doesn't need preprocessed fnIds since its a direct lookup
      */
     if (!strLoc) return null;
-    var [file, loc] = parseCfgId(strLoc);
+    var [file, loc, fnLoc] = parseCfgId(strLoc);
     if (loc == 'NATIVE') return strLoc;
-    var curFn = fns[file][loc][0]; // first index is the id, 2nd is the source length
+    // console.log(file,loc,fnLoc)
+    var index;
+    if (isCaller){
+        if (!fnLoc) return 'GLOBAL';
+        index = fnLoc.split('-')[1];
+    }
+    else index = loc;
+    var curFn = fns[file][index][0]; // first index is the id, 2nd is the source length
 
     if (!curFn) throw new Error(`no matching function found for ${strLoc}`);
     return curFn;
@@ -114,16 +121,31 @@ var patchCFG = function(cfg, fnIds){
     var fnLns = preprocessFnIds(fnIds);
     var uniqueCallers = {};
     cfg.forEach((entry,id)=>{
-        if (entry[0] in uniqueCallers)
-            return;
+        // if (entry[0] in uniqueCallers)
+        //     return;
         var caller, callee;
         var perc = id/cfg.length;
-        // console.log(`${perc}% done...`)
+        console.log(`${perc*100}% done...`)
         caller = findBoundingFn(entry[0], fnIds, fnLns),
         callee = findMatchingFn(entry[1], fnIds);
         // console.log(`${entry} becomes ${[caller, callee]}`);
         res.push([caller, callee]);
         uniqueCallers[entry[0]] = true;
+    });
+    return res;
+}
+
+var dictStaticCFG = function(cfg, fnIds){
+    var fnLns = preprocessFnIds(fnIds),
+        res = {};
+    cfg.forEach((entry,id)=>{
+        var caller = findMatchingFn(entry[0], fnIds, true),
+            callee = findMatchingFn(entry[1], fnIds, false);
+        var perc = id/cfg.length;
+        console.log(`${perc*100}% done...`)
+        if (!(caller in res))
+            res[caller] = [];
+        res[caller].push(callee);
     });
     return res;
 }
@@ -145,10 +167,11 @@ var read = function(f){
 
 function findMissingCallees(cg, fg, allIds){
     var parsedCfg = parseCFG(read(cg));
-    var parsedFg = parseCFG(read(fg));
+    // var parsedFg = parseCFG(read(fg));
     console.log(`done parsing cg and fg\n Patching cg and fg now`)
     // _findMissingCallees(parsedCfg, parsedFg);
 
+    return dictStaticCFG(parsedCfg, allIds)
     return patchCFG(parsedCfg, allIds);
 }
 

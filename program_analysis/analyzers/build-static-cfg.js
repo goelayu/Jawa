@@ -94,6 +94,7 @@ var execCFGModule = function(filenames){
     var _cmdOut = spawnSync(cfgCMD, {shell:true} );
     
     program.verbose && console.log(_cmdOut.stderr.toString())
+    return;
     //create fg
     program.verbose && console.log(`creating fg: ${fgCMD}`)
     _cmdOut = spawnSync(fgCMD, {shell:true} );
@@ -121,7 +122,8 @@ var buildEvtCFG = function(completeCg, handlers){
     // parse evt handlers as a list of ids
     var missingEdges = 0;
 
-    dCg = cvtToDictCG(completeCg);
+    // dCg = cvtToDictCG(completeCg);
+    dCg = completeCg;
 
     var handlerCFG = {};
 
@@ -161,6 +163,10 @@ var getIdLen = function(allIds){
     return idSrcLen;
 }
 
+var pruneStaticCg = function(staticCfg, dynamicCfg){
+    
+}
+
 var cgStats = function(completeCG, static, dynamic, allIds){
     var total = new Set, evt = new Set, 
         staticSize = dynamicSize = 0;
@@ -172,9 +178,11 @@ var cgStats = function(completeCG, static, dynamic, allIds){
     });
     console.log(`dynamic size: ${dynamicSize}`)
 
-    completeCG.forEach((f)=>{
-        total.add(f[0]);
-        total.add(f[1]);
+    Object.keys(completeCG).forEach((caller)=>{
+        total.add(caller);
+        completeCG[caller].forEach((callee)=>{
+            total.add(callee)
+        })
     });
     // Object.values(completeCG).forEach((f)=>{
     //     total.add(f);
@@ -204,21 +212,23 @@ var patchCFG = function(allIds){
 function main(){
     // 1) clean JS dir
     program.verbose && console.log(`----------Cleaning the JS dir ${JSSRCFILES}-------------`)
-    cleanJSDir();
+    // cleanJSDir();
     program.verbose && console.log(`----------Parsing dynamic CFG----------- `)
     var dynamicCfgDict = JSON.parse(fs.readFileSync(`${program.performance}/cg`,'utf-8'));
     var dynamicCfg = util.mergeValsArr(dynamicCfgDict);
+    console.log(`dynamic cfg nodes: ${dynamicCfg.length}.length`)
     program.verbose && console.log(`----------Extracting evt handlers and filenames----------- `)
     // var evtFile = `${program.performance}/handlers`
     // var handlers = extractEvtHandlers(evtFile);
     var filenames = extractFileNames(dynamicCfg);
     var handlerIds = Object.keys(dynamicCfgDict);
-    fs.writeFileSync(`${JSSRCFILES}/filenames`,JSON.stringify(filenames));
+    console.log(`number of handlers: ${handlerIds.length}`)
+    // fs.writeFileSync(`${JSSRCFILES}/filenames`,JSON.stringify(filenames));
     program.verbose && console.log(`---------Parsing mm directory to get JS src files-----------`);
-    extractSrcFiles(program.directory, `${JSSRCFILES}/filenames`);
+    // extractSrcFiles(program.directory, `${JSSRCFILES}/filenames`);
     var allIds = getAllIds(filenames);
     program.verbose && console.log(`-------Build static call graph--------------`)
-    execCFGModule(filenames);
+    // execCFGModule(filenames);
     // program.verbose && console.log(`----------Patch CG with missing edges------------`)
     var completeCg = patchCFG(allIds);
     // program.verbose && console.log(`----------Build final evt CG------------`)
