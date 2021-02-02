@@ -32,7 +32,65 @@ function getTracerObj(){
     return fs.readFileSync('./analyzers/runtime/tracer.js','utf-8');
 }
 
-function instrumentHTML(src){
+function instrumentHTML(src, filename){
+
+    var isHtml;
+    try {
+        var script = new vm.Script(src);
+        isHtml = false;
+    } catch (e) {
+        isHtml = true;
+    }
+
+    if (IsJsonString(src))
+        return src;
+
+    if (!isHtml)
+        return instrumentJavaScript(src, filename, false);
+
+    var scriptLocs = [];
+    var scriptBeginRegexp = /<\s*script[^>]*>/ig;
+    var scriptEndRegexp = /<\s*\/\s*script/i;
+    var lastScriptEnd = 0;
+    var match, newline = /\n/ig;
+
+
+    while (match = scriptBeginRegexp.exec(src)) {
+        var scriptOffset = 0;
+        var scriptBegin = match.index + match[0].length;
+        if (scriptBegin < lastScriptEnd) {
+            continue;
+        }
+
+        /*
+        The slicing takes care of whether there is. a new line
+        immediately after the <Script> tag or not, because 
+        it will account for the correct offset
+        */
+        var _prevScript = src.slice(0,scriptBegin+1);
+        while(nMatch = newline.exec(_prevScript))
+            scriptOffset++;
+        var endMatch = scriptEndRegexp.exec(src.slice(scriptBegin));
+        if (endMatch) {
+            var scriptEnd = scriptBegin + endMatch.index;
+            scriptLocs.push({ start: scriptBegin, end: scriptEnd , offset: scriptOffset});
+            lastScriptEnd = scriptEnd;
+        }
+    }
+
+    // process the scripts in reverse order
+    for (var i = scriptLocs.length - 1; i >= 0; i--) {
+        var loc = scriptLocs[i];
+        var script = src.slice(loc.start, loc.end);
+        var path = filename + "-script-" + i;
+        //Add the script offset to be sent to the instrumentation script
+        // options.scriptOffset = loc;
+        var prefix = src.slice(0, loc.start).replace(/[^\n]/g, " "); // padding it out so line numbers make sense
+        // console.log("Instrumenting " + JSON.stringify(loc));
+        // src = src.slice(0, loc.start) + instrumentJavaScript(prefix + script, options, true) + src.slice(loc.end);
+        // console.log("And the final src is :" + src)
+        src = src.slice(0, loc.start) + instrumentJavaScript(prefix + script, path, true) + src.slice(loc.end);
+    }
     //insert the tracer object at top of the html
     var doctypeMatch = /<!DOCTYPE[^>[]*(\[[^]]*\])?>/i.exec(src);
     var headIndx = src.indexOf('<head>');
@@ -65,6 +123,8 @@ function instrumentJavaScript(src, filename, jsInHTML){
     }
     src = rewriter.instrument(src, {filename: filename});
     console.log(`returned: ${JSON.stringify(src)}`);
+    if (jsInHTML)
+        return src.replace(/^\s+|\s+$/g, '');
     return src;
 }
 
