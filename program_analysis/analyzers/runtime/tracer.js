@@ -3,7 +3,36 @@
  * a.k.a. the dynamic analyser
  */
 
- var __tracer = new (function(){
+(function Intercepts(){
+
+    var _fetchSend = window.fetch;
+        // override the native send()
+    window.fetch = function(){
+        var intercept = __tracer.getCaptureMode() == 'postload' ? 
+            (__tracer.getTracingMode() ? true : false) : false;
+        if (!intercept){
+            return _fetchSend.apply(this, arguments);
+        }
+        __tracer.logXMLCall();
+        // call the native send()
+        _fetchSend.apply(this, arguments);
+    }
+
+    var _xmlSend = XMLHttpRequest.prototype.send;
+        // override the native send()
+    XMLHttpRequest.prototype.send = function(){
+        var intercept = __tracer.getCaptureMode() == 'postload' ? 
+            (__tracer.getTracingMode() ? true : false) : false;
+        if (!intercept){
+            return _xmlSend.apply(this, arguments);
+        }
+        __tracer.logXMLCall();
+        // call the native send()
+        _xmlSend.apply(this, arguments);
+    }
+})();
+
+var __tracer = new (function(){
      var TM = true, //tracing turned on by default
         shadowStackHead = null, 
         callStack = [];
@@ -14,7 +43,8 @@
             preload: new Set,
             postload: new Set
         },
-        captureMode = 'preload' // can be either preload or postload
+        captureMode = 'preload', // can be either preload or postload
+        curEvt = null;
 
     this.__enter__ = function(id){
         if (!TM) return;
@@ -25,7 +55,7 @@
         // var invocId = `${id}_count${executionCounter[id]}`;
         // callGraph[invocId] = [];
         // callStack.push(invocId);
-        callStack.push(id);
+        callStack.push(`${curEvt}_${id}`);
         // if (shadowStackHead)
             // callGraph[shadowStackHead].push(invocId);
         // shadowStackHead = invocId;
@@ -36,10 +66,10 @@
 
         allFns[captureMode].add(id);
         // Store functions reachable from event handlers
-        if (callStack.length == 1 && !(id in evtFns))
-            evtFns[id] = new Set;
+        if (callStack.length == 1)
+            evtFns[`${curEvt}_${id}`] = new Set;
         else {
-            var rootEvt = callStack[0].split('_count')[0];
+            var rootEvt = callStack[0];
             evtFns[rootEvt].add(id);
         }
     }
@@ -59,6 +89,10 @@
 
     this.setCaptureMode = function(mode){
         captureMode = mode;
+    }
+
+    this.getCaptureMode = function(){
+        return captureMode;
     }
 
     this.getCallGraph = function(){
@@ -86,9 +120,23 @@
     this.setTracingMode = function(mode){
         TM = mode;
     }
- })
+
+    this.getTracingMode = function(){
+        return TM;
+    }
+
+    this.setEventId = function(id){
+        curEvt = id;
+    }
+
+    this.logXMLCall = function(){
+        var rootEvt = callStack[0];
+        evtFns[rootEvt].add("xml");
+    }
+    
+})
 
 window.addEventListener('load',()=>{
-    // Turn tracing on 
+    // Turn tracing off
     window.__tracer.setTracingMode(false);
 })
