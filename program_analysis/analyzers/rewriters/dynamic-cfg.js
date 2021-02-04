@@ -14,19 +14,20 @@ var getNodes = function(src, arr){
     });
 }
 
-var makeId = function (path, node) {
+var makeId = function (path, node, offset) {
     var loc = node.loc;
     if (!loc) {
         console.error(`No location for node`);
         return;
     }
     // console.log(loc)
-    return `${path}-${loc.start.line}-${loc.start.column}-${loc.end.line}-${loc.end.column}`;
+    return `${path}-${loc.start.line+offset}-${loc.start.column}-${loc.end.line+offset}-${loc.end.column}`;
 }
 
 function instrument(src, options){
     var filename = options.filename;
     var rewrite = options.rewrite;
+    var offset = options.offset ? options.offset : 0;
     /**
      * Construct AST from the source string
      */
@@ -49,7 +50,7 @@ function instrument(src, options){
                 node.update(`${tracerCheck} ${node.source()}`);
             } else if (node.type == 'FunctionDeclaration' || node.type == 'FunctionExpression'){
                 var nodeBody = node.body.source().substring(1, node.body.source().length-1);
-                var id = makeId(filename,node);
+                var id = makeId(filename,node, offset);
                 var idLen = id.split('-').length;
                 var ln = Number.parseInt(id.split('-')[idLen - 4])
                 var nodeAttr = node.attr;

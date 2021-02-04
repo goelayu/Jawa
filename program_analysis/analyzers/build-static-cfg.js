@@ -94,14 +94,15 @@ var getAllIds = function(){
 }
 
 var execCFGModule = function(filenames){
-    var baseCMD = `node ${STATICANALYSER} `;
+    var baseCMD = `node --max-old-space-size=2048 ${STATICANALYSER} `;
     var cmdArgs = ' ';
-    // var jsSrcs = fs.readdirSync(JSSRCFILES);
+    // var filenames = fs.readdirSync(program.jsSrc)
     filenames.forEach((file)=>{
+        if (file == '' || file.indexOf('-script-')>=0) return;
         cmdArgs += ` ${program.jsSrc}/${file}/${file}`;
     });
-    var cfgCMD = baseCMD + `--cg ${cmdArgs} > ${JSSRCFILES}/cg`;
-    var fgCMD = baseCMD + `--fg ${cmdArgs} > ${JSSRCFILES}/fg`;
+    var cfgCMD = baseCMD + `--cg ${cmdArgs} > ${program.jsSrc}/cg`;
+    var fgCMD = baseCMD + `--fg ${cmdArgs} > ${program.jsSrc}/fg`;
     //create cfg
     program.verbose && console.log(`creating cfg: ${cfgCMD}`)
     var _cmdOut = spawnSync(cfgCMD, {shell:true} );
@@ -157,8 +158,9 @@ var buildEvtCFG = function(completeCg, handlers){
     }
 
     handlers.forEach((h)=>{
+        var [evt, id] = h.split(';;;;');
         handlerCFG[h] = {native: new Set, user: new Set};
-        traverseCFG(h, dCg[h]);
+        traverseCFG(h, dCg[id]);
     });
     program.verbose && console.log(`Found ${missingEdges} missing edges`)
     return handlerCFG;
@@ -176,25 +178,11 @@ var getIdLen = function(allIds){
     return idSrcLen;
 }
 
-var cgStats = function(completeCG, static, dynamic, allFns, allIds){
-    var total = new Set, evt = new Set, 
-        staticSize = dynamicSize  = preloadSize = 0;
+var cgStats = function(completeCG, static, dynamicDict, allFns, allIds){
+    var total = new Set, evtAll = new Set, evtNoXml = new Set, 
+        staticSizeAll = staticSizeNoXml = dynamicSize  = preloadSize = 0;
     
     var idSrcLen = getIdLen(allIds);
-
-    dynamic.forEach((d)=>{
-        dynamicSize += idSrcLen[d][1];
-    });
-
-    allFns.preload.forEach((f)=>{
-        if (!idSrcLen[f]) {
-            console.log(`${f} not found`)
-            return;
-        }
-        preloadSize += idSrcLen[f][1];
-    });
-
-    console.log(`dynamic size: ${dynamicSize} ${preloadSize}`)
 
     Object.keys(completeCG).forEach((caller)=>{
         total.add(caller);
@@ -202,25 +190,51 @@ var cgStats = function(completeCG, static, dynamic, allFns, allIds){
             total.add(callee)
         })
     });
-    // Object.values(completeCG).forEach((f)=>{
-    //     total.add(f);
-    // })
 
-    Object.values(static).forEach((f)=>{
-        f.user.forEach(evt.add, evt);
+    var xmlFns = util.getXMLFns(dynamicDict);
+    Object.entries(static).forEach((f)=>{
+        if (xmlFns.indexOf(f[0])>=0){
+            console.log(`${f} is a xml function`);
+            f[1].user.forEach(evtAll.add, evtAll);
+            return;
+        }
+        f[1].user.forEach(evtAll.add, evtAll);
+        // if (f.user.has('xml')) return;
+        f[1].user.forEach(evtNoXml.add, evtNoXml);
     });
 
     
-    evt.forEach((val)=>{
-        staticSize += idSrcLen[val][1];
-    });
+    // evtAll.forEach((val)=>{
+    //     staticSizeAll += idSrcLen[val][1];
+    // });
 
-    console.log(total.size, evt.size, staticSize);
+    // evtNoXml.forEach((val)=>{
+    //     staticSizeNoXml += idSrcLen[val][1];
+    // });
+    
+    var dynamicAll = util.mergeValsArr(dynamicDict, false);
+    var dynamicNoXml = util.mergeValsArr(dynamicDict, true);
+
+    var preLoadSize = util.sumFnSizes(allFns.preload, idSrcLen);
+
+    //union values
+    var preloadStaticAll = util.unionArray(allFns.preload, [...evtAll]);
+    var preloadStaticNoXml = util.unionArray(allFns.preload, [...evtNoXml]);
+    var preloadStaticSizeAll = util.sumFnSizes(preloadStaticAll, idSrcLen);
+    var preloadStaticSizeNoXml = util.sumFnSizes(preloadStaticNoXml, idSrcLen);
+    var preloadDynamicAll = util.unionArray(allFns.preload, dynamicAll);
+    var preloadDynamicNoXml = util.unionArray(allFns.preload, dynamicNoXml);
+    var preloadDynamicSizeAll = util.sumFnSizes(preloadDynamicAll, idSrcLen);
+    var preloadDynamicSizeNoXml = util.sumFnSizes(preloadDynamicNoXml, idSrcLen);
+    var totalJS = util.getFileSize(program.jsSrc);
+
+    console.log('Res:', preLoadSize, preloadDynamicSizeAll, preloadDynamicSizeNoXml, preloadStaticSizeAll, preloadStaticSizeNoXml, totalJS)
+    // console.log('Total and static lengths: ', total.size, evt.size);
 
 }
 
 var patchCFG = function(allIds){
-    var cg = `${JSSRCFILES}/cg`,
+    var cg = `${program.jsSrc}/cg`,
         fg = `${JSSRCFILES}/fg`;
     
     var completeCg = cgPatcher.findMissingCallees(cg, fg, allIds);
@@ -239,21 +253,18 @@ function main(){
     var filenames = extractFileNames(dynamicCfg);
     var handlerIds = Object.keys(dynamicCfgDict);
     console.log(`number of handlers: ${handlerIds.length}`)
-    // fs.writeFileSync(`${JSSRCFILES}/filenames`,JSON.stringify(filenames));
-    // program.verbose && console.log(`---------Parsing mm directory to get JS src files-----------`);
-    // extractSrcFiles(program.directory, `${JSSRCFILES}/filenames`);
     var allIds = getAllIds();
     // cgStats(null, null, dynamicCfg, allFns, allIds);
     // return;
     program.verbose && console.log(`-------Build static call graph--------------`)
-    // execCFGModule(filenames);
+    execCFGModule(filenames);
     // program.verbose && console.log(`----------Patch CG with missing edges------------`)
     var completeCg = patchCFG(allIds);
     // program.verbose && console.log(`----------Build final evt CG------------`)
     var staticCfg = buildEvtCFG(completeCg, handlerIds);
     
     // cgStats(null, null, dynamicCfg, allIds);
-    cgStats(completeCg, staticCfg, dynamicCfg, allFns, allIds);
+    cgStats(completeCg, staticCfg, dynamicCfgDict, allFns, allIds);
 }
 
 main();

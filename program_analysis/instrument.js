@@ -86,11 +86,12 @@ function instrumentHTML(src, filename){
         var path = filename + "-script-" + i;
         //Add the script offset to be sent to the instrumentation script
         // options.scriptOffset = loc;
+        var offset = src.slice(0,loc.start).length;
         var prefix = src.slice(0, loc.start).replace(/[^\n]/g, " "); // padding it out so line numbers make sense
         // console.log("Instrumenting " + JSON.stringify(loc));
         // src = src.slice(0, loc.start) + instrumentJavaScript(prefix + script, options, true) + src.slice(loc.end);
         // console.log("And the final src is :" + src)
-        src = src.slice(0, loc.start) + instrumentJavaScript(prefix + script, path, true) + src.slice(loc.end);
+        src = src.slice(0, loc.start) + instrumentJavaScript(script, {filename:path, offset:offset}, true) + src.slice(loc.end);
     }
     //insert the tracer object at top of the html
     var doctypeMatch = /<!DOCTYPE[^>[]*(\[[^]]*\])?>/i.exec(src);
@@ -121,16 +122,18 @@ function dumpMD(){
     fs.writeFileSync(returnInfoFile, JSON.stringify(rewriter.metadata.allFnIds));
 }
 
-function instrumentJavaScript(src, filename, jsInHTML){
+function instrumentJavaScript(src, options, jsInHTML){
     if (IsJsonString(src)){
-        if (jsInHTML)
-            return src.replace(/^\s+|\s+$/g, '');
-        else return src;
+        // if (jsInHTML)
+        //     return src.replace(/^\s+|\s+$/g, '');
+        // else 
+        return src;
     }
-    src = rewriter.instrument(src, {filename: filename});
-    console.log(`returned: ${JSON.stringify(src)}`);
-    if (jsInHTML)
-        return src.replace(/^\s+|\s+$/g, '');
+    console.log(`instrumenting src`)
+    src = rewriter.instrument(src, options);
+    console.log(`returned from instrumentation`);
+    // if (jsInHTML)
+    //     return src.replace(/^\s+|\s+$/g, '');
     return src;
 }
 
@@ -157,7 +160,7 @@ function main(){
 
             }
         }
-        src = instrumentJavaScript(src, filename, false)
+        src = instrumentJavaScript(src, {filename:filename}, false)
     } else {
         src = instrumentHTML(src, filename)
     }

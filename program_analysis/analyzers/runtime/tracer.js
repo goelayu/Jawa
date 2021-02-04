@@ -55,7 +55,7 @@ var __tracer = new (function(){
         // var invocId = `${id}_count${executionCounter[id]}`;
         // callGraph[invocId] = [];
         // callStack.push(invocId);
-        callStack.push(`${curEvt}_${id}`);
+        callStack.push(`${curEvt};;;;${id}`);
         // if (shadowStackHead)
             // callGraph[shadowStackHead].push(invocId);
         // shadowStackHead = invocId;
@@ -67,7 +67,7 @@ var __tracer = new (function(){
         allFns[captureMode].add(id);
         // Store functions reachable from event handlers
         if (callStack.length == 1)
-            evtFns[`${curEvt}_${id}`] = new Set;
+            evtFns[`${curEvt};;;;${id}`] = new Set;
         else {
             var rootEvt = callStack[0];
             evtFns[rootEvt].add(id);

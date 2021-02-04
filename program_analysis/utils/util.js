@@ -1,8 +1,9 @@
 /**
  * Contains utility functions for program analysis
  */
+const fs = require('fs');
 
-var mergeValsArr = function(dict){
+var mergeValsArr = function(dict, excludeXML){
     /**
      * Takes a dictionary where values are arrays
      * and merges them together in a single array
@@ -10,9 +11,54 @@ var mergeValsArr = function(dict){
 
     var arr = [];
     Object.values(dict).forEach((val)=>{
+        if (excludeXML && val.indexOf('xml')>=0) return;
         arr = arr.concat(val);
     });
     return arr;
+}
+
+var getXMLFns = function(d){
+    var res = [];
+    Object.keys(d).forEach((k)=>{
+        if (d[k].indexOf('xml')>=0)
+            res.push(k);
+    });
+    return res;
+}
+
+var unionArray = function(ar1, ar2){
+    return [...new Set([...ar1, ...ar2])];
+}
+
+var getFileSize = function(dir){
+    var filenames = fs.readdirSync(dir);
+    var res = 0;
+    filenames.forEach((file)=>{
+        try {    
+            var idFile = `${dir}/${file}/${file}`;
+            res += fs.readFileSync(idFile, 'utf-8').length
+        } catch (e) {
+            console.log(`Error while readings ids for ${file}`);
+        }
+    });
+    return res;
+}
+
+var categorizeFns = function(fns){
+    var filenameFns = {};
+    
+}
+
+var addFnBytes = function(allIds, fnIds){
+    /**
+     * Takes in allIds as a input which has the following type
+     * { filename: {
+     *      ln: [id, length]
+     *  }
+     * }
+     */
+
+
 }
 
 
@@ -41,6 +87,18 @@ function getCandidateElements(listeners){
     return elems;
 }
 
+var sumFnSizes = function(fns, sizes){
+    var res = 0;
+    fns.forEach((f)=>{
+        if (!sizes[f]) {
+            console.log(`${f} not found`)
+            return;
+        }
+        res += sizes[f][1];
+    });
+    return res;
+}
+
 var extractEvtHandlers = function(evtFile){
     var handlers = [],
         handlerInfo = JSON.parse(fs.readFileSync(evtFile));
@@ -52,5 +110,9 @@ var extractEvtHandlers = function(evtFile){
     return handlers;
 }
 module.exports = {
-    mergeValsArr : mergeValsArr
+    mergeValsArr : mergeValsArr,
+    unionArray : unionArray,
+    sumFnSizes : sumFnSizes,
+    getFileSize : getFileSize,
+    getXMLFns : getXMLFns
 }
