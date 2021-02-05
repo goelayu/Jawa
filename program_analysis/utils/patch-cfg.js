@@ -151,10 +151,11 @@ var dictStaticCFG = function(cfg, fnIds){
 }
 
 var _findMissingCallees = function(cg, fg){
-    var cgCallees = cg.map(e=>e[0]);
+    var cgCallees = [...new Set(cg.map(e=>e[0]))]; // remove dedup callees
     var allCallees = fg.map(e=>e[1]).filter(e=>e.indexOf('Callee')>=0)
         .map(e=>e.replace('"Callee(','').replace(')";',''));
     var missingCallees = allCallees.filter(e=> cgCallees.indexOf(e)<0);
+    console.log(`Found total ${missingCallees.length} missing edges`);
     missingCallees.forEach((mc)=>{
         cg.push([mc, null]);
     });
@@ -167,9 +168,9 @@ var read = function(f){
 
 function findMissingCallees(cg, fg, allIds){
     var parsedCfg = parseCFG(read(cg));
-    // var parsedFg = parseCFG(read(fg));
-    console.log(`done parsing cg and fg\n Patching cg and fg now`)
-    // _findMissingCallees(parsedCfg, parsedFg);
+    var parsedFg = parseCFG(read(fg));
+    console.log(`done parsing cg and fg\nPatching cg and fg now`)
+    _findMissingCallees(parsedCfg, parsedFg);
 
     return dictStaticCFG(parsedCfg, allIds)
     return patchCFG(parsedCfg, allIds);

@@ -140,3 +140,9 @@ window.addEventListener('load',()=>{
     // Turn tracing off
     window.__tracer.setTracingMode(false);
 })
+
+window.addEventListener('beforeunload', function(e){
+    e.preventDefault();
+    console.log(`cancelling navigation`);
+    return "";
+})

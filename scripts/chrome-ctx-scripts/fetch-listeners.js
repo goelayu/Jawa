@@ -79,8 +79,14 @@ var all_handlers = ["abort", "blur", "change", "click", "close", "contextmenu", 
 var IGNORE_ELEMENTS = ['SCRIPT', 'IFRAME', 'BODY','LINK','IMG'
     ,'INPUT','FORM','A','HTML']
 
+function getEventId(el, evt){
+    //construct event id from element and event information
+    return `${getElemId(el)}_on${evt}`;
+}
+
 function _triggerEvent(el, evt){
     var event = new Event(evt);
+    window.__tracer.setEventId(getEventId(el,evt));
     el.dispatchEvent && el.dispatchEvent(event);
 }
 
@@ -94,7 +100,7 @@ function triggerEvents(elems){
             handlers.forEach((h)=>{
                 _triggerEvent(elem, h);
             })
-        } finally {
+        } catch (e) {
             /**no op */
         }
     });
