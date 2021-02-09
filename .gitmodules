@@ -1,3 +1,6 @@
 [submodule "program_analysis/analyzers/javascript-call-graph"]
 	path = program_analysis/analyzers/javascript-call-graph
 	url = https://github.com/goelayu/javascript-call-graph.git
+[submodule "program_analysis/analyzers/closure-compiler"]
+	path = program_analysis/analyzers/closure-compiler
+	url = https://github.com/goelayu/closure-compiler.git
