@@ -8,6 +8,10 @@
 !scripts/*/
 !parser/
 !pyutils/
+
+!filter-ads-trackers/
+!filter-ads-trackers/*
+
 !*js
 !*py
 !*sh
