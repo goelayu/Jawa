@@ -3512,6 +3512,7 @@
 /ptrack.
 /pub/as?_ri_=$image
 /pub/imp?
+/pubads_impl*
 /pubfooter/js/tracking-
 /pubimppixel/*
 /public/analytics.js
