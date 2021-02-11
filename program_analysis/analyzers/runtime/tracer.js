@@ -114,7 +114,10 @@ var __tracer = new (function(){
     }
 
     this.getEvtFns = function(){
-        return _getEvtFns(evtFns);
+        var res =  _getEvtFns(evtFns);
+        //empty event dict
+        evtFns = {};
+        return res;
     }
 
     this.setTracingMode = function(mode){

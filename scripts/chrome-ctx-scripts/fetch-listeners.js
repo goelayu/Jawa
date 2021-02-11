@@ -90,7 +90,29 @@ function _triggerEvent(el, evt){
     el.dispatchEvent && el.dispatchEvent(event);
 }
 
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+  
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+  
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+  
+      // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+  
+    return array;
+}
+
 function triggerEvents(elems){
+    //shuffle elements array
+    shuffle(elems);
+
     // turn on the tracer logging
     window.__tracer.setTracingMode(true);
     window.__tracer.setCaptureMode('postload');
@@ -136,7 +158,7 @@ function getClickableElements(listeners){
 }
 
 var elems = getCandidateElements(verbose_listeners);
-triggerEvents(elems);
+// triggerEvents(elems);
 // var elems = getClickableElements(verbose_listeners);
 // elems.forEach((e)=>{
 //     e.click();

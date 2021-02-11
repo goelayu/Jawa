@@ -34,7 +34,8 @@ async function launch(){
     const options = {
         executablePath: "/usr/bin/google-chrome",
         headless: program.testing ? false : true,
-        args : [ '--ignore-certificate-errors'/*, '--blink-settings=scriptEnabled=false'*/, '--auto-open-devtools-for-tabs']
+        defaultViewport: null,
+        args : [ '--ignore-certificate-errors'/*, '--blink-settings=scriptEnabled=false'*/, '--auto-open-devtools-for-tabs',]
         // '--no-first-run'],
         // ignoreDefaultArgs: true,
     }
@@ -72,9 +73,9 @@ async function launch(){
 
     if (program.coverage){
         await getCoverage(page, 'preload');
-        await page.coverage.startJSCoverage();
-        await extractHandlers(page,cdp); 
-        await getCoverage(page, 'postLoad', true);
+    //     await page.coverage.startJSCoverage();
+    //     await extractHandlers(page,cdp); 
+    //     await getCoverage(page, 'postLoad', true);
     }
 
 
@@ -99,10 +100,10 @@ async function launch(){
         let cstmEntries =  program.custom.split(',');
         for (var c of cstmEntries){
             switch (c) {
-                 case 'Handlers': await extractHandlers(page,cdp); break;
+                 case 'Handlers': await extractHandlers(page,cdp,20); break;
                  case 'DOM' : await extractDOM(page); break; 
                  case 'Distill' : await distillDOM(page); break;
-                 case 'CG' : await chromeFns.getCallGraph(page, program); break
+                 case 'CG' : await chromeFns.getAllFns(page, program); break; 
             }
         }
     }
@@ -162,6 +163,8 @@ var getCoverage = async function(page, f, extractFileNames){
     let totalBytes = 0;
     let usedBytes = 0;
     let fileUrls = [];
+    dump(jsCoverage, `${program.output}/coverage`);
+    return;
     for (const entry of jsCoverage) {
 
         if (entry.url.indexOf('.js') > 0) {
@@ -217,13 +220,21 @@ var distillDOM = async function(page){
     dump(dcRes, `${program.output}/distill_dom`);
 }
 
-var extractHandlers = async function(page,cdp){
+var extractHandlers = async function(page,cdp, nTimes){
+    //eval the handler script
     console.log('extracting handlers')
     var handlerCode = fs.readFileSync(HANDLERS, 'utf-8');
     await cdp.send('Runtime.evaluate',{expression:handlerCode, includeCommandLineAPI:true})
     var _handlers = await page.evaluateHandle(()=> archive_listeners);
     var handlers = await _handlers.jsonValue();
     dump(handlers, `${program.output}/handlers`);
+    //extract event handler call graph
+    if (!nTimes) nTimes = 1;
+    for (var i = 0;i<nTimes;i++){
+        //trigger event handlers
+        await page.evaluateHandle(()=> triggerEvents(elems))
+        await chromeFns.getCallGraph(page, program, i);
+    } 
 }
 
 var extractDOM = async function(page){

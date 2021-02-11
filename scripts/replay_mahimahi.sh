@@ -7,10 +7,20 @@
 
 # set -v
 
+machine=$(uname -n)
+echo machine is $machine
+
 mmwebreplay=/home/goelayu/research/mahimahi/build/bin/mm-webreplay
-# mmwebreplay=/vault-home/goelayu/tools/mahimahi/src/frontend/mm-webreplay
 mmnoop=/home/goelayu/research/mahimahi/build/bin/mm-noop
 mmwebrecord=/home/goelayu/research/mahimahi/build/bin/mm-webrecord
+if [[ $machine -eq 'wolverines' ]]; then
+	mmwebreplay=mm-webreplay
+	mmwebrecord=mm-webrecord
+fi
+
+
+# mmwebreplay=/vault-home/goelayu/tools/mahimahi/src/frontend/mm-webreplay
+
 
 # ipfilePrefix=/home/goelayu/research/WebPeformance/output/unmodified/trace_5_15_record_v76_ssl1.0_c69/
 ipfilePrefix=/home/goelayu/research/WebPeformance/traces/vaspol/record/devtools_logs/0/

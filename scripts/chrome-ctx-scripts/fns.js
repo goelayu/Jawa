@@ -7,10 +7,10 @@
 
 const fs = require('fs');
 
-var getCallGraph = async function(page, program){
+var getCallGraph = async function(page, program, index){
     var _cgObj = await page.evaluateHandle(() => window.__tracer.getEvtFns());
     var cg = await _cgObj.jsonValue();
-    dump(cg, `${program.output}/cg`);
+    dump(cg, `${program.output}/cg${index}`);
 }
 
 var getAllFns = async function(page, program){
