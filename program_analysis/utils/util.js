@@ -3,22 +3,19 @@
  */
 const fs = require('fs');
 
-var mergeValsArr = function(dict, opt){
+var mergeValsArr = function(dict){
     /**
      * Takes a dictionary where values are arrays
      * and merges them together in a single array
      */
-    const INVALID_URL_DOMAINS = ["analytics","gtm","fbevents", "googletag", "archiveteam", "ping-meta-prd.jwpltx.com","prd.jwpltx.com","eproof.drudgereport.com","idsync.rlcdn.com","cdn.filestackcontent.com","connect.facebook.net","e.cdnwidget.com","nr-events.taboola.com","pixel.quantserve.com","pixel.wp.com","res.akamaized.net","sync.adkernel.com","certify.alexametrics.com","pixel.adsafeprotected.com","px.ads.linkedin.com","s.w-x.co","bat.bing.com","beacon.krxd.net","googleads.g.doubleclick.net","metrics.brightcove.com","ping.chartbeat.net","www.google-analytics.com","trc-events.taboola.com","px.moatads.com","www.facebook.com","sb.scorecardresearch.com","nexus.ensighten.com","odb.outbrain.com"];
-
 
     var arr = [];
     Object.values(dict).forEach((val)=>{
         // if (excludeXML && val.indexOf('xml')>=0) return;
-        val.forEach((v)=>{
-            if (!opt || (opt && !INVALID_URL_DOMAINS.filter(e=>v.indexOf(e)>=0).length))
-                arr.push(v);
-        })
-        // arr = arr.concat(val);
+        // val.forEach((v)=>{
+        //     arr.push(v);
+        // })
+        arr = arr.concat(val);
     });
     return arr;
 }
