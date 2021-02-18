@@ -1,10 +1,12 @@
 const falafel = require('falafel'),
     beautifier = require('js-beautify'),
-    astutils = require('../utils/astutils');
+    astutils = require('../utils/astutils'),
+    globalWrapper = require('./global-code-wrapper');
 
 var metadata = {allFnIds:{}};
 
 var getNodes = function(src, arr){
+    src = globalWrapper.wrap(src);
     src = beautifier.js(src);
     return falafel(src, {
         locations: true, 
