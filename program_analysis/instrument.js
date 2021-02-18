@@ -26,11 +26,11 @@ function IsJsonString(str) {
 }
 
 function initRewriter(){
-    rewriter = require(`./analyzers/rewriters/${program.rewriter}`);
+    rewriter = require(`./rewriters/${program.rewriter}`);
 }
 
 function getTracerObj(){
-    return fs.readFileSync('./analyzers/runtime/tracer.js','utf-8');
+    return fs.readFileSync('./runtime/tracer.js','utf-8');
 }
 
 function instrumentHTML(src, filename){
