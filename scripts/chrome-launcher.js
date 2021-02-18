@@ -100,7 +100,7 @@ async function launch(){
         let cstmEntries =  program.custom.split(',');
         for (var c of cstmEntries){
             switch (c) {
-                 case 'Handlers': await extractHandlers(page,cdp,20); break;
+                 case 'Handlers': await extractHandlers(page,cdp,100); break;
                  case 'DOM' : await extractDOM(page); break; 
                  case 'Distill' : await distillDOM(page); break;
                  case 'CG' : await chromeFns.getAllFns(page, program); break; 

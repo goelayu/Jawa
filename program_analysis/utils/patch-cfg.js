@@ -155,8 +155,8 @@ var dictStaticCFG = function(cfg, fnIds){
         var perc = id/cfg.length;
         ((perc*100) % 10 == 0) && console.log(`${perc*100}% done...`)
         if (!(caller in res))
-            res[caller] = [];
-        res[caller].push(callee);
+            res[caller] = new Set;
+        res[caller].add(callee);
     });
     return res;
 }

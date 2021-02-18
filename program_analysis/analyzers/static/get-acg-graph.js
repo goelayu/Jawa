@@ -6,6 +6,7 @@
 
 var fs = require('fs'),
     cgPatcher = require('../../utils/patch-cfg'),
+    {spawnSync} = require('child_process')
 
 
 const STATICANALYSER = `${__dirname}/../javascript-call-graph/main.js`
@@ -33,10 +34,10 @@ var execACGModule = function(filenames, srcDir){
     });
     var cfgCMD = baseCMD + `--cg --fg${cmdArgs} 2> ${srcDir}/cg 1>${srcDir}/fg`;
     //create cfg
-    program.verbose && console.log(`creating cfg: ${cfgCMD}`)
+    // program.verbose && console.log(`creating cfg: ${cfgCMD}`)
     var _cmdOut = spawnSync(cfgCMD, {shell:true} );
     
-    program.verbose && console.log(_cmdOut.stderr.toString())
+    // program.verbose && console.log(_cmdOut.stderr.toString())
 }
 
 var getAllIds = function(srcDir){
@@ -48,7 +49,7 @@ var getAllIds = function(srcDir){
             var ids = JSON.parse(fs.readFileSync(idFile, 'utf-8'));
             allIds[file] = ids;
         } catch (e) {
-            program.verbose && console.log(`Error while readings ids for ${file}`);
+            // program.verbose && console.log(`Error while readings ids for ${file}`);
         }
     });
     return allIds;
@@ -69,10 +70,35 @@ var patchCFG = function(allIds, srcDir){
  */
 var getCallGraph = function(srcDir, dynamicGraph){
     var filenames = extractFileNames(dynamicGraph);
-    execACGModule(filenames, srcDir);
+    // execACGModule(filenames, srcDir);
     var allIds = getAllIds(srcDir);
     var completeGraph = patchCFG(allIds, srcDir)
-    return completeGraph;
+    
+    var graph = new Graph(completeGraph);
+    // graph.buildGraph();
+    return graph;
+}
+
+class Graph{
+    constructor (data){
+        this.raw = data;
+        this.nodes = new Set;
+        this.callers = new Set;
+        this.callerCallee = {};
+    }
+
+    buildGraph(){
+        this.raw.forEach((entry)=>{
+            var [caller, callee] = entry;
+            if (!(caller in this.callerCallee)){
+                this.callerCallee[caller] = new Set;
+                this.callers.add(caller);
+                this.nodes.add(caller);
+            }
+            this.nodes.add(callee);
+            this.callerCallee[caller].add(callee);
+        });
+    }
 }
 
 module.exports = {

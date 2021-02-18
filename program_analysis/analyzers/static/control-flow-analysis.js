@@ -4,6 +4,7 @@ const falafel = require('falafel'),
     fs = require('fs');
 
 var metadata = {allFnIds:{}};
+var _astCache = {}; // a cache which stores functions per file
 
 var getNodes = function(src, arr){
     src = beautifier.js(src);
@@ -58,11 +59,18 @@ function analyze(options){
 
     filenames.forEach((filename,ind)=>{
         var fileFns = fns.filter(e=>e.indexOf(filename)>=0);
-        var content = fs.readFileSync(filepaths[ind],'utf-8');
-        var ASTNodes = [],src = getNodes(content, ASTNodes);
-        var prgNode = ASTNodes[ASTNodes.length - 1];
-        prgNode.attr = {filename: filename};
-        astutils.addMetadata(prgNode);
+        var ASTNodes;
+        // check file cache
+        if (_astCache[filename])
+            ASTNodes = _astCache[filename]
+        else {
+            var content = fs.readFileSync(filepaths[ind],'utf-8');
+            ASTNodes = [],src = getNodes(content, ASTNodes);
+            var prgNode = ASTNodes[ASTNodes.length - 1];
+            prgNode.attr = {filename: filename};
+            astutils.addMetadata(prgNode);
+            _astCache[filename] = ASTNodes;
+        }
         //get control flow functions
         var _controlFlowFns = getFnsWithControlFlow(ASTNodes, fileFns, filename);
         controlFlowFns = controlFlowFns.concat(_controlFlowFns);
