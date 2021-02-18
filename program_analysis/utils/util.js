@@ -17,7 +17,13 @@ var mergeValsArr = function(dict){
         // })
         arr = arr.concat(val);
     });
-    return arr;
+    //add the keys as well since they are the root of the call gaphs
+    arr = arr.concat(Object.keys(dict).map(e=>e.split(';;;;')[1]));
+    return unique(arr);
+}
+
+var unique = function(arr){
+    return [...new Set(arr)];
 }
 
 var getXMLFns = function(d){
@@ -90,12 +96,17 @@ function getCandidateElements(listeners){
     return elems;
 }
 
-var sumFnSizes = function(fns, sizes){
+var sumFnSizes = function(fns, sizes, filesToExclude){
     var res = 0;
     fns.forEach((f)=>{
         if (!sizes[f]) {
-            console.log(`${f} not found`)
+            console.error(`${f} not found`)
             return;
+        }
+        if (filesToExclude){
+            var fnFile = f.split('-').slice(0,f.split('-').length - 4).join('-');
+            if (filesToExclude.indexOf(fnFile)>=0)
+                return;
         }
         res += sizes[f][1];
     });

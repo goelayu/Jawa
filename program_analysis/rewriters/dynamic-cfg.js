@@ -1,6 +1,6 @@
 const falafel = require('falafel'),
     beautifier = require('js-beautify'),
-    astutils = require('../../utils/astutils');
+    astutils = require('../utils/astutils');
 
 var metadata = {allFnIds:{}};
 

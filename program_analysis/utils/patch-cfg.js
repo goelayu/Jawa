@@ -9,11 +9,7 @@
 
 const fs = require('fs');
 
-// program 
-//     .option('--src [src]', 'input source file')
-//     .option('--cfg [cfg]', 'static cfg')
-//     .option('--fg [fg]','static flow graph')
-//     .parse(process.argv);
+var parsedCfg;
 
 var parseCFG = function(strCfg){
     /**
@@ -31,6 +27,10 @@ var parseCFG = function(strCfg){
         cfg.push([caller, callee]);
     });
     return cfg;
+}
+
+var read = function(f){
+    return fs.readFileSync(f,'utf-8');
 }
 
 var parseCfgId = function(strLoc){
@@ -112,8 +112,19 @@ var findMatchingFn = function(strLoc, fns, isCaller){
     return curFn;
 }
 
-var parse = function(f){
-    return fs.readFileSync(f, 'utf-8');
+var getFnCallSites = function(fns){
+    var cg = parsedCfg;
+    var fnCallSites = {};//dict where key is fn and value is call sites
+    cg.forEach((entry)=>{
+        var [file, loc, fnLoc] = parseCfgId(entry[0]);
+        if (!fnLoc) return;
+        var index = fnLoc.split('-')[1];
+        var caller = fns[file][index][0]
+        if (!(caller in fnCallSites))
+            fnCallSites[caller] = new Set;
+        fnCallSites[caller].add(loc);
+    });
+    return fnCallSites;
 }
 
 var patchCFG = function(cfg, fnIds){
@@ -162,12 +173,8 @@ var _findMissingCallees = function(cg, fg){
     // console.log(cg);
 }
 
-var read = function(f){
-    return fs.readFileSync(f,'utf-8');
-}
-
 function findMissingCallees(cg, fg, allIds){
-    var parsedCfg = parseCFG(read(cg));
+    parsedCfg = parseCFG(read(cg));
     var parsedFg = parseCFG(read(fg));
     console.log(`done parsing cg and fg\nPatching cg and fg now`)
     _findMissingCallees(parsedCfg, parsedFg);
@@ -177,5 +184,6 @@ function findMissingCallees(cg, fg, allIds){
 }
 
 module.exports = {
-    findMissingCallees : findMissingCallees
+    findMissingCallees : findMissingCallees,
+    getFnCallSites : getFnCallSites
 }
