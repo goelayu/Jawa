@@ -68,9 +68,9 @@ var patchCFG = function(allIds, srcDir){
  * @param {string} srcDir //path to the directory containing all JS files 
  * @param {Array} dynamicGraph // array containing all dynamic function nodes
  */
-var getCallGraph = function(srcDir, dynamicGraph){
+var getCallGraph = function(srcDir, dynamicGraph, runModule){
     var filenames = extractFileNames(dynamicGraph);
-    // execACGModule(filenames, srcDir);
+    if (runModule) execACGModule(filenames, srcDir);
     var allIds = getAllIds(srcDir);
     var completeGraph = patchCFG(allIds, srcDir)
     

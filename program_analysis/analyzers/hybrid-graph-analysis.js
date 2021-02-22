@@ -59,7 +59,7 @@ var loadDynamicGraphs = function(dir, num){
             program.verbose && console.log(`extract graph ${i} with ${fns.length} nodes`)
             graphs.push(fns);
         }catch (e) {
-            console.error(`Error while fetching dynamic cg: ${i}`)
+            program.verbose && console.error(`Error while fetching dynamic cg: ${i}`)
         }
     }
     return graphs;
@@ -144,22 +144,22 @@ var tuneGraph = function(hybridGraph, dynamicGraphs, completeGraph, filenames){
      * Learning param - 10
      * Eval param - 50
      */
-    var learn = 10, eval = 50,
+    var learn = 10, eval = 30, evalLimit = dynamicGraphs.length;
         learnGraph = graphUnions(dynamicGraphs, learn),
         evalGraph = graphUnions(dynamicGraphs, eval);
 
     learnNodes(hybridGraph, learnGraph, completeGraph, filenames);
     while (!isComplete(hybridGraph, evalGraph)){
         program.verbose && console.log(`Comparing learnt ${learn} of size ${hybridGraph.size} with eval ${eval} of size ${evalGraph.size}`)
-        learnNodes(hybridGraph, learnGraph, completeGraph, filenames);
         learn += 10;
         learnGraph = graphUnions(dynamicGraphs, learn);
         if (learn == eval) {
-            eval += 50;
+            eval += 30;
             evalGraph = graphUnions(dynamicGraphs, eval);
         }
+        learnNodes(hybridGraph, learnGraph, completeGraph, filenames);
 
-        if (eval > 100)
+        if (eval > Math.min(evalLimit,90))
             throw new Error(`Call graph didn't converge within the limit specified`);
     }
     program.verbose && console.log(`Comparing learnt ${learn} of size ${hybridGraph.size} with eval ${eval} of size ${evalGraph.size}`)
@@ -170,7 +170,7 @@ var buildCallGraph = function(){
     var dynamicGraphs = loadDynamicGraphs(program.performance, 100);
 
     // get the complete call graph
-    var completeGraph = staticGraph.getCallGraph(program.source, dynamicGraphs[0]);
+    var completeGraph = staticGraph.getCallGraph(program.source, dynamicGraphs[0], false);
 
     var filenames = extractFileNames(dynamicGraphs[0]);
 
@@ -178,6 +178,7 @@ var buildCallGraph = function(){
     tuneGraph(hybridGraph, dynamicGraphs, completeGraph, filenames);
 
     console.log(`Final call graph: ${hybridGraph.size} nodes`)
+    fs.writeFileSync(`${program.performance}/hybridcg`,JSON.stringify([...hybridGraph]));
 }
 
 buildCallGraph();
