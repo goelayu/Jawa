@@ -39,18 +39,31 @@ var unionArray = function(ar1, ar2){
     return [...new Set([...ar1, ...ar2])];
 }
 
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
 var getFileSize = function(dir){
     var filenames = fs.readdirSync(dir);
-    var res = 0;
+    var resTotal = resJS = 0;
     filenames.forEach((file)=>{
         try {    
             var idFile = `${dir}/${file}/${file}`;
-            res += fs.readFileSync(idFile, 'utf-8').length
+            var content = fs.readFileSync(idFile, 'utf-8');
+            if (!IsJsonString(content))
+                resJS += content.length;
+            else console.log(`${file} is json string`)
+            resTotal += content.length;
         } catch (e) {
             console.log(`Error while readings ids for ${file}`);
         }
     });
-    return res;
+    return [resTotal, resJS];
 }
 
 var categorizeFns = function(fns){
