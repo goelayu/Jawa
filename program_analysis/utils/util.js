@@ -48,6 +48,31 @@ function IsJsonString(str) {
     return true;
 }
 
+/**
+ * 
+ * @param {string} dir
+ * @returns {dictionary} allIds
+ *          {
+ *             fileName: {
+ *                          lineNumber: [fnId, totalLen, selfLen]
+ *                        }
+ *          } 
+ */
+var getAllIds = function(dir){
+    var filenames = fs.readdirSync(dir);
+    var allIds = {};
+    filenames.forEach((file)=>{
+        try {    
+            var idFile = `${dir}/${file}/ids`;
+            var ids = JSON.parse(fs.readFileSync(idFile, 'utf-8'));
+            allIds[file] = ids;
+        } catch (e) {
+            console.error(`Error while readings ids for ${file}`);
+        }
+    });
+    return allIds;
+}
+
 var getFileSize = function(dir){
     var filenames = fs.readdirSync(dir);
     var resTotal = resJS = 0;
@@ -57,33 +82,43 @@ var getFileSize = function(dir){
             var content = fs.readFileSync(idFile, 'utf-8');
             if (!IsJsonString(content))
                 resJS += content.length;
-            else console.log(`${file} is json string`)
+            else console.error(`${file} is json string`)
             resTotal += content.length;
         } catch (e) {
-            console.log(`Error while readings ids for ${file}`);
+            console.error(`Error while readings ids for ${file}`);
         }
     });
     return [resTotal, resJS];
 }
 
-var categorizeFns = function(fns){
-    var filenameFns = {};
-    
+var getIdLen = function(allIds){
+    // returns all ids an array
+    var idSrcLen = {};
+    Object.values(allIds).forEach((idDict)=>{
+        //idDict is a dict with key as ln and values as 3-tuple (id, totalLen, selfLen)
+        Object.values(idDict).forEach((idLen)=>{
+            idSrcLen[idLen[0]] = [idLen[1],idLen[2]];
+        });
+    });
+    return idSrcLen;
 }
 
-var addFnBytes = function(allIds, fnIds){
-    /**
-     * Takes in allIds as a input which has the following type
-     * { filename: {
-     *      ln: [id, length]
-     *  }
-     * }
-     */
-
-
+var sumFnSizes = function(fns, idLen, filesToExclude){
+    var res = 0;
+    fns.forEach((f)=>{
+        if (!idLen[f]) {
+            console.error(`${f} not found`)
+            return;
+        }
+        if (filesToExclude){
+            var fnFile = f.split('-').slice(0,f.split('-').length - 4).join('-');
+            if (filesToExclude.indexOf(fnFile)>=0)
+                return;
+        }
+        res += idLen[f][1];
+    });
+    return res;
 }
-
-
 
 var all_handlers = ["abort", "blur", "change", "click", "close", "contextmenu", "dblclick", "focus",
     "input", "keydown", "keypress", "keyup", "mouseenter", "mousedown", "mouseleave", "mousemove", "mouseout",
@@ -109,23 +144,6 @@ function getCandidateElements(listeners){
     return elems;
 }
 
-var sumFnSizes = function(fns, sizes, filesToExclude){
-    var res = 0;
-    fns.forEach((f)=>{
-        if (!sizes[f]) {
-            console.error(`${f} not found`)
-            return;
-        }
-        if (filesToExclude){
-            var fnFile = f.split('-').slice(0,f.split('-').length - 4).join('-');
-            if (filesToExclude.indexOf(fnFile)>=0)
-                return;
-        }
-        res += sizes[f][1];
-    });
-    return res;
-}
-
 var extractEvtHandlers = function(evtFile){
     var handlers = [],
         handlerInfo = JSON.parse(fs.readFileSync(evtFile));
@@ -141,5 +159,7 @@ module.exports = {
     unionArray : unionArray,
     sumFnSizes : sumFnSizes,
     getFileSize : getFileSize,
-    getXMLFns : getXMLFns
+    getXMLFns : getXMLFns,
+    getAllIds : getAllIds,
+    getIdLen : getIdLen
 }
