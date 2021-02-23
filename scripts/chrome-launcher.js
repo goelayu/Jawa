@@ -25,6 +25,8 @@ program
     .option('--memory','get the total memory footprint of the JS heap')
     .option('--coverage', 'get the js coverage information')
     .option('--load-iter [value]', 'page loading iteration count')
+    .option('--chrome-dir [value]', 'path to the chrome user directory, only useful if loadIter is present')
+    .option('--wait', 'waits before exiting chrome')
     .parse(process.argv);
 
 const SERIALIZESTYLES=`${__dirname}/chrome-ctx-scripts/serializeWithStyle.js`
@@ -44,8 +46,7 @@ async function launch(){
     var outDir = program.output;
 
     if (program.loadIter){
-        var chromeDir = `/vault-home/goelayu/CHROMEDIR/`;
-        options.userDataDir = chromeDir;
+        options.userDataDir = program.chromeDir;
     }
     const browser = await puppeteer.launch(options);
     let page = await browser.newPage();
@@ -86,11 +87,19 @@ async function launch(){
         console.log('Timer fired before page could be loaded')
     })
 
+    console.log('Site loaded');
+
     if (program.coverage){
         await getCoverage(page, 'preload');
     //     await page.coverage.startJSCoverage();
     //     await extractHandlers(page,cdp); 
     //     await getCoverage(page, 'postLoad', true);
+    }
+
+    if (program.wait){
+        //turn on logging
+        await page.evaluateHandle(()=> window.__tracer.setTracingMode(true));
+        await sleep(30000)
     }
 
 
@@ -130,7 +139,6 @@ async function launch(){
     if (program.memory)
         await getMemory(page);
     
-    console.log('Site loaded');
     if (!program.testing)
         browser.close();
 
@@ -156,6 +164,10 @@ async function autoScroll(page){
             }, 200);
         });
     });
+}
+
+var sleep = function(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 var globalTimeout = function(browser,cdp, timeout){

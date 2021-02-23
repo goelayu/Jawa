@@ -10,7 +10,9 @@
 machine=$(uname -n)
 echo machine is $machine
 
-CUSTOMCHROMEDIR=/vault-home/goelayu/CHROMEDIR/
+
+_dir=`shuf -i 9600-9900 -n 1`
+CUSTOMCHROMEDIR=/vault-home/goelayu/CHROMEDIR/${_dir}
 
 mmwebreplay=/home/goelayu/research/mahimahi/build/bin/mm-webreplay
 mmnoop=/home/goelayu/research/mahimahi/build/bin/mm-noop
@@ -47,7 +49,7 @@ clean(){
 }
 
 cleanChromeCache(){
-	rm -rf CUSTOMCHROMEDIR/*
+	rm -rf $CUSTOMCHROMEDIR/*
 }
 
 # @params: <path to mm dir> <url> <output directory> <url> <mode> <conf file> <multi-loads>
@@ -74,13 +76,13 @@ replay(){
 
 	iter=0
 	if [[ $7 != '' ]]; then
+		cleanChromeCache
 		for i in $(seq 0 $7); do
-			cleanChromeCache
 			port=`shuf -i 9600-9900 -n 1`
 			echo "Running on port" $port
 			mkdir -p $3/$i
-			echo "$cmd node chrome-launcher.js -u $2 -l -o $3/$i -n --timeout 30000 --screenshot --load-iter $i $DATAFLAGS"
-			$cmd node chrome-launcher.js -u $2 -l -o $3/$i -n --timeout 60000 --load-iter $i $DATAFLAGS
+			echo "$cmd node chrome-launcher.js -u $2 -l -o $3/$i -n --timeout 30000 --screenshot --load-iter $i --chrome-dir $CUSTOMCHROMEDIR $DATAFLAGS"
+			$cmd node chrome-launcher.js -u $2 -l -o $3/$i -n --timeout 60000 --load-iter $i --chrome-dir $CUSTOMCHROMEDIR $DATAFLAGS
 		done
 		echo 'Done waiting'
 		return
