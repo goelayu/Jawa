@@ -10,10 +10,13 @@
 machine=$(uname -n)
 echo machine is $machine
 
+CUSTOMCHROMEDIR=/vault-home/goelayu/CHROMEDIR/
+
 mmwebreplay=/home/goelayu/research/mahimahi/build/bin/mm-webreplay
 mmnoop=/home/goelayu/research/mahimahi/build/bin/mm-noop
 mmwebrecord=/home/goelayu/research/mahimahi/build/bin/mm-webrecord
-if [[ $machine -eq 'wolverines' ]]; then
+if [[ $machine == 'wolverines' ]]; then
+	echo 'Running on wolverines'
 	mmwebreplay=mm-webreplay
 	mmwebrecord=mm-webrecord
 fi
@@ -43,7 +46,11 @@ clean(){
 	rm loadErrors
 }
 
-# @params: <path to mm dir> <url> <output directory> <url> <conf file>
+cleanChromeCache(){
+	rm -rf CUSTOMCHROMEDIR/*
+}
+
+# @params: <path to mm dir> <url> <output directory> <url> <mode> <conf file> <multi-loads>
 replay(){
 	echo "$@"
 	echo "url is",$url
@@ -64,16 +71,27 @@ replay(){
 		cmd="$mmwebrecord $1"
 		echo "RECORD MODE";
 	fi;
+
+	iter=0
+	if [[ $7 != '' ]]; then
+		for i in $(seq 0 $7); do
+			cleanChromeCache
+			port=`shuf -i 9600-9900 -n 1`
+			echo "Running on port" $port
+			mkdir -p $3/$i
+			echo "$cmd node chrome-launcher.js -u $2 -l -o $3/$i -n --timeout 30000 --screenshot --load-iter $i $DATAFLAGS"
+			$cmd node chrome-launcher.js -u $2 -l -o $3/$i -n --timeout 60000 --load-iter $i $DATAFLAGS
+		done
+		echo 'Done waiting'
+		return
+	fi
+
 	#avoid 9600 range because a certain kworker runs on port 9645
 	port=`shuf -i 9600-9900 -n 1`
 	echo "Running on port" $port
 	echo "$cmd node chrome-launcher.js -u $2 -l -o $3 -n --timeout 30000 --screenshot $DATAFLAGS"
     $cmd node chrome-launcher.js -u $2 -l -o $3 -n --timeout 60000 $DATAFLAGS
-	# $cmd node inspectChrome.js -u $2 -o $3 -p $port --mode std -l --chrome-conf $6 $DATAFLAGS
-    # sleep 4
 	replay_pid=$!
-	#waitForNode
-	# waitForNode $port
 	echo "Done waiting"
 }
 
@@ -136,7 +154,7 @@ while read url; do
 	fi
 	toolmode=$3
 	conf=./chromeConfigs/$4
-	replay $mmpath $url $out $clean_url $toolmode $conf
+	replay $mmpath $url $out $clean_url $toolmode $conf 5
 	# replay $mmpath/1/${clean_url} $url $out/1/${clean_url} $clean_url $4
 	sleep 2
 done<"$5"

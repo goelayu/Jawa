@@ -24,6 +24,7 @@ program
     .option('--mhtml', 'capture the mhtml version of the page')
     .option('--memory','get the total memory footprint of the JS heap')
     .option('--coverage', 'get the js coverage information')
+    .option('--load-iter [value]', 'page loading iteration count')
     .parse(process.argv);
 
 const SERIALIZESTYLES=`${__dirname}/chrome-ctx-scripts/serializeWithStyle.js`
@@ -39,14 +40,28 @@ async function launch(){
         // '--no-first-run'],
         // ignoreDefaultArgs: true,
     }
+    
     var outDir = program.output;
+
+    if (program.loadIter){
+        var chromeDir = `/vault-home/goelayu/CHROMEDIR/`;
+        options.userDataDir = chromeDir;
+    }
     const browser = await puppeteer.launch(options);
     let page = await browser.newPage();
     var nLogs = [], cLogs = [], jProfile;
     var cdp = await page.target().createCDPSession();
+
+    if (program.loadIter){
+        console.log(`Part of a series of page loads`)
+        var count = program.loadIter, agent;
+        if (count == 0 || count == 1)
+            agent = 'desktop'
+        await emulateUserAgent(page, agent);
+    }
+
+    // console.log(`User agent is: ${await browser.userAgent()}`);
     await initCDP(cdp);
-    console.log(await browser.userAgent());
-    await page.setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36");
     if (program.network){
         initNetHandlers(cdp, nLogs)
     }
@@ -156,6 +171,26 @@ var initCDP = async function(cdp){
     await cdp.send('Network.enable');
     await cdp.send('Runtime.enable');
     await cdp.send('Profiler.enable');
+}
+
+var emulateUserAgent = async function(page, agent){
+    /**
+     * If agent value not provided, randomly chooses an agent from the list; 
+     */
+    var devices = puppeteer.devices;
+    if (!agent){
+        var deviceNames = Object.keys(devices);
+        // deviceNames.push('desktop');
+        agent = deviceNames[Math.floor(Math.random() * deviceNames.length)];
+    }
+    console.log('found agent', agent)
+    if (agent == 'desktop'){
+        await page.setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36");
+        return
+    }
+    
+    var agentSettings = devices[agent];
+    await page.emulate(agentSettings);
 }
 
 var getCoverage = async function(page, f, extractFileNames){
