@@ -1,7 +1,8 @@
 
 
 const fs = require('fs'),
-    program = require('commander');
+    program = require('commander'),
+    vm = require('vm');
 
 program
     .version("0.1.0")
@@ -130,7 +131,11 @@ function instrumentJavaScript(src, options, jsInHTML){
         return src;
     }
     console.log(`instrumenting src`)
-    src = rewriter.instrument(src, options);
+    try {
+        src = rewriter.instrument(src, options);
+    } catch (e) {
+        console.error('error while instrumenting script',e);
+    }
     console.log(`returned from instrumentation`);
     // if (jsInHTML)
     //     return src.replace(/^\s+|\s+$/g, '');

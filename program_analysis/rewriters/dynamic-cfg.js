@@ -1,7 +1,8 @@
 const falafel = require('falafel'),
     beautifier = require('js-beautify'),
     astutils = require('../utils/astutils'),
-    globalWrapper = require('./global-code-wrapper');
+    globalWrapper = require('./global-code-wrapper'),
+    fs = require('fs');
 
 var metadata = {allFnIds:{}};
 
@@ -14,6 +15,7 @@ var getNodes = function(src, arr){
     }, function(node){
         arr.push(node);
     });
+   
 }
 
 var makeId = function (path, node, offset) {

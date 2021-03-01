@@ -12,7 +12,7 @@ var IIFE_NAME="__ARCHIVE__"
 
 
 var nonExpressionsNonStmts = ["Identifier","Literal","Element","Property","Import","Export",
-"Pattern","Definition","Super","Clause", "Block"];
+"Pattern","Definition","Super","Clause"];
 
 var stmnts = ["DoWhileStatement","ForStatement","ForInStatement","ForOfStatement","IfStatement",
 "LabeledStatement","SwitchStatement","TryStatement","WhileStatement","WithStatement"];

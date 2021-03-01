@@ -80,7 +80,7 @@ def get_mm_header(mm_obj, key):
 
     return None
 
-def instrument(root, fileType, output_directory,args,file):
+def instrument(root, fileType,args,file):
     f = open(os.path.join(root,file), "rb")
     http_response = http_record_pb2.RequestResponse()
     http_response.ParseFromString(f.read())
@@ -103,7 +103,12 @@ def instrument(root, fileType, output_directory,args,file):
     # check whether its a analytics file or not
     if fileType == 'js' and args.filter and filter_rules.should_block(fullurl,options={'third-party':True}):
         print "Blocking analytics file", filename
-        copy(os.path.join(root,file), os.path.join(args.output, output_directory))
+        copy(os.path.join(root,file), args.output)
+        return
+
+    if fileType == 'js' and ('web.archive.org/_static/js/' in fullurl or 'archive.org/includes/' in fullurl):
+        print "Skipping client-side libraries for archive.org", fullurl
+        copy(os.path.join(root,file), args.output)
         return
 
     if len(filename) > 50:
@@ -143,7 +148,7 @@ def instrument(root, fileType, output_directory,args,file):
         except zlib.error as e:
             print "Corrupted decoding: " + file + str(e)
             print "Simply copying the file"
-            copy(os.path.join(root,file), os.path.join(args.output, output_directory))
+            copy(os.path.join(root,file), args.output)
             f.close()
             return
             # os._exit(0)
@@ -157,7 +162,7 @@ def instrument(root, fileType, output_directory,args,file):
         command = "node --inspect-brk={}".format(node_debugging_port) + command
     else:
         command = "node " + command
-    _log_path = log_directory+"/"+output_directory+"/" + filename + "/"
+    _log_path = log_directory+"/" + filename + "/"
     subprocess.call("mkdir -p {}".format(_log_path), shell=True)
 
     log_file=open(_log_path+"logs","w")
@@ -219,7 +224,7 @@ def instrument(root, fileType, output_directory,args,file):
         length_header.value = bytes(modifiedLength)
 
     # print " response header looks like " , output_http_response.response.header
-    outputFile = open(os.path.join(args.output, output_directory, file), "w")
+    outputFile = open(os.path.join(args.output, file), "w")
     
     outputFile.write(output_http_response.SerializeToString())
 
@@ -231,10 +236,10 @@ def instrument(root, fileType, output_directory,args,file):
 def main(args):
     file_counter = 0
     TEMP_FILE = "tmp"
-    output_directory = args.input.split('/')[-2]
+    # output_directory = args.input.split('/')[-2]
 
     subprocess.Popen("mkdir -p {}".format(args.output), shell=True)
-    subprocess.Popen("mkdir -p {}".format(os.path.join(args.output, output_directory)), shell=True)
+    # subprocess.Popen("mkdir -p {}".format(os.path.join(args.output, output_directory)), shell=True)
 
 
     http_response = http_record_pb2.RequestResponse()
@@ -275,14 +280,14 @@ def main(args):
                 if copyFile:
                     print "Simply copying the file without modification.. "
                     # print http_response.request.first_line
-                    copy(os.path.join(root,file), os.path.join(args.output, output_directory))
+                    copy(os.path.join(root,file), args.output)
 
             except IOError as e:
                 print args.input + ": Could not open file ", e
 
     pool = mp.Pool(mp.cpu_count())
 
-    instrument_singleton = partial(instrument, root, "js",output_directory, args)
+    instrument_singleton = partial(instrument, root, "js", args)
         
     pool.map(instrument_singleton, jsFiles)
     pool.close()
@@ -290,7 +295,7 @@ def main(args):
     # for jsFile in jsFiles:
     #     instrument(jsFile,root, "js", output_directory,args)
 
-    instrument_singleton = partial(instrument, root, "html",output_directory, args)
+    instrument_singleton = partial(instrument, root, "html", args)
     # for pid in childPids:
     #     print "waiting on pid", pid
     #     os.waitpid(pid,0)
