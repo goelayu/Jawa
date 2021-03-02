@@ -7,7 +7,7 @@ const falafel = require('falafel'),
 var metadata = {allFnIds:{}};
 
 var getNodes = function(src, arr){
-    src = globalWrapper.wrap(src);
+    // src = globalWrapper.wrap(src);
     src = beautifier.js(src);
     return falafel(src, {
         locations: true, 

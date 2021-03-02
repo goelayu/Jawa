@@ -140,7 +140,7 @@ function wrap(content){
             }
         }).toString();
     } catch (e){
-        console.error('error while parsing',e);
+        console.error('error while global code wrapping',e);
     }
 
     return content;

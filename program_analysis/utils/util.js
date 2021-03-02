@@ -88,7 +88,7 @@ var getFileSize = function(dir){
             console.error(`Error while readings ids for ${file}`);
         }
     });
-    return [resTotal, resJS];
+    return resTotal;
 }
 
 var getIdLen = function(allIds){
@@ -103,8 +103,8 @@ var getIdLen = function(allIds){
     return idSrcLen;
 }
 
-var sumFnSizes = function(fns, idLen, filesToExclude){
-    var res = 0;
+var sumFnSizes = function(fns, idLen, filesToExclude, total){
+    var res = 0, t = 0;
     fns.forEach((f)=>{
         if (!idLen[f]) {
             console.error(`${f} not found`)
@@ -117,6 +117,11 @@ var sumFnSizes = function(fns, idLen, filesToExclude){
         }
         res += idLen[f][1];
     });
+    if (total){
+        t = Object.values(idLen).reduce((acc, cur)=>{acc += cur[1]; return acc},0)
+        return [res,t]
+    }
+
     return res;
 }
 
