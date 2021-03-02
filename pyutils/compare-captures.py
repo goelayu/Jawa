@@ -19,12 +19,12 @@ def extractCriticalFiles(mfiles):
 
 def parseDir(dir):
     objs = []
-    for root, folder, files in os.walk(dir):
+    for root, folder, files in os.walk(dir.strip()):
         for file in files:
             try:
                 http_obj = Mahimahi(os.path.join(root, file))
                 objs.append(http_obj)
-            except:
+            except Exception as e:
                 pass
     return extractCriticalFiles(objs)
 
@@ -128,57 +128,54 @@ def dump_log(log_data):
     for k in log_data['type_to_files_all']:
         str = str + ',{} : {} '.format(k, _s(log_data['type_to_files_all'][k]))
         str = str + ',{}_dedup : {} '.format(k, _s(log_data['type_to_files_dedup'][k]))
-        str = str + ',{}_diff : {} '.format(k, _d(log_data['type_to_files_dedup'][k]))
+        # str = str + ',{}_diff : {} '.format(k, _d(log_data['type_to_files_dedup'][k]))
     logging.info(str)
 
-def compare(args):
-    # src_idx_count = 0
-    # src_dir = getSourceDir(args.directory, src_idx_count)
-    # while not isValidDir(src_dir):
-    #     src_idx_count=src_idx_count+1
-    #     src_dir = getSourceDir(args.directory, src_idx_count)
-    # src_files = parseDir(src_dir)
+def compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all):
+    all_files.extend(dst_objs)
+    matches = []
+    unmatches = []
+    for file in dst_objs:
+        type = getType(file.getHeader('content-type'), file)
+        
+        # if type != 'css' and type != 'html':
+        #     continue
+        # logging.info('type is {}'.format(type))
+        match = _compare(file, dedup_files)
+        match and matches.append(file)
+        if not match:
+            unmatches.append(file)
+            type_to_files_dedup[type].append(file)
+        type_to_files_all[type].append(file)
+    dedup_files.extend(unmatches) 
 
-    # all_files = copy.deepcopy(src_files)
-    # dedup_files = copy.deepcopy(src_files)
+def compare(args):
     all_files = []
     dedup_files = []
     type_to_files_dedup = {'javascript':[], 'html':[], 'image':[], 'css':[], None:[], 'font':[]}
     type_to_files_all = {'javascript':[], 'html':[], 'image':[], 'css':[], None:[], 'font':[]}
-    # logging.info('DedupRatio: {}'.format(getDedupRatio(all_files, dedup_files)))
-    for root, folder, files in os.walk(args.directory):
-        # if root == src_dir:
-        #     continue
-        if len(files) != 0:
-            # logging.info('total files: {} and matched files:{}'.format(len(src_files), len(files_matched)))
-            # count=count+1
-            dst_dir = root
-            dst_objs = parseDir(dst_dir)
+
+    if args.selected:
+        dirs = open(args.directory).readlines()
+        for d in dirs:
+            logging.info('Parsing directory {}'.format(d))
+            dst_objs = parseDir(d)
             if not isValidDir(dst_objs):
                 continue
-
-            html_css_files = [d for d in dst_objs if getType(d.getHeader('content-type'), d) == 'css' or getType(d.getHeader('content-type'), d) == 'html' ]
-            all_files.extend(html_css_files)
-            logging.info('{}/{}'.format(root,folder))
-            logging.info("Comparing {} with {} with url {}".format(len(dedup_files), len(dst_objs), dst_dir ))
-            matches = []
-            unmatches = []
-            for file in dst_objs:
-                type = getType(file.getHeader('content-type'), file)
-                
-                if type != 'css' and type != 'html':
+            logging.info("Comparing {} with {} with url {}".format(len(dedup_files), len(dst_objs), d ))
+            compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all)
+            dump_log({'all_files':all_files, 'dedup_files':dedup_files, 'type_to_files_dedup': type_to_files_dedup, 'type_to_files_all':type_to_files_all}) 
+    else:
+        for root, folder, files in os.walk(args.directory):
+            if len(files) != 0:
+                logging.info('{}/{}'.format(root,folder))
+                dst_objs = parseDir(root)
+                logging.info("Comparing {} with {} with url {}".format(len(dedup_files), len(dst_objs), root ))
+                if not isValidDir(dst_objs):
                     continue
-                # logging.info('type is {}'.format(type))
-                match = _compare(file, dedup_files)
-                match and matches.append(file)
-                if not match:
-                    unmatches.append(file)
-                    type_to_files_dedup[type].append(file)
-                type_to_files_all[type].append(file)
-            dedup_files.extend(unmatches) 
-    dump_log({'all_files':all_files, 'dedup_files':dedup_files, 'type_to_files_dedup': type_to_files_dedup, 'type_to_files_all':type_to_files_all})  
-            # logging.info('Status: {} {} {} {} {}'.format(len(dedup_files), len(type_to_files['javascript']), \
-            #     getTotalSize(all_files), getTotalSize(dedup_files), getTotalSize(type_to_files['javascript'])))
+                compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all)
+            
+    dump_log({'all_files':all_files, 'dedup_files':dedup_files, 'type_to_files_dedup': type_to_files_dedup, 'type_to_files_all':type_to_files_all}) 
 
 
 def init_logger():
@@ -190,6 +187,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('directory', help="path to the captures directory")
     parser.add_argument('--url', help='url of the site')
+    parser.add_argument('--selected', dest='selected', action='store_true')
     args = parser.parse_args()
     init_logger()
     compare(args)
