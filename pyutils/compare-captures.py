@@ -9,6 +9,8 @@ import logging
 import copy
 import multiprocessing as mp
 import tarfile
+import re
+import json
 
 from pyutils.mahimahi import Mahimahi
 
@@ -131,7 +133,11 @@ def dump_log(log_data):
         # str = str + ',{}_diff : {} '.format(k, _d(log_data['type_to_files_dedup'][k]))
     logging.info(str)
 
-def compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all):
+def dump_file(file, data):
+    with (open(file,'w')) as f:
+        f.write(json.dumps(data))
+
+def compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all, js_urls):
     all_files.extend(dst_objs)
     matches = []
     unmatches = []
@@ -140,7 +146,9 @@ def compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_t
         
         # if type != 'css' and type != 'html':
         #     continue
-        # logging.info('type is {}'.format(type))
+        if type == 'javascript':
+            # logging.info('comparing url {}'.format(file.getUrl()))
+            js_urls.append(get_archive_filename(file.getUrl()))
         match = _compare(file, dedup_files)
         match and matches.append(file)
         if not match:
@@ -149,22 +157,33 @@ def compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_t
         type_to_files_all[type].append(file)
     dedup_files.extend(unmatches) 
 
+def get_archive_filename(url):
+    if len(url) > 50:
+        url = url[-50:]
+    s = str(url).strip().replace(' ', '_')
+    return re.sub(r'(?u)[^-\w.]', '', s)
+
 def compare(args):
     all_files = []
     dedup_files = []
     type_to_files_dedup = {'javascript':[], 'html':[], 'image':[], 'css':[], None:[], 'font':[]}
     type_to_files_all = {'javascript':[], 'html':[], 'image':[], 'css':[], None:[], 'font':[]}
-
     if args.selected:
         dirs = open(args.directory).readlines()
         for d in dirs:
+            d = d.strip()
+            js_urls = []
             logging.info('Parsing directory {}'.format(d))
             dst_objs = parseDir(d)
             if not isValidDir(dst_objs):
                 continue
             logging.info("Comparing {} with {} with url {}".format(len(dedup_files), len(dst_objs), d ))
-            compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all)
-            dump_log({'all_files':all_files, 'dedup_files':dedup_files, 'type_to_files_dedup': type_to_files_dedup, 'type_to_files_all':type_to_files_all}) 
+            compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all, js_urls)
+            dump_log({'all_files':all_files, 'dedup_files':dedup_files, 'type_to_files_dedup': type_to_files_dedup, 'type_to_files_all':type_to_files_all})
+
+            #extract url path to append to output
+            site_path = "/".join(d.split('/')[6:])
+            dump_file('{}/{}/archive_urls'.format(args.urldir,site_path), js_urls)
     else:
         for root, folder, files in os.walk(args.directory):
             if len(files) != 0:
@@ -188,6 +207,7 @@ if __name__ == "__main__":
     parser.add_argument('directory', help="path to the captures directory")
     parser.add_argument('--url', help='url of the site')
     parser.add_argument('--selected', dest='selected', action='store_true')
+    parser.add_argument('urldir', help='path to dump processed JavaScript urls')
     args = parser.parse_args()
     init_logger()
     compare(args)
