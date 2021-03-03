@@ -97,6 +97,8 @@ def getTotalDiffSize(files):
 
 
 def getTotalSize(files):
+    for i in files:
+        logging.info('File {} with size {}'.format(i.getUrl(), len(i._plainText)))
     sizes = [len(i._plainText) for i in files]
     # sizes = [len(i.getBody()) for i in files]
     return sum(sizes)
@@ -128,6 +130,7 @@ def dump_log(log_data):
     _d = getTotalDiffSize
     str = 'Total: {}, Dedup: {} '.format(_s(log_data['all_files']), _s(log_data['dedup_files']))
     for k in log_data['type_to_files_all']:
+        logging.info('computing total size for type: {} with # {}'.format(k, len(log_data['type_to_files_all'][k])))
         str = str + ',{} : {} '.format(k, _s(log_data['type_to_files_all'][k]))
         str = str + ',{}_dedup : {} '.format(k, _s(log_data['type_to_files_dedup'][k]))
         # str = str + ',{}_diff : {} '.format(k, _d(log_data['type_to_files_dedup'][k]))
@@ -137,7 +140,7 @@ def dump_file(file, data):
     with (open(file,'w')) as f:
         f.write(json.dumps(data))
 
-def compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all, js_urls):
+def compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all, valid_js):
     all_files.extend(dst_objs)
     matches = []
     unmatches = []
@@ -148,7 +151,9 @@ def compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_t
         #     continue
         if type == 'javascript':
             # logging.info('comparing url {}'.format(file.getUrl()))
-            js_urls.append(get_archive_filename(file.getUrl()))
+            short_name = get_archive_filename(file.getUrl())
+            if short_name not in valid_js:
+                continue
         match = _compare(file, dedup_files)
         match and matches.append(file)
         if not match:
@@ -163,6 +168,21 @@ def get_archive_filename(url):
     s = str(url).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)
 
+def is_valid_inst_jsfile(f, dir,site_path):
+    path = "{}/{}/{}/ids".format(dir,site_path,f)
+
+    return os.path.exists(path)
+
+def get_valid_jsfiles(files, datadir,site_path):
+    js_urls = []
+    for file in files:
+        type = getType(file.getHeader('content-type'), file)
+        if type == 'javascript':
+            short_name = get_archive_filename(file.getUrl())
+            if is_valid_inst_jsfile(short_name, datadir,site_path):
+                js_urls.append(short_name)
+    return js_urls
+
 def compare(args):
     all_files = []
     dedup_files = []
@@ -172,17 +192,19 @@ def compare(args):
         dirs = open(args.directory).readlines()
         for d in dirs:
             d = d.strip()
-            js_urls = []
             logging.info('Parsing directory {}'.format(d))
             dst_objs = parseDir(d)
             if not isValidDir(dst_objs):
                 continue
+
+            site_path = "/".join(d.split('/')[6:])
+            js_urls = get_valid_jsfiles(dst_objs, args.urldir,site_path)
+
             logging.info("Comparing {} with {} with url {}".format(len(dedup_files), len(dst_objs), d ))
             compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all, js_urls)
             dump_log({'all_files':all_files, 'dedup_files':dedup_files, 'type_to_files_dedup': type_to_files_dedup, 'type_to_files_all':type_to_files_all})
-
+            
             #extract url path to append to output
-            site_path = "/".join(d.split('/')[6:])
             dump_file('{}/{}/archive_urls'.format(args.urldir,site_path), js_urls)
     else:
         for root, folder, files in os.walk(args.directory):
