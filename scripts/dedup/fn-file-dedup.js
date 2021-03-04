@@ -18,10 +18,11 @@ var parse = function(f){
     return JSON.parse(fs.readFileSync(f,'utf-8'));
 }
 
-var convertToFiles = function(fns){
+var convertToFiles = function(fns, rfiles){
     fileFns = {};
     fns.forEach((f)=>{
         var fnFile = f.split('-').slice(0,f.split('-').length - 4).join('-');
+        if (rfiles.indexOf(fnFile)<0) return;
         if (!(fnFile in fileFns))
             fileFns[fnFile] = [];
         
@@ -30,10 +31,10 @@ var convertToFiles = function(fns){
     return fileFns;
 }
 
-var getPerFileSize = function(fns, resDir){
-    var fileFns = convertToFiles(fns);
+var getPerFileSize = function(fns, resDir, rfiles){
+    var fileFns = convertToFiles(fns, rfiles);
     //get all ids for this dir
-    var allIds = getAllIds(Object.keys(fileFns), resDir);
+    var allIds = getAllIds(rfiles, resDir);
     
     var idSrcLen = utils.getIdLen(allIds),
         res = {};
@@ -61,7 +62,13 @@ var getAllIds = function(filenames, dir){
 
 var getRelevantFiles = function(path){
     const ARCHIVE_URLS = 'archive_urls';
-    return parse(`${path}/${ARCHIVE_URLS}`);
+    var urls = [];
+    try {
+        urls = parse(`${path}/${ARCHIVE_URLS}`);
+    } catch (e){
+        urls = [];
+    }
+    return urls
 }
 
 /**
@@ -117,11 +124,12 @@ var dedupAnalysis = function(){
         if (path == '') return;
         // get source files
         var srcDir = `${program.dir}/${path}`;
-        var files = getRelevantFiles(srcDir);
+        var rfiles = getRelevantFiles(srcDir);
+        if (!rfiles.length) return;
         // get all functions
         var execFns = parse(`${program.performance}/${path}/allFns`).preload;
 
-        var fnFileSizes = getPerFileSize(execFns, srcDir );
+        var fnFileSizes = getPerFileSize(execFns, srcDir, rfiles);
         var [_total, _dedup] = queryAndUpdateDedupStore(fnFileSizes, dedupStore);
 
 
