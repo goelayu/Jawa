@@ -28,6 +28,9 @@ analyzer_script = "{}/../program_analysis/instrument.js".format(DIR)
 filter_list = "{}/../filter-ads-trackers/easyprivacy.txt".format(DIR)
 filter_rules = None
 
+mp_manager = mp.Manager()
+analytic_files = mp_manager.list()
+
 def copy(source, destination):
     subprocess.Popen("cp -r {} {}/".format(source, destination), shell=True)
 
@@ -100,12 +103,6 @@ def instrument(root, fileType,args,file):
 
     print "Instrumenting file {} with type {}".format(fullurl, fileType)
 
-    # check whether its a analytics file or not
-    if fileType == 'js' and args.filter and filter_rules.should_block(fullurl,options={'third-party':True}):
-        print "Blocking analytics file", filename
-        copy(os.path.join(root,file), args.output)
-        return
-
     if fileType == 'js' and ('web.archive.org/_static/js/' in fullurl or 'archive.org/includes/' in fullurl):
         print "Skipping client-side libraries for archive.org", fullurl
         copy(os.path.join(root,file), args.output)
@@ -117,6 +114,12 @@ def instrument(root, fileType,args,file):
         filename = url+filename
 
     filename = get_valid_filename(filename)
+
+    # check whether its a analytics file or not
+    if fileType == 'js' and args.filter and filter_rules.should_block(fullurl,options={'third-party':True}):
+        print "Discovered analytics file", filename
+        analytic_files.append(filename)
+        print "length of analytics", len(analytic_files)
 
     node_debugging_port = random.randint(9300,9600)
     # pid = os.fork()
@@ -163,6 +166,7 @@ def instrument(root, fileType,args,file):
     else:
         command = "node " + command
     _log_path = log_directory+"/" + filename + "/"
+
     subprocess.call("mkdir -p {}".format(_log_path), shell=True)
 
     log_file=open(_log_path+"logs","w")
@@ -172,7 +176,6 @@ def instrument(root, fileType,args,file):
 
     src_file.write(content)
     src_file.close()
-
 
     print "Executing ", command
     cmd = subprocess.call(command, stdout=log_file, stderr =error_file, shell=True)
@@ -307,6 +310,14 @@ def main(args):
     pool.close()
     pool.join()
     print "All the HTML child processes died..\n Main thread terminating"
+
+    metadata_dir = "{}/{}".format(args.logDir, "__metadata__")
+    subprocess.call("mkdir -p {}".format(metadata_dir), shell=True)
+    analytics_file = open("{}/analytics".format(metadata_dir),'w')
+    for i in analytic_files:
+        print 'dumping {}'.format(i)
+    analytics_file.write(json.dumps(list(analytic_files)))
+    analytics_file.close()
     
 
 if __name__ == "__main__":
