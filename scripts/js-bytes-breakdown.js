@@ -8,7 +8,7 @@ var fs = require('fs'),
     utils = require('../program_analysis/utils/util');
 
 program
-    .option('--js-src [value]','path to the js source files')
+    .option('-j, --js-src [value]','path to the js source files')
     .option('-p, --performance [value]','path to the performance files')
     .parse(process.argv);
 
@@ -32,4 +32,20 @@ var unionSize = function(){
 
 }
 
-unionSize();
+var breakdown = function(){
+    var allIds = utils.getAllIds(program.jsSrc);
+    var idSrcLen = utils.getIdLen(allIds);
+    var fns = parse(`${program.performance}/allFns`);
+    var analyticFiles = parse(`${program.jsSrc}/__metadata__/analytics`);
+
+    var [preload, preloadTotal] = utils.sumFnSizes([...fns.preload], idSrcLen, null, analyticFiles);
+    var [postload, postloadTotal] = utils.sumFnSizes([...fns.postload], idSrcLen, null, analyticFiles);
+
+    var totalJs = utils.getFileSize(program.jsSrc, fs.readdirSync(program.jsSrc));
+
+    console.log(preload, postload, (preloadTotal+postloadTotal)-(preload+postload), totalJs);
+
+}
+
+// unionSize();
+breakdown();

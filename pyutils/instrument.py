@@ -103,8 +103,16 @@ def instrument(root, fileType,args,file):
 
     print "Instrumenting file {} with type {}".format(fullurl, fileType)
 
-    if fileType == 'js' and ('web.archive.org/_static/js/' in fullurl or 'archive.org/includes/' in fullurl):
-        print "Skipping client-side libraries for archive.org", fullurl
+    # if fileType == 'js' and ('web.archive.org/_static/js/' in fullurl or 'archive.org/includes/' in fullurl):
+    #     print "Skipping client-side libraries for archive.org", fullurl
+    #     copy(os.path.join(root,file), args.output)
+    #     return
+
+    # skip non critical archive urls
+    ts = re.findall(r'\d+',origPath)
+    print "timestamp as extracted", ts
+    if len(ts) == 0 or len(ts[0]) != 14:
+        print "Skipping non critical files", fullurl
         copy(os.path.join(root,file), args.output)
         return
 
@@ -119,7 +127,6 @@ def instrument(root, fileType,args,file):
     if fileType == 'js' and args.filter and filter_rules.should_block(fullurl,options={'third-party':True}):
         print "Discovered analytics file", filename
         analytic_files.append(filename)
-        print "length of analytics", len(analytic_files)
 
     node_debugging_port = random.randint(9300,9600)
     # pid = os.fork()
