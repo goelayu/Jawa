@@ -110,7 +110,6 @@ def instrument(root, fileType,args,file):
 
     # skip non critical archive urls
     ts = re.findall(r'\d+',origPath)
-    print "timestamp as extracted", ts
     if len(ts) == 0 or len(ts[0]) != 14:
         print "Skipping non critical files", fullurl
         copy(os.path.join(root,file), args.output)
