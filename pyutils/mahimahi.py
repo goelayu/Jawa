@@ -75,6 +75,13 @@ class Mahimahi:
 
         return None
 
+    def getRequestHeader(self, key):
+        for header in self.http_obj.request.header:
+            if header.key.lower() == key:
+                return header.value
+
+        return None
+
 
     def isChunked(self):
         for header in self.http_obj.response.header:

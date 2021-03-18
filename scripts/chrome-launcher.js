@@ -55,7 +55,7 @@ async function launch(){
 
     if (program.loadIter){
         console.log(`Part of a series of page loads`)
-        var count = program.loadIter, agent;
+        var count = program.loadIter, agent = 'desktop';
         if (count == 0 || count == 1)
             agent = 'desktop'
         await emulateUserAgent(page, agent);
@@ -84,7 +84,9 @@ async function launch(){
     await page.goto(program.url,{
         timeout: program.timeout,
     }).catch(err => {
-        console.log('Timer fired before page could be loaded')
+        console.log('Timer fired before page could be loaded', err)
+        clearTimeout(globalTimer);
+        return;
     })
 
     console.log('Site loaded');
@@ -99,7 +101,8 @@ async function launch(){
     if (program.wait){
         //turn on logging
         await page.evaluateHandle(()=> window.__tracer.setTracingMode(true));
-        await sleep(30000)
+        await page.evaluateHandle(()=> window.__tracer.setCaptureMode('postload'));
+        await sleep(20000)
     }
 
 
@@ -128,6 +131,7 @@ async function launch(){
                  case 'DOM' : await extractDOM(page); break; 
                  case 'Distill' : await distillDOM(page); break;
                  case 'CG' : await chromeFns.getAllFns(page, program); break; 
+                 case 'dynAPI': await getDynCount(page); break;
             }
         }
     }
@@ -232,6 +236,12 @@ var getMemory = async function(page){
     var _mem = await page.evaluateHandle(() => performance.memory.usedJSHeapSize);
     var mem = await _mem.jsonValue();
     dump(mem, `${program.output}/memory`)
+}
+
+var getDynCount = async function(page){
+    var _dyn = await page.evaluateHandle(() => window.__getDynAPI());
+    var dyn = await _dyn.jsonValue();
+    dump(dyn, `${program.output}/dynAPI`)
 }
 
 var getMhtml = async function(cdp){

@@ -14,7 +14,7 @@ program
 
 
 
-var rewriter = null;
+var rewriter = null, intercepts;
 var returnInfoFile = program.input + ".info";
 
 function IsJsonString(str) {
@@ -110,7 +110,9 @@ function instrumentHTML(src, filename){
         postStr = src;
     }
 
-    var tracerStr = `<script> ${getTracerObj()} </script>`;
+    var intercepts = fs.readFileSync('./runtime/dynamic-api-intercepts.js','utf-8');
+
+    var tracerStr = `<script> ${intercepts + getTracerObj()} </script>`;
 
     src = preStr + tracerStr + postStr;
 
