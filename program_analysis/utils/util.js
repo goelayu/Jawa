@@ -73,16 +73,20 @@ var getAllIds = function(dir){
     return allIds;
 }
 
-var getFileSize = function(dir){
-    var filenames = fs.readdirSync(dir);
+var getFileSize = function(dir, filenames){
+    // var filenames = fs.readdirSync(dir);
+    
     var resTotal = resJS = 0;
+    // console.log(`Reading # files ${filenames.length}`)
     filenames.forEach((file)=>{
         try {    
-            var idFile = `${dir}/${file}/${file}`;
-            var content = fs.readFileSync(idFile, 'utf-8');
+            // var idFile = `${dir}/${file}/${file}`;
+            var idFile = `${dir}/${file}`;
+            var content = fs.readFileSync(idFile, 'ascii'); //read with ascii encoding to for consistency reasons
             if (!IsJsonString(content))
                 resJS += content.length;
             else console.error(`${file} is json string`)
+            // console.log(`file ${file} with size ${content.length}`)
             resTotal += content.length;
         } catch (e) {
             console.error(`Error while readings ids for ${file}`);
@@ -103,26 +107,33 @@ var getIdLen = function(allIds){
     return idSrcLen;
 }
 
-var sumFnSizes = function(fns, idLen, filesToExclude, total){
+var sumFnSizes = function(fns, idLen, filesToInclude, filesToExclude){
     var res = 0, t = 0;
     fns.forEach((f)=>{
         if (!idLen[f]) {
             console.error(`${f} not found`)
             return;
         }
-        if (filesToExclude){
-            var fnFile = f.split('-').slice(0,f.split('-').length - 4).join('-');
-            if (filesToExclude.indexOf(fnFile)>=0)
+        var fnFile = f.split('-').slice(0,f.split('-').length - 4).join('-');
+        if (filesToInclude){
+            if (filesToInclude.indexOf(fnFile)<0)
                 return;
         }
+        if (filesToExclude){
+            if (filesToExclude.indexOf(fnFile)>=0){
+                t+=idLen[f][1];
+                return;
+            }
+        }
         res += idLen[f][1];
+        t += idLen[f][1];
     });
-    if (total){
-        t = Object.values(idLen).reduce((acc, cur)=>{acc += cur[1]; return acc},0)
-        return [res,t]
-    }
+    // if (total){
+    //     t = Object.values(idLen).reduce((acc, cur)=>{acc += cur[1]; return acc},0)
+    //     return [res,t]
+    // }
 
-    return res;
+    return [res,t];
 }
 
 var all_handlers = ["abort", "blur", "change", "click", "close", "contextmenu", "dblclick", "focus",
