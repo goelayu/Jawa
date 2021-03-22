@@ -136,120 +136,130 @@
     // });
 })();
 
-var __tracer = new (function(){
-     var TM = true, //tracing turned on by default
-        shadowStackHead = null, 
-        callStack = [];
-        callGraph = {},
-        executionCounter = {},
-        evtFns = {},
-        allFns = {
-            preload: new Set,
-            postload: new Set
-        },
-        captureMode = 'preload', // can be either preload or postload
-        curEvt = null;
+if (!window.top.__tracer){
+    __declareTracer__();
+} else {
+    window.__tracer = window.top.__tracer;
+}
 
-    this.__enter__ = function(id){
-        if (!TM) return;
-        // if (!(id in executionCounter))
-        //     executionCounter[id] = -1;
-        // executionCounter[id]++
+function __declareTracer__(){
+    window.__tracer = new (function(){
+        var TM = true, //tracing turned on by default
+            shadowStackHead = null, 
+            callStack = [];
+            callGraph = {},
+            executionCounter = {},
+            evtFns = {},
+            allFns = {
+                preload: new Set,
+                postload: new Set
+            },
+            captureMode = 'preload', // can be either preload or postload
+            curEvt = null;
 
-        // var invocId = `${id}_count${executionCounter[id]}`;
-        // callGraph[invocId] = [];
-        // callStack.push(invocId);
-        callStack.push(`${curEvt};;;;${id}`);
-        // if (shadowStackHead)
-            // callGraph[shadowStackHead].push(invocId);
-        // shadowStackHead = invocId;
-        if (captureMode == 'preload'){
+        this.__enter__ = function(id){
+            if (!TM) return;
+            // if (!(id in executionCounter))
+            //     executionCounter[id] = -1;
+            // executionCounter[id]++
+
+            // var invocId = `${id}_count${executionCounter[id]}`;
+            // callGraph[invocId] = [];
+            // callStack.push(invocId);
+            callStack.push(`${curEvt};;;;${id}`);
+            // if (shadowStackHead)
+                // callGraph[shadowStackHead].push(invocId);
+            // shadowStackHead = invocId;
+            if (captureMode == 'preload'){
+                allFns[captureMode].add(id);
+                return;
+            }
+
             allFns[captureMode].add(id);
-            return;
+            // Store functions reachable from event handlers
+            if (callStack.length == 1)
+                evtFns[`${curEvt};;;;${id}`] = new Set;
+            else {
+                var rootEvt = callStack[0];
+                evtFns[rootEvt].add(id);
+            }
         }
 
-        allFns[captureMode].add(id);
-        // Store functions reachable from event handlers
-        if (callStack.length == 1)
-            evtFns[`${curEvt};;;;${id}`] = new Set;
-        else {
+        this.__exit__ = function(){
+            if (!TM) return;
+            var _id = callStack.pop();
+            // var csLen = callStack.length;
+            // shadowStackHead = csLen ? callStack[csLen - 1] : null;
+
+            //convert set to array for stringification
+            // if (!shadowStackHead){
+            //     var id = _id.split('_count')[0];
+            //     evtFns[id] = [...evtFns[id]];
+            // }
+        }
+
+        this.setCaptureMode = function(mode){
+            captureMode = mode;
+        }
+
+        this.getCaptureMode = function(){
+            return captureMode;
+        }
+
+        this.getCallGraph = function(){
+            return callGraph;
+        }
+
+        this.getAllFns = function(){
+            allFns.preload = [...allFns.preload];
+            allFns.postload = [...allFns.postload];
+            return allFns;
+        }
+
+        var _getEvtFns = function(fns){
+            //convert sets to array for stringification by fetch API
+            Object.keys(fns).forEach((id)=>{
+                fns[id] = [...fns[id]];
+            });
+            return fns;
+        }
+
+        this.getEvtFns = function(){
+            var res =  _getEvtFns(evtFns);
+            //empty event dict
+            evtFns = {};
+            return res;
+        }
+
+        this.setTracingMode = function(mode){
+            TM = mode;
+        }
+
+        this.getTracingMode = function(){
+            return TM;
+        }
+
+        this.setEventId = function(id){
+            curEvt = id;
+        }
+
+        this.logXMLCall = function(){
             var rootEvt = callStack[0];
-            evtFns[rootEvt].add(id);
+            evtFns[rootEvt].add("xml");
         }
-    }
+        
+    })
+}
 
-    this.__exit__ = function(){
-        if (!TM) return;
-        var _id = callStack.pop();
-        // var csLen = callStack.length;
-        // shadowStackHead = csLen ? callStack[csLen - 1] : null;
+if (window == window.top){
+    window.addEventListener('load',()=>{
+        // Turn tracing off
+        window.__tracer.setTracingMode(false);
+    })
 
-        //convert set to array for stringification
-        // if (!shadowStackHead){
-        //     var id = _id.split('_count')[0];
-        //     evtFns[id] = [...evtFns[id]];
-        // }
-    }
-
-    this.setCaptureMode = function(mode){
-        captureMode = mode;
-    }
-
-    this.getCaptureMode = function(){
-        return captureMode;
-    }
-
-    this.getCallGraph = function(){
-        return callGraph;
-    }
-
-    this.getAllFns = function(){
-        allFns.preload = [...allFns.preload];
-        allFns.postload = [...allFns.postload];
-        return allFns;
-    }
-
-    var _getEvtFns = function(fns){
-        //convert sets to array for stringification by fetch API
-        Object.keys(fns).forEach((id)=>{
-            fns[id] = [...fns[id]];
-        });
-        return fns;
-    }
-
-    this.getEvtFns = function(){
-        var res =  _getEvtFns(evtFns);
-        //empty event dict
-        evtFns = {};
-        return res;
-    }
-
-    this.setTracingMode = function(mode){
-        TM = mode;
-    }
-
-    this.getTracingMode = function(){
-        return TM;
-    }
-
-    this.setEventId = function(id){
-        curEvt = id;
-    }
-
-    this.logXMLCall = function(){
-        var rootEvt = callStack[0];
-        evtFns[rootEvt].add("xml");
-    }
-    
-})
-
-window.addEventListener('load',()=>{
-    // Turn tracing off
-    window.__tracer.setTracingMode(false);
-})
-
-window.addEventListener('beforeunload', function(e){
-    e.preventDefault();
-    console.log(`cancelling navigation`);
-    return "";
-})
+    window.addEventListener('beforeunload', function(e){
+        e.preventDefault();
+        console.log(`cancelling navigation`);
+        return "";
+    })
+}

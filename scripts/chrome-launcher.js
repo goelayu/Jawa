@@ -38,7 +38,8 @@ async function launch(){
         executablePath: "/usr/bin/google-chrome",
         headless: program.testing ? false : true,
         defaultViewport: null,
-        args : [ '--ignore-certificate-errors'/*, '--blink-settings=scriptEnabled=false'*/, '--auto-open-devtools-for-tabs',]
+        args : [ '--ignore-certificate-errors'/*, '--blink-settings=scriptEnabled=false'*/, '--auto-open-devtools-for-tabs', '--disable-web-security',
+        '--disable-features=IsolateOrigins,site-per-process,CrossSiteDocumentBlockingAlways,CrossSiteDocumentBlockingIfIsolating'],
         // '--no-first-run'],
         // ignoreDefaultArgs: true,
     }
