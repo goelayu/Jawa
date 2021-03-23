@@ -3,10 +3,11 @@
  * of CDP (as used inside chrome-remote-interface)
  */
 
- const puppeteer = require('puppeteer'),
+ const puppeteer = require('puppeteer-extra'),
     program = require('commander'),
     fs = require('fs'),
-    chromeFns = require('./chrome-ctx-scripts/fns')
+    chromeFns = require('./chrome-ctx-scripts/fns'),
+    AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 const { createDeflate } = require('zlib');
 
 program
@@ -35,7 +36,7 @@ const HANDLERS=`${__dirname}/chrome-ctx-scripts/fetch-listeners.js`
 
 async function launch(){
     const options = {
-        executablePath: "/usr/bin/google-chrome",
+        executablePath: "/usr/bin/google-chrome-stable",
         headless: program.testing ? false : true,
         defaultViewport: null,
         args : [ '--ignore-certificate-errors'/*, '--blink-settings=scriptEnabled=false'*/, '--auto-open-devtools-for-tabs', '--disable-web-security',
@@ -49,6 +50,7 @@ async function launch(){
     if (program.loadIter){
         options.userDataDir = program.chromeDir;
     }
+    puppeteer.use(AdblockerPlugin({blockTrackers: true}))
     const browser = await puppeteer.launch(options);
     let page = await browser.newPage();
     var nLogs = [], cLogs = [], jProfile;
