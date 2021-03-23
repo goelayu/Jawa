@@ -25,7 +25,7 @@ gzip_compress = zlib.compressobj(9, zlib.DEFLATED, zlib.MAX_WBITS | 16)
 # analyzer_script = 'instrument.js'
 DIR = os.path.dirname(os.path.abspath(__file__))
 analyzer_script = "{}/../program_analysis/instrument.js".format(DIR)
-filter_list = "{}/../filter-ads-trackers/easyprivacy.txt".format(DIR)
+filter_list = "{}/../filter-ads-trackers/combined.txt".format(DIR)
 filter_rules = None
 
 mp_manager = mp.Manager()
@@ -72,8 +72,9 @@ def get_valid_filename(s):
     return re.sub(r'(?u)[^-\w.]', '', s)
 
 def get_filter_rules():
-    f = open(filter_list,'r').readlines()
-    rules = AdblockRules(f,use_re2=True, max_mem=512*1024*1024)
+    with open(filter_list,'rb') as f:
+        raw_rules = f.read().decode('utf8').splitlines()
+    rules = AdblockRules(raw_rules,use_re2=True, max_mem=512*1024*1024)
     return rules
 
 def get_mm_header(mm_obj, key):
@@ -109,11 +110,11 @@ def instrument(root, fileType,args,file):
     #     return
 
     # skip non critical archive urls
-    ts = re.findall(r'\d+',origPath)
-    if len(ts) == 0 or len(ts[0]) != 14:
-        print "Skipping non critical files", fullurl
-        copy(os.path.join(root,file), args.output)
-        return
+    # ts = re.findall(r'\d+',origPath)
+    # if len(ts) == 0 or len(ts[0]) != 14:
+    #     print "Skipping non critical files", fullurl
+    #     copy(os.path.join(root,file), args.output)
+    #     return
 
     if len(filename) > 50:
         filename = filename[-50:]
@@ -231,6 +232,11 @@ def instrument(root, fileType,args,file):
         length_header = output_http_response.response.header.add()
         length_header.key = "Content-Length"
         length_header.value = bytes(modifiedLength)
+
+    if fileType == 'html':
+        acao = output_http_response.response.header.add()
+        acao.key = "Access-Control-Allow-Origin"
+        acao.value = "*"
 
     # print " response header looks like " , output_http_response.response.header
     outputFile = open(os.path.join(args.output, file), "w")
