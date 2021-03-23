@@ -114,7 +114,10 @@ var sumFnSizes = function(fns, idLen, filesToInclude, filesToExclude){
             console.error(`${f} not found`)
             return;
         }
-        var fnFile = f.split('-').slice(0,f.split('-').length - 4).join('-');
+        var endIndx = 4;
+        if (f.indexOf('-script-')>=0)
+            endIndx = 6;
+        var fnFile = f.split('-').slice(0,f.split('-').length - endIndx).join('-');
         if (filesToInclude){
             if (filesToInclude.indexOf(fnFile)<0)
                 return;
