@@ -10,8 +10,8 @@
 !pyutils/
 !tests/
 
-!filter-ads-trackers/
-!filter-ads-trackers/*
+!filter-lists/
+!filter-lists/*
 
 !*js
 !*py
