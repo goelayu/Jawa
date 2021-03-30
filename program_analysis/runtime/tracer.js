@@ -159,6 +159,7 @@ function __declareTracer__(){
 
         this.__enter__ = function(id){
             if (!TM) return;
+            shadowStackHead = id;
             // if (!(id in executionCounter))
             //     executionCounter[id] = -1;
             // executionCounter[id]++
@@ -208,6 +209,10 @@ function __declareTracer__(){
 
         this.getCallGraph = function(){
             return callGraph;
+        }
+
+        this.peakCallStack = function(){
+            return shadowStackHead;
         }
 
         this.getAllFns = function(){

@@ -44,14 +44,15 @@ def main(args):
             try:
                 mm = Mahimahi(os.path.join(root,file))
                 type = mm.getHeader('content-type')
-                if 'javascript' not in type or not mm.isCriticalFile() or mm.getStatus() != '200':
+                # print type, mm.getUrl(),mm.getRequestHeader('host'), mm.getStatus()
+                if 'javascript' not in type or mm.getStatus() != '200':
                     continue
                 url = mm.getUrl()
                 fullurl = "{}/{}".format(mm.getRequestHeader('host'),mm.getUrl())
                 file_size = len(mm._plainText)
                 filtered_url = False
                 for rule in filters:
-                    if rule in url:
+                    if rule in fullurl:
                         filtered_url = True
                 
                 if is_adblocked_url(url, args.adblock):

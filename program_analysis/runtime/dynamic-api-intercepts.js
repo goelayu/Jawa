@@ -22,7 +22,7 @@
 
         Object.defineProperty(api, prop,{
             get: function(){
-                window.__dynAPI__[prop]++;
+                window.__dynAPI__[prop].push(__tracer.peakCallStack());
                 
                 if (oldget && oldget.call)
                     return oldget.call(this);
@@ -50,6 +50,6 @@
         var [api,prop] = entry;
         api = api.split('-')[0];
         interceptAPI(window[api].prototype,prop);
-        window.__dynAPI__[prop]=0;
+        window.__dynAPI__[prop]=[];
     })
 })();
