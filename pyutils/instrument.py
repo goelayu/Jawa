@@ -84,11 +84,13 @@ def get_mm_header(mm_obj, key):
 
     return None
 
-def instrument(root, fileType,args,file):
-    f = open(os.path.join(root,file), "rb")
-    http_response = http_record_pb2.RequestResponse()
-    http_response.ParseFromString(f.read())
-    f.close()
+def instrument(root, fileType,args,file_obj):
+    http_response = file_obj['mm']
+    file = file_obj['file']
+    # f = open(os.path.join(root,file), "rb")
+    # http_response = http_record_pb2.RequestResponse()
+    # http_response.ParseFromString(f.read())
+    # f.close()
     filename = http_response.request.first_line.split()[1]
     origPath = filename
     output_http_response = deepcopy(http_response)
@@ -256,24 +258,23 @@ def main(args):
     subprocess.Popen("mkdir -p {}".format(args.output), shell=True)
     # subprocess.Popen("mkdir -p {}".format(os.path.join(args.output, output_directory)), shell=True)
 
-
-    http_response = http_record_pb2.RequestResponse()
-
     global filter_rules
     filter_rules = get_filter_rules()
 
     for root, folder, files in os.walk(args.input):
         print "This directory has ", len(files), " number of files"
-        scriptsToInstrument = [];
         url = root.split('/')[-2]
 
         htmlFiles = []
         jsFiles = []
+        file_obj = []
+        urls = []
 
         for file in files:
             try:
                 file_counter += 1
                 f = open(os.path.join(root,file), "rb")
+                http_response = http_record_pb2.RequestResponse()
                 http_response.ParseFromString(f.read())
                 f.close()
 
@@ -281,16 +282,23 @@ def main(args):
                 fileType = "None"
 
                 print "Checking: {} file : {}".format(file, file_counter)
+
+                filename = http_response.request.first_line.split()[1]
+                fullurl = "http://{}{}".format(get_mm_header(http_response,'host'),filename)
+
+                cur_file_obj = {'file':file, 'mm':http_response}
                 for header in http_response.response.header:
                     if header.key.lower() == "content-type":
                         if "javascript" in header.value.lower():
                             fileType = "js"
                             copyFile = False
-                            jsFiles.append(file)
+                            jsFiles.append(cur_file_obj)
+                            urls.append(fullurl)
                         elif "html" in header.value.lower():
                             fileType = "html"
                             copyFile = False
-                            htmlFiles.append(file)
+                            htmlFiles.append(cur_file_obj)
+                            urls.append(fullurl)
 
                 if copyFile:
                     print "Simply copying the file without modification.. "
@@ -326,10 +334,14 @@ def main(args):
     metadata_dir = "{}/{}".format(args.logDir, "__metadata__")
     subprocess.call("mkdir -p {}".format(metadata_dir), shell=True)
     analytics_file = open("{}/analytics".format(metadata_dir),'w')
-    for i in analytic_files:
-        print 'dumping {}'.format(i)
+    urls_file = open("{}/urls".format(metadata_dir),'w')
+    # for i in analytic_files:
+    #     print 'dumping {}'.format(i)
     analytics_file.write(json.dumps(list(analytic_files)))
     analytics_file.close()
+
+    urls_file.write(json.dumps(urls))
+    urls_file.close()
     
 
 if __name__ == "__main__":
