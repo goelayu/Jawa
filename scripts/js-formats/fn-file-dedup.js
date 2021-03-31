@@ -5,7 +5,8 @@
 
 var fs = require('fs'),
     program = require('commander'),
-    utils = require('../../program_analysis/utils/util');
+    utils = require('../../program_analysis/utils/util'),
+    beautifier = require('js-beautify');
 
 program
     .option('-d, --dir [dir]',"directory containing resource files")
@@ -21,7 +22,10 @@ var parse = function(f){
 var convertToFiles = function(fns, rfiles){
     fileFns = {};
     fns.forEach((f)=>{
-        var fnFile = f.split('-').slice(0,f.split('-').length - 4).join('-');
+        var endIndx = 4;
+        if (f.indexOf('-script-')>=0)
+            endIndx = 6;
+        var fnFile = f.split('-').slice(0,f.split('-').length - endIndx).join('-');
         if (rfiles.indexOf(fnFile)<0) return;
         if (!(fnFile in fileFns))
             fileFns[fnFile] = [];
@@ -64,7 +68,8 @@ var getRelevantFiles = function(path){
     const ARCHIVE_URLS = 'archive_urls';
     var urls = [];
     try {
-        urls = parse(`${path}/${ARCHIVE_URLS}`);
+        // urls = parse(`${path}/${ARCHIVE_URLS}`);
+        urls = fs.readdirSync(path);
     } catch (e){
         urls = [];
     }
@@ -115,7 +120,7 @@ var queryAndUpdateDedupStore = function(fnEntry, dedupStore){
  * 3) Compares this with the dedup store to see if an entry for the file already exists or not
  */
 var dedupAnalysis = function(){
-    var total = 0, dedup = 0;
+    var total = 0, dedup = 0, fileTotal = 0;
     var dedupStore = {};
 
     var paths = fs.readFileSync(program.urls,'utf-8').split('\n');
@@ -131,12 +136,12 @@ var dedupAnalysis = function(){
 
         var fnFileSizes = getPerFileSize(execFns, srcDir, rfiles);
         var [_total, _dedup] = queryAndUpdateDedupStore(fnFileSizes, dedupStore);
+        var _fileTotal = utils.getFileSize(srcDir, Object.keys(fnFileSizes));
 
-
-        total += _total, dedup += _dedup;
-        program.verbose && console.log(`${path}: Total- ${_total} Dedup- ${_dedup}`);
+        total += _total, dedup += _dedup, fileTotal += _fileTotal
+        program.verbose && console.log(`${path}: Total- ${_total} Dedup- ${_dedup} FileTotal- ${_fileTotal}`);
     });
-    console.log(total, dedup);
+    console.log(total, dedup, fileTotal);
 
 
 }

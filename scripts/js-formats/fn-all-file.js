@@ -7,6 +7,7 @@
 var fs = require('fs'),
     program = require('commander'),
     utils = require('../../program_analysis/utils/util');
+    var crypto = require('crypto');
 
 program
     .option('-d, --dir [dir]',"directory containing resource files")
@@ -44,15 +45,15 @@ var convertToFiles = function(fns, rfiles){
 var getPerFileData = function(fns, resDir, rfiles){
     var fileFns = convertToFiles(fns, rfiles);
     //get all ids for this dir
-    var allIds = getAllIds(rfiles, resDir);
     
-    var idSrcLen = utils.getIdLen(allIds),
-        res = {};
+    var res = {};
     Object.keys(fileFns).forEach((file)=>{
+        var allIds = getAllIds([file], resDir);
+        var idSrcLen = utils.getIdLen(allIds);
+        var fileSrc = fs.readFileSync(`${resDir}/${file}/${file}`,'utf-8');
         var fns = fileFns[file];
-        res[file] = fns; // store a 2-tuple of fn arrays and their corresponding size
+        res[file] = [fns,idSrcLen,fileSrc]; // store a 2-tuple of fn arrays and their corresponding size
     });
-    res.idSrcLen = idSrcLen;
     return res;
 }
 
@@ -71,9 +72,10 @@ var getAllIds = function(filenames, dir){
 }
 
 var getRelevantFiles = function(path){
+    const ARCHIVE_URLS = 'archive_urls';
     var urls = [];
     try {
-        urls = fs.readdirSync(path);
+        urls = parse(`${path}/${ARCHIVE_URLS}`);
     } catch (e){
         urls = [];
     }
@@ -97,30 +99,50 @@ var mergeFns = function(src, dst){
  * @param {any} fnEntry  
  *         fnEntry is a dictionary where keys are filenames loaded for the current url, and 
  *          values are 2-tuple with list of fn in each file, and their corresponding total size
- * @param {any} dedupStore 
- *          dedupStore is a dict with keys as filenames
- *          and values as arrays where each entry is a unique combination of functions executed in this file
+ * @param {any} filestore 
+ *          filestore is a dict with keys as filenames
+ *          and values as dictionaries: key is md5 hash of the source, value is list of fns and the fn sizes of all fns in the file
  */ 
 var updateFileStore = function(fnEntry, filestore, firstUrl){
     Object.keys(fnEntry).forEach((file)=>{
-        if (file == 'idSrcLen') return;
-        if (!firstUrl && filestore[file] == null) return;
-        var fnOrders = filestore[file] || [];
-        var curOrder = fnEntry[file];
-        var unionFns = mergeFns(curOrder, fnOrders) 
-        program.verbose && console.log(`File: ${file} Orig fns: ${fnOrders.length} Final Fns: ${unionFns.length}`)
-        //update filestore with the union
-        filestore[file] = unionFns;
+        // if (!firstUrl && filestore[file] == null) return;
+        if (!(file in filestore))
+            filestore[file] = {};
+        var fnsPast = filestore[file];
+
+        var fnsCur = fnEntry[file]; //[fns, length, source]
+        // var curHash = crypto.createHash('md5').update(fnsCur[2]).digest('hex');
+        var curHash = Object.keys(fnsCur[1]) + '';
+        var fileExists = false;
+        Object.keys(fnsPast).forEach((hash)=>{
+            if (hash == curHash)
+                fileExists = true;
+        })
+        if (fileExists){
+            var curFns = fnsCur[0];
+            var unionFns = mergeFns(fnsPast[curHash][0],curFns);
+            fnsPast[curHash][0] = unionFns;
+            program.verbose && console.log(`File: ${file} Orig fns: ${fnsCur[0].length} Final Fns: ${unionFns.length}`)
+        } else {
+            fnsPast[curHash] = fnsCur.slice(0,2);
+            program.verbose && console.log(`No hash for file: ${file}`)
+        }
+        
     });
 }
 
 var processFileStore = function(filestore){
     var total = 0, idSrcLen = filestore.idSrcLen;
     Object.keys(filestore).forEach((file)=>{
-        if (file == 'idSrcLen') return;
-        var fns = filestore[file];
-        var _size = utils.sumFnSizes(fns, idSrcLen);
-        total += _size[0];
+        
+        Object.keys(filestore[file]).forEach((hash)=>{
+            var fns = filestore[file][hash][0];
+            var idSrcLen = filestore[file][hash][1];
+
+            var _size = utils.sumFnSizes(fns, idSrcLen);
+            total += _size;
+        })
+        
     });
     return total;
 }
@@ -137,22 +159,20 @@ var allFunctionsAnalysis = function(){
 
     var paths = fs.readFileSync(program.urls,'utf-8').split('\n');
     // console.log(paths)
-    var firstUrl = true;
     paths.forEach((path, idx)=>{
         if (path == '') return;
+        program.verbose && console.log(`path: ${path}`)
         if (!fs.existsSync(`${program.performance}/${path}/allFns`)) return;
         // get source files
         var srcDir = `${program.dir}/${path}`;
         var rfiles = getRelevantFiles(srcDir);
+        // console.log(rfiles)
         if (!rfiles.length) return;
         // get all functions
         var execFns = parse(`${program.performance}/${path}/allFns`).preload;
 
         var fnFileData = getPerFileData(execFns, srcDir, rfiles);
-        updateFileStore(fnFileData, filestore, firstUrl);
-
-        if (firstUrl)
-            filestore.idSrcLen = fnFileData.idSrcLen;
+        updateFileStore(fnFileData, filestore);
 
         //for subsequent urls, don't update the filestore
         firstUrl = false;
