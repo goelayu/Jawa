@@ -61,26 +61,43 @@ var getIrrelevantFiles = function(){
     return [adblockUrls, filteredUrls.map(e=>getDiskUrl(e))];
 }
 
-var APIDistribution = function(){
-    var apiData = parse(`${program.dyn}`);
-    var userAgentFns = apiData.userAgent,
-        dist = {analytics:0, filtered:0, main:0};
-
-    var [adblockFiles, filteredFiles] = getIrrelevantFiles();
-
-    userAgentFns.forEach((fn)=>{
+var _APIDistribution = function(fns, res, adblockFiles, filteredFiles){
+    fns.forEach((fn)=>{
+        if (!fn) return;
         var endIndx = 4;
         if (fn.indexOf('-script-')>=0)
             endIndx = 6;
         var fnFile = fn.split('-').slice(0,fn.split('-').length - endIndx).join('-');
 
         if (adblockFiles.indexOf(fnFile)>=0)
-            dist.analytics++
+            res.analytics++
         else if(filteredFiles.indexOf(fnFile)>=0)
-            dist.filtered++
-        else dist.main++;
+            res.filtered++
+        else {
+            console.log(fnFile)
+            res.main++;
+        }
     });
-    console.log(dist);
+}
+
+var APIDistribution = function(){
+    var apiData = parse(`${program.dyn}`);
+        dist = {analytics:0, filtered:0, main:0};
+
+    var [adblockFiles, filteredFiles] = getIrrelevantFiles();
+
+    var keys = Object.keys(apiData).filter(e=>e!='cookie' && e!='referrer')
+
+    keys.forEach((k)=>{
+        _APIDistribution(apiData[k], dist, adblockFiles, filteredFiles)
+        // console.log(k,dist)
+    })
+    // _APIDistribution(apiData.userAgent, dist, adblockFiles, filteredFiles)
+    // _APIDistribution(apiData.platform, dist, adblockFiles, filteredFiles)
+    // _APIDistribution(apiData.referrer, dist, adblockFiles, filteredFiles)
+    // _APIDistribution(apiData.innerWidth, dist, adblockFiles, filteredFiles)
+    var total = Object.values(dist).reduce((acc,cur)=>{return acc+cur},0);
+    console.log(total, dist.main);
 }
 
 APIDistribution();
