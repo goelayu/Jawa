@@ -14,10 +14,10 @@ echo 'Done creating vms '
 # echo 'Done creating disks'
 
 #wait a minute for all the vms and disk to be initialized before attaching them together
-sleep 90
+# sleep 90
 
-for i in $(seq 1 $1); do
-    az vm disk attach --vm-name crawler_${i} --name crawl_disk_${i} --new --sku Standard_LRS --size-gb 512 --resource-group webarchive_crawler  &
-done
+# for i in $(seq 1 $1); do
+#     az vm disk attach --vm-name crawler_${i} --name crawl_disk_${i} --new --sku Standard_LRS --size-gb 512 --resource-group webarchive_crawler  &
+# done
 
-echo 'Done attaching disks'
+# echo 'Done attaching disks'

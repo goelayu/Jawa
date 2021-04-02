@@ -2,6 +2,8 @@
 
 #!/bin/bash
 
+echo 'Running site', $1
+sudo mkdir /data
 sudo sysctl -w net.ipv4.ip_forward=1
 sudo chown goelayu:goelayu /data
 cd /home/goelayu/webArchive/scripts

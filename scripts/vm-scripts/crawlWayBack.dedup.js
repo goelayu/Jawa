@@ -185,7 +185,7 @@ var parseResponse = async function(res){
     res.on('end',async ()=>{
         var procRes = JSON.parse(rawData);
         program.debug && console.log(`Data retrieved: ${procRes} `)
-        var finalRes = randomizer(procRes,10000);
+        var finalRes = randomizer(procRes,3000);
         console.log(procRes.length);
         // return;
         for (var entry of finalRes){
@@ -204,7 +204,7 @@ var parseResponse = async function(res){
 
 
 async function crawlWayBack(url){
-    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&from=20201101&to=20201130&output=json&matchType=prefix&filter=mimetype:text/html&filter=statuscode:200`;
+    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&from=20201201&to=20201230&output=json&matchType=prefix&filter=mimetype:text/html&filter=statuscode:200`;
     console.log(apiEndPoint);
     http.get(apiEndPoint, parseResponse);
     // await parseResponse(res);
