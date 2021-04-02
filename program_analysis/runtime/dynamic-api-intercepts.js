@@ -43,13 +43,22 @@
         'Navigator-2' : "platform",
         'HTMLDocument-1' : "cookie",
         'HTMLDocument-2' : "lastModified",
-        'HTMLDocument-3' : "referrer"
+        'HTMLDocument-3' : "referrer",
+        'Window-1':'innerWidth',
+        'Window-2':'innerHeight',
+        'Window-3':'screen',
+        'Window-4':'pageXOffset',
+        'Window-5':'pageYOffset',
+        'Window-6':'devicePixelRatio',
+
     }
 
     Object.entries(APIs).forEach((entry)=>{
         var [api,prop] = entry;
         api = api.split('-')[0];
-        interceptAPI(window[api].prototype,prop);
+        if (api == 'Window')
+            interceptAPI(window,prop);
+        else interceptAPI(window[api].prototype,prop);
         window.__dynAPI__[prop]=[];
     })
 })();
