@@ -31,9 +31,24 @@ filter_rules = None
 
 mp_manager = mp.Manager()
 analytic_files = mp_manager.list()
+custom_files = mp_manager.list()
 
 def copy(source, destination):
     subprocess.Popen("cp -r {} {}/".format(source, destination), shell=True)
+
+def read_filter():
+    path='../filter-lists/archive-filter.txt'
+    with open(path,'rb') as f:
+        filters = f.readlines()
+    return strip_list(filters)
+
+def strip_list(l):
+    r = []
+    for i in l:
+        r.append(i.strip())
+    return r
+
+custom_filter = read_filter()
 
 def unchunk(body):
     new_body = ""
@@ -107,17 +122,17 @@ def instrument(root, fileType,args,file_obj):
 
     print "Instrumenting file {} with type {}".format(fullurl, fileType)
 
-    # if fileType == 'js' and ('web.archive.org/_static/js/' in fullurl or 'archive.org/includes/' in fullurl):
-    #     print "Skipping client-side libraries for archive.org", fullurl
-    #     copy(os.path.join(root,file), args.output)
-    #     return
+    if fileType == 'js' and ('web.archive.org/_static/js/' in fullurl or 'archive.org/includes/' in fullurl):
+        print "Skipping client-side libraries for archive.org", fullurl
+        copy(os.path.join(root,file), args.output)
+        return
 
     # skip non critical archive urls
-    # ts = re.findall(r'\d+',origPath)
-    # if len(ts) == 0 or len(ts[0]) != 14:
-    #     print "Skipping non critical files", fullurl
-    #     copy(os.path.join(root,file), args.output)
-    #     return
+    ts = re.findall(r'\d+',origPath)
+    if len(ts) == 0 or len(ts[0]) != 14:
+        print "Skipping non critical files", fullurl
+        copy(os.path.join(root,file), args.output)
+        return
 
     if len(filename) > 50:
         filename = filename[-50:]
@@ -128,8 +143,15 @@ def instrument(root, fileType,args,file_obj):
 
     # check whether its a analytics file or not
     if fileType == 'js' and args.filter and filter_rules.should_block(fullurl,options={'third-party':True}):
-        print "Discovered analytics file", filename
+        print "Discovered analytics file", fullurl
         analytic_files.append(filename)
+
+    if fileType == 'js' and args.filter:
+        for rule in custom_filter:
+            if rule in fullurl:
+                print "Discovered custom filtered file", fullurl
+                custom_files.append(filename) 
+    
 
     node_debugging_port = random.randint(9300,9600)
     # pid = os.fork()
@@ -362,7 +384,11 @@ def main(args):
     urls_file = open("{}/urls".format(metadata_dir),'w')
     # for i in analytic_files:
     #     print 'dumping {}'.format(i)
-    analytics_file.write(json.dumps(list(analytic_files)))
+    filter_data = {}
+    filter_data['tracker'] = list(analytic_files)
+    filter_data['custom'] = list(custom_files)
+    print filter_data.copy()
+    analytics_file.write(json.dumps(filter_data.copy()))
     analytics_file.close()
 
     urls_file.write(json.dumps(urls))
