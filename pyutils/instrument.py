@@ -11,6 +11,7 @@ from copy import deepcopy
 from Naked.toolshed.shell import execute_js
 import json
 import time
+# import hashlib
 import unicodedata
 import multiprocessing as mp
 from functools import partial
@@ -25,7 +26,7 @@ gzip_compress = zlib.compressobj(9, zlib.DEFLATED, zlib.MAX_WBITS | 16)
 # analyzer_script = 'instrument.js'
 DIR = os.path.dirname(os.path.abspath(__file__))
 analyzer_script = "{}/../program_analysis/instrument.js".format(DIR)
-filter_list = "{}/../filter-ads-trackers/combined.txt".format(DIR)
+filter_list = "{}/../filter-lists/combined.txt".format(DIR)
 filter_rules = None
 
 mp_manager = mp.Manager()
@@ -69,7 +70,7 @@ def get_valid_filename(s):
     """
     # return s.replace('/',';;')
     s = str(s).strip().replace(' ', '_')
-    return re.sub(r'(?u)[^-\w.]', '', s)
+    return re.sub(r'(?u)[^-\w.]', '_', s)
 
 def get_filter_rules():
     with open(filter_list,'rb') as f:
@@ -178,25 +179,41 @@ def instrument(root, fileType,args,file_obj):
 
     subprocess.call("mkdir -p {}".format(_log_path), shell=True)
 
-    log_file=open(_log_path+"logs","w")
+    log_file=open(_log_path+"logs","w+")
     error_file=open(_log_path+"errors","w")
     src_file = open(_log_path+'/'+filename,'w')
     id_file = open(_log_path+'ids','w')
 
-    src_file.write(content)
-    src_file.close()
+    src_file_data = {'type':fileType}
 
     print "Executing ", command
     cmd = subprocess.call(command, stdout=log_file, stderr =error_file, shell=True)
+
+    if fileType == 'js':
+        src_file_data['length']=len(content)
+        # src_file_data['hash']=hashlib.sha256().update(content).digest()
+        src_file_data['hash'] = hash(content)
+        src_file.write(json.dumps(src_file_data))
+    else:
+        log_file=open(_log_path+"logs","r")
+        lf = log_file.read()
+        src_file_data['length']=len(lf)
+        src_file_data['hash']=hash(lf)
+        src_file.write(json.dumps(src_file_data))
+    
+    log_file.close()
+    error_file.close()
+    src_file.close()
     
     try:
         returnInfoFile = TEMP_FILE + ".info";
         returnInfo = "".join(open(returnInfoFile,'r').readlines())
 
         id_file.write(returnInfo)
-        id_file.close()
     except IOError as e:
         print "Error while reading info file" + str(e)
+
+    id_file.close()
 
     if gzip:
         file_with_content = TEMP_FILE_zip
@@ -268,7 +285,7 @@ def main(args):
         htmlFiles = []
         jsFiles = []
         file_obj = []
-        urls = []
+        urls = {'js':[], 'html':[]}
 
         for file in files:
             try:
@@ -283,8 +300,16 @@ def main(args):
 
                 print "Checking: {} file : {}".format(file, file_counter)
 
-                filename = http_response.request.first_line.split()[1]
+                filename = http_response.request.first_line.split()[1] 
                 fullurl = "http://{}{}".format(get_mm_header(http_response,'host'),filename)
+
+                req_method = http_response.request.first_line.split()[0] # GET url-suffix HTTP1.1
+                status = http_response.response.first_line.split()[1] #http1.1 200 ok
+
+                if status != '200' or req_method != 'GET':
+                    copy(os.path.join(root,file), args.output)
+                    continue
+
 
                 cur_file_obj = {'file':file, 'mm':http_response}
                 for header in http_response.response.header:
@@ -293,12 +318,12 @@ def main(args):
                             fileType = "js"
                             copyFile = False
                             jsFiles.append(cur_file_obj)
-                            urls.append(fullurl)
+                            urls['js'].append([fullurl,filename])
                         elif "html" in header.value.lower():
                             fileType = "html"
                             copyFile = False
                             htmlFiles.append(cur_file_obj)
-                            urls.append(fullurl)
+                            urls['html'].append([fullurl,filename])
 
                 if copyFile:
                     print "Simply copying the file without modification.. "
