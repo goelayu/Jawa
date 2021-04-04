@@ -214,13 +214,13 @@ def instrument(root, fileType,args,file_obj):
     if fileType == 'js':
         src_file_data['length']=len(content)
         # src_file_data['hash']=hashlib.sha256().update(content).digest()
-        src_file_data['hash'] = hash(content)
+        src_file_data['hash'] = hashlib.sha256().update(content).digest()
         src_file.write(json.dumps(src_file_data))
     else:
         log_file=open(_log_path+"logs","r")
         lf = log_file.read()
         src_file_data['length']=len(lf)
-        src_file_data['hash']=hash(lf)
+        src_file_data['hash']=hashlib.sha256().update(lf).digest()
         src_file.write(json.dumps(src_file_data))
     
     log_file.close()
