@@ -19,14 +19,14 @@ var parse = function(f){
     return JSON.parse(fs.readFileSync(f,'utf-8'));
 }
 
-var convertToFiles = function(fns, rfiles){
+var convertToFiles = function(fns, excludedFiles){
     fileFns = {};
     fns.forEach((f)=>{
         var endIndx = 4;
         if (f.indexOf('-script-')>=0)
             endIndx = 6;
         var fnFile = f.split('-').slice(0,f.split('-').length - endIndx).join('-');
-        // if (rfiles.indexOf(fnFile)<0) return;
+        if (excludedFiles.indexOf(fnFile)>=0) return;
         if (!(fnFile in fileFns))
             fileFns[fnFile] = [];
         
@@ -35,8 +35,8 @@ var convertToFiles = function(fns, rfiles){
     return fileFns;
 }
 
-var getPerFileSize = function(fns, resDir){
-    var fileFns = convertToFiles(fns);
+var getPerFileSize = function(fns, resDir, excludedFiles){
+    var fileFns = convertToFiles(fns,excludedFiles);
     //get all ids for this dir
     var allIds = utils.getAllIds(resDir);
     
@@ -116,22 +116,23 @@ var dedupAnalysis = function(){
         if (path == '') return;
         // get source files
         var srcDir = `${program.dir}/${path}`;
-        // var rfiles = getRelevantFiles(srcDir);
-        // if (!rfiles.length) return;
         var rfiles = fs.readdirSync(srcDir).filter(e=>e!='__metadata__' && e!='py_out');
         // get all functions
         var _execFns = parse(`${program.performance}/${path}/allFns`),
             execFns = [...new Set(_execFns.preload.concat(_execFns.postload))];
-        var fnFileSizes = getPerFileSize(execFns, srcDir);
+
+        var _filterFiles = parse(`${srcDir}/__metadata__/analytics`),
+            filterFiles = _filterFiles.tracker.concat(_filterFiles.custom);
+        
+        var fnFileSizes = getPerFileSize(execFns, srcDir, filterFiles);
         console.log(rfiles.filter(x => !Object.keys(fnFileSizes).includes(x)))
         var [_total, _dedup] = queryAndUpdateDedupStore(fnFileSizes, dedupStore);
-        var _fileTotal = utils.getFileSize(srcDir, rfiles)[1];
+        var [_fileTotal, _excludedTotal] = utils.getFileSize(srcDir, rfiles, filterFiles);
 
         total += _total, dedup += _dedup, fileTotal += _fileTotal
-        program.verbose && console.log(`${path}: Total- ${_total} Dedup- ${_dedup} FileTotal- ${_fileTotal}`);
+        program.verbose && console.log(`${path}: Total- ${_total} Dedup- ${_dedup} FileTotal- ${_fileTotal} ExcludedTotal- ${_excludedTotal}`);
     });
     // console.log(total, dedup, fileTotal);
-
 
 }
 
