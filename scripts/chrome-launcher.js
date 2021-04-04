@@ -3,11 +3,11 @@
  * of CDP (as used inside chrome-remote-interface)
  */
 
- const puppeteer = require('puppeteer-extra'),
+ const puppeteer = require('puppeteer'),
     program = require('commander'),
     fs = require('fs'),
-    chromeFns = require('./chrome-ctx-scripts/fns'),
-    AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
+    chromeFns = require('./chrome-ctx-scripts/fns');
+    // AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 const { createDeflate } = require('zlib');
 
 program
@@ -50,7 +50,7 @@ async function launch(){
     if (program.loadIter){
         options.userDataDir = program.chromeDir;
     }
-    puppeteer.use(AdblockerPlugin({blockTrackers: true}))
+    // puppeteer.use(AdblockerPlugin({blockTrackers: true}))
     const browser = await puppeteer.launch(options);
     let page = await browser.newPage();
     var nLogs = [], cLogs = [], jProfile;
@@ -105,7 +105,7 @@ async function launch(){
         //turn on logging
         await page.evaluateHandle(()=> window.__tracer.setTracingMode(true));
         await page.evaluateHandle(()=> window.__tracer.setCaptureMode('postload'));
-        await sleep(20000)
+        await sleep(5000)
     }
 
 
