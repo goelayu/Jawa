@@ -26,7 +26,7 @@ var convertToFiles = function(fns, rfiles){
         if (f.indexOf('-script-')>=0)
             endIndx = 6;
         var fnFile = f.split('-').slice(0,f.split('-').length - endIndx).join('-');
-        if (rfiles.indexOf(fnFile)<0) return;
+        // if (rfiles.indexOf(fnFile)<0) return;
         if (!(fnFile in fileFns))
             fileFns[fnFile] = [];
         
@@ -35,33 +35,20 @@ var convertToFiles = function(fns, rfiles){
     return fileFns;
 }
 
-var getPerFileSize = function(fns, resDir, rfiles){
-    var fileFns = convertToFiles(fns, rfiles);
+var getPerFileSize = function(fns, resDir){
+    var fileFns = convertToFiles(fns);
     //get all ids for this dir
-    var allIds = getAllIds(rfiles, resDir);
+    var allIds = utils.getAllIds(resDir);
     
-    var idSrcLen = utils.getIdLen(allIds),
-        res = {};
+    var res = {};
     Object.keys(fileFns).forEach((file)=>{
         var fns = fileFns[file];
-        var fnsSize = utils.sumFnSizes(fns, idSrcLen);
+        var fnsSize = utils.sumFnSizes(fns, allIds[file]);
+        var totalSize = utils.getFileSize(resDir, [file])[1];
+        program.verbose && console.log(file, fnsSize, totalSize)
         res[file] = [fns,fnsSize]; // store a 2-tuple of fn arrays and their corresponding size
     });
     return res;
-}
-
-var getAllIds = function(filenames, dir){
-    var allIds = {};
-    filenames.forEach((file)=>{
-        try {    
-            var idFile = `${dir}/${file}/ids`;
-            var ids = JSON.parse(fs.readFileSync(idFile, 'utf-8'));
-            allIds[file] = ids;
-        } catch (e) {
-            program.verbose && console.error(`Error while readings ids for ${file}`);
-        }
-    });
-    return allIds;
 }
 
 var getRelevantFiles = function(path){
@@ -129,19 +116,21 @@ var dedupAnalysis = function(){
         if (path == '') return;
         // get source files
         var srcDir = `${program.dir}/${path}`;
-        var rfiles = getRelevantFiles(srcDir);
-        if (!rfiles.length) return;
+        // var rfiles = getRelevantFiles(srcDir);
+        // if (!rfiles.length) return;
+        var rfiles = fs.readdirSync(srcDir).filter(e=>e!='__metadata__' && e!='py_out');
         // get all functions
-        var execFns = parse(`${program.performance}/${path}/allFns`).preload;
-
-        var fnFileSizes = getPerFileSize(execFns, srcDir, rfiles);
+        var _execFns = parse(`${program.performance}/${path}/allFns`),
+            execFns = [...new Set(_execFns.preload.concat(_execFns.postload))];
+        var fnFileSizes = getPerFileSize(execFns, srcDir);
+        console.log(rfiles.filter(x => !Object.keys(fnFileSizes).includes(x)))
         var [_total, _dedup] = queryAndUpdateDedupStore(fnFileSizes, dedupStore);
-        var _fileTotal = utils.getFileSize(srcDir, Object.keys(fnFileSizes));
+        var _fileTotal = utils.getFileSize(srcDir, rfiles)[1];
 
         total += _total, dedup += _dedup, fileTotal += _fileTotal
         program.verbose && console.log(`${path}: Total- ${_total} Dedup- ${_dedup} FileTotal- ${_fileTotal}`);
     });
-    console.log(total, dedup, fileTotal);
+    // console.log(total, dedup, fileTotal);
 
 
 }

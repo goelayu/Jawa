@@ -259,7 +259,8 @@ function __declareTracer__(){
 if (window == window.top){
     window.addEventListener('load',()=>{
         // Turn tracing off
-        window.__tracer.setTracingMode(false);
+        // window.__tracer.setTracingMode(false);
+        window.__tracer.setCaptureMode('postload')
     })
 
     window.addEventListener('beforeunload', function(e){

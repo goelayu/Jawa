@@ -56,6 +56,8 @@ function instrumentHTML(src, filename){
     var lastScriptEnd = 0;
     var match, newline = /\n/ig;
 
+    var inHtmlScripts = "";
+
 
     while (match = scriptBeginRegexp.exec(src)) {
         var scriptOffset = 0;
@@ -84,6 +86,7 @@ function instrumentHTML(src, filename){
     for (var i = scriptLocs.length - 1; i >= 0; i--) {
         var loc = scriptLocs[i];
         var script = src.slice(loc.start, loc.end);
+        inHtmlScripts += script;
         var path = filename + "-script-" + i;
         //Add the script offset to be sent to the instrumentation script
         // options.scriptOffset = loc;
@@ -116,6 +119,9 @@ function instrumentHTML(src, filename){
 
     src = preStr + tracerStr + postStr;
 
+    //dump all the scripts at the stdout channel;
+    console.log(inHtmlScripts);
+
     return src;
 
 }
@@ -132,13 +138,13 @@ function instrumentJavaScript(src, options, jsInHTML){
         // else 
         return src;
     }
-    console.log(`instrumenting src`)
+    // console.log(`instrumenting src`)
     try {
         src = rewriter.instrument(src, options);
     } catch (e) {
         console.error('error while instrumenting script',e);
     }
-    console.log(`returned from instrumentation`);
+    // console.log(`returned from instrumentation`);
     // if (jsInHTML)
     //     return src.replace(/^\s+|\s+$/g, '');
     return src;

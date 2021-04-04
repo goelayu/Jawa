@@ -8,7 +8,7 @@ var metadata = {allFnIds:{}};
 
 var getNodes = function(src, arr){
     // src = globalWrapper.wrap(src);
-    src = beautifier.js(src);
+    // src = beautifier.js(src);
     return falafel(src, {
         locations: true, 
         ranges: true
@@ -58,7 +58,7 @@ function instrument(src, options){
                 var idLen = id.split('-').length;
                 var ln = Number.parseInt(id.split('-')[idLen - 4])
                 var nodeAttr = node.attr;
-                allFnIds[ln] =[id,nodeAttr.totalLen, nodeAttr.selfLen];
+                allFnIds[id] =[nodeAttr.totalLen, nodeAttr.selfLen];
                 node.body.update(
                     `{
                         try{

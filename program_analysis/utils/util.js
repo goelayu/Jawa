@@ -1,7 +1,8 @@
 /**
  * Contains utility functions for program analysis
  */
-const fs = require('fs');
+const fs = require('fs'),
+beautifier = require('js-beautify');
 
 var mergeValsArr = function(dict){
     /**
@@ -74,25 +75,26 @@ var getAllIds = function(dir){
 }
 
 var getFileSize = function(dir, filenames){
-    // var filenames = fs.readdirSync(dir);
+    /**
+     * Returns two sizes; one some total of all the content in a file
+     * Second sum total of the self lengths of all the functions in the file
+     */
     
-    var resTotal = resJS = 0;
+    var resTotal = resJS = 0, idSelfLen = 0;
     // console.log(`Reading # files ${filenames.length}`)
     filenames.forEach((file)=>{
         try {    
-            // var idFile = `${dir}/${file}/${file}`;
-            var idFile = `${dir}/${file}`;
-            var content = fs.readFileSync(idFile, 'ascii'); //read with ascii encoding to for consistency reasons
-            if (!IsJsonString(content))
-                resJS += content.length;
-            else console.error(`${file} is json string`)
-            // console.log(`file ${file} with size ${content.length}`)
-            resTotal += content.length;
+            var _fileInfo = `${dir}/${file}/${file}`;
+            var _idFile = `${dir}/${file}/ids`;
+            var fileInfo = JSON.parse(fs.readFileSync(_fileInfo, 'ascii')); //read with ascii encoding to for consistency reasons
+            var _idSelfLen = JSON.parse(fs.readFileSync(_idFile, 'utf-8'));
+            idSelfLen += Object.values(_idSelfLen).reduce((acc,cur)=>{return acc+cur[1]},0);
+            resTotal += fileInfo.length;
         } catch (e) {
-            console.error(`Error while readings ids for ${file}`);
+            console.error(`Error while reading file: ${file}`,e);
         }
     });
-    return resTotal;
+    return [resTotal,idSelfLen];
 }
 
 var getIdLen = function(allIds){
@@ -136,7 +138,8 @@ var sumFnSizes = function(fns, idLen, filesToInclude, filesToExclude){
     //     return [res,t]
     // }
 
-    return [res,t];
+    // return [res,t];
+    return t;
 }
 
 var all_handlers = ["abort", "blur", "change", "click", "close", "contextmenu", "dblclick", "focus",
