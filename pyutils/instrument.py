@@ -11,7 +11,7 @@ from copy import deepcopy
 from Naked.toolshed.shell import execute_js
 import json
 import time
-# import hashlib
+import hashlib
 import unicodedata
 import multiprocessing as mp
 from functools import partial
@@ -212,15 +212,16 @@ def instrument(root, fileType,args,file_obj):
     cmd = subprocess.call(command, stdout=log_file, stderr =error_file, shell=True)
 
     if fileType == 'js':
+        content =  re.sub("FILE ARCHIVED(.|\n)*",'', content)
         src_file_data['length']=len(content)
         # src_file_data['hash']=hashlib.sha256().update(content).digest()
-        src_file_data['hash'] = hashlib.sha256().update(content).digest()
+        src_file_data['hash'] = hashlib.md5(content).hexdigest()
         src_file.write(json.dumps(src_file_data))
     else:
         log_file=open(_log_path+"logs","r")
         lf = log_file.read()
         src_file_data['length']=len(lf)
-        src_file_data['hash']=hashlib.sha256().update(lf).digest()
+        src_file_data['hash']=hashlib.md5(lf).hexdigest()
         src_file.write(json.dumps(src_file_data))
     
     log_file.close()
