@@ -22,27 +22,37 @@ var parse = function(f){
     return JSON.parse(fs.readFileSync(f, 'utf-8'));
 }
 
-var dedupAnalysis = function(JSStore, page){
+
+var dedupAnalysis = function(JSStore, page, filterFiles){
     var filenames = fs.readdirSync(`${program.dir}/${page}`);
     filenames.forEach((file)=>{
         try {
             if (file == '__metadata__' || file == 'py_out') return;
             var resInfo = parse(`${program.dir}/${page}/${file}/${file}`);
+            var curHash = resInfo.hash;
+            var curHash = Object.keys(parse(`${program.dir}/${page}/${file}/ids`)) + '';
             var storedHashes = JSStore.files[file];
             if (!storedHashes){
                 //first occurance of the file
-                JSStore.files[file]=[resInfo.hash];
+                JSStore.files[file]=[curHash];
+                JSStore.dedupSize += resInfo.length;
+
+                if (filterFiles.indexOf(file)>=0)
+                    JSStore.filterDedupSize+= resInfo.length;
             } else {
                 var isDuplicate = false;
                 storedHashes.forEach((hash)=>{
-                    if (hash == resInfo.hash){
+                    if (hash == curHash){
                         //duplicate file
                         isDuplicate = true;
                     }
                 });
                 if (!isDuplicate){
-                    JSStore.files[file].push(resInfo.hash);
+                    JSStore.files[file].push(curHash);
                     JSStore.dedupSize += resInfo.length;
+
+                    if (filterFiles.indexOf(file)>=0)
+                        JSStore.filterDedupSize+= resInfo.length;
                 }
             }
             JSStore.totalSize += resInfo.length;
@@ -56,13 +66,18 @@ var dedupAnalysis = function(JSStore, page){
 function main(){
     var pages = fs.readFileSync(program.urls, 'utf-8').split('\n');
 
-    var JSStore = {files:{}, dedupSize:0, totalSize:0};
+    var JSStore = {files:{}, dedupSize:0, totalSize:0, filterDedupSize:0};
     pages.forEach((page)=>{
         if (page == '') return;
-        dedupAnalysis(JSStore, page)
-        console.log(JSStore.totalSize, JSStore.dedupSize)
+
+        var _filterFiles = parse(`${program.dir}/${page}/__metadata__/analytics`),
+            filterFiles = _filterFiles.tracker.concat(_filterFiles.custom);
+        var prevTotal = JSStore.totalSize, prevDedup = JSStore.dedupSize;
+        dedupAnalysis(JSStore, page, filterFiles)
+        
+        program.verbose && console.log(page, JSStore.totalSize - prevTotal, JSStore.dedupSize - prevDedup)
     });
-    console.log(JSStore.totalSize, JSStore.dedupSize)
+    console.log(JSStore.totalSize, JSStore.dedupSize, JSStore.filterDedupSize)
 }
 
 main();

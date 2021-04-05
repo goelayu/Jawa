@@ -27,6 +27,11 @@ var convertToFiles = function(fns, excludedFiles){
             endIndx = 6;
         var fnFile = f.split('-').slice(0,f.split('-').length - endIndx).join('-');
         if (excludedFiles.indexOf(fnFile)>=0) return;
+        if (fnFile == 'undefined'){
+            console.error('undefined filename');
+            return;
+        }
+        // console.log('filename is', fnFile)
         if (!(fnFile in fileFns))
             fileFns[fnFile] = [];
         
@@ -45,7 +50,7 @@ var getPerFileSize = function(fns, resDir, excludedFiles){
         var fns = fileFns[file];
         var fnsSize = utils.sumFnSizes(fns, allIds[file]);
         var totalSize = utils.getFileSize(resDir, [file])[1];
-        program.verbose && console.log(file, fnsSize, totalSize)
+        // program.verbose && console.log(file, fnsSize, totalSize)
         res[file] = [fns,fnsSize]; // store a 2-tuple of fn arrays and their corresponding size
     });
     return res;
@@ -107,7 +112,7 @@ var queryAndUpdateDedupStore = function(fnEntry, dedupStore){
  * 3) Compares this with the dedup store to see if an entry for the file already exists or not
  */
 var dedupAnalysis = function(){
-    var total = 0, dedup = 0, fileTotal = 0;
+    var total = 0, dedup = 0, fileTotal = 0, excludedTotal = 0;
     var dedupStore = {};
 
     var paths = fs.readFileSync(program.urls,'utf-8').split('\n');
@@ -125,14 +130,15 @@ var dedupAnalysis = function(){
             filterFiles = _filterFiles.tracker.concat(_filterFiles.custom);
         
         var fnFileSizes = getPerFileSize(execFns, srcDir, filterFiles);
-        console.log(rfiles.filter(x => !Object.keys(fnFileSizes).includes(x)))
+        // console.log(rfiles.filter(x => !Object.keys(fnFileSizes).includes(x)))
         var [_total, _dedup] = queryAndUpdateDedupStore(fnFileSizes, dedupStore);
+        console.log(rfiles, filterFiles)
         var [_fileTotal, _excludedTotal] = utils.getFileSize(srcDir, rfiles, filterFiles);
 
-        total += _total, dedup += _dedup, fileTotal += _fileTotal
+        total += _total, dedup += _dedup, fileTotal += _fileTotal, excludedTotal += _excludedTotal;
         program.verbose && console.log(`${path}: Total- ${_total} Dedup- ${_dedup} FileTotal- ${_fileTotal} ExcludedTotal- ${_excludedTotal}`);
     });
-    // console.log(total, dedup, fileTotal);
+    console.log(total, dedup, fileTotal, excludedTotal);
 
 }
 

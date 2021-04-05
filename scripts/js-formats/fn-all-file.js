@@ -49,10 +49,9 @@ var getPerFileData = function(fns, resDir, rfiles){
     var res = {};
     Object.keys(fileFns).forEach((file)=>{
         var allIds = getAllIds([file], resDir);
-        var idSrcLen = utils.getIdLen(allIds);
         var fileSrc = fs.readFileSync(`${resDir}/${file}/${file}`,'utf-8');
         var fns = fileFns[file];
-        res[file] = [fns,idSrcLen,fileSrc]; // store a 2-tuple of fn arrays and their corresponding size
+        res[file] = [fns,allIds[file],fileSrc]; // store a 3-tuple of fn arrays and their corresponding size, and the file src
     });
     return res;
 }
@@ -103,14 +102,14 @@ var mergeFns = function(src, dst){
  *          filestore is a dict with keys as filenames
  *          and values as dictionaries: key is md5 hash of the source, value is list of fns and the fn sizes of all fns in the file
  */ 
-var updateFileStore = function(fnEntry, filestore, firstUrl){
+var updateFileStore = function(fnEntry, filestore){
     Object.keys(fnEntry).forEach((file)=>{
         // if (!firstUrl && filestore[file] == null) return;
         if (!(file in filestore))
             filestore[file] = {};
         var fnsPast = filestore[file];
 
-        var fnsCur = fnEntry[file]; //[fns, length, source]
+        var fnsCur = fnEntry[file]; //[fns, length, source] length = {{id:length}}
         // var curHash = crypto.createHash('md5').update(fnsCur[2]).digest('hex');
         var curHash = Object.keys(fnsCur[1]) + '';
         var fileExists = false;
@@ -137,9 +136,9 @@ var processFileStore = function(filestore){
         
         Object.keys(filestore[file]).forEach((hash)=>{
             var fns = filestore[file][hash][0];
-            var idSrcLen = filestore[file][hash][1];
+            var allIds = filestore[file][hash][1];
 
-            var _size = utils.sumFnSizes(fns, idSrcLen);
+            var _size = utils.sumFnSizes(fns, allIds);
             total += _size;
         })
         
@@ -165,11 +164,12 @@ var allFunctionsAnalysis = function(){
         if (!fs.existsSync(`${program.performance}/${path}/allFns`)) return;
         // get source files
         var srcDir = `${program.dir}/${path}`;
-        var rfiles = getRelevantFiles(srcDir);
-        // console.log(rfiles)
-        if (!rfiles.length) return;
-        // get all functions
-        var execFns = parse(`${program.performance}/${path}/allFns`).preload;
+        var rfiles = fs.readdirSync(srcDir).filter(e=>e!='__metadata__' && e!='py_out');
+        var _execFns = parse(`${program.performance}/${path}/allFns`),
+            execFns = [...new Set(_execFns.preload.concat(_execFns.postload))];
+
+        var _filterFiles = parse(`${srcDir}/__metadata__/analytics`),
+            filterFiles = _filterFiles.tracker.concat(_filterFiles.custom);
 
         var fnFileData = getPerFileData(execFns, srcDir, rfiles);
         updateFileStore(fnFileData, filestore);
