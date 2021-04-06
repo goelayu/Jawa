@@ -17,7 +17,7 @@ CUSTOMCHROMEDIR=/vault-home/goelayu/CHROMEDIR/${_dir}
 mmwebreplay=/home/goelayu/research/mahimahi/build/bin/mm-webreplay
 mmnoop=/home/goelayu/research/mahimahi/build/bin/mm-noop
 mmwebrecord=/home/goelayu/research/mahimahi/build/bin/mm-webrecord
-if [[ $machine == 'wolverines' ]]; then
+if [[ $machine == 'wolverines' || $machine == 'lions' || $machine == 'redwings' || $machine == 'pistons' ]]; then
 	echo 'Running on wolverines'
 	mmwebreplay=mm-webreplay
 	mmwebrecord=mm-webrecord
@@ -81,7 +81,7 @@ replay(){
 			port=`shuf -i 9600-9900 -n 1`
 			echo "Running on port" $port
 			mkdir -p $3/$i
-			echo "$cmd node chrome-launcher.js -u $2 -l -o $3/$i -n --timeout 30000 --screenshot --load-iter $i --chrome-dir $CUSTOMCHROMEDIR $DATAFLAGS"
+			echo "$cmd node chrome-launcher.js -u $2 -l -o $3/$i -n --timeout 60000 --screenshot --load-iter $i --chrome-dir $CUSTOMCHROMEDIR $DATAFLAGS"
 			$cmd node chrome-launcher.js -u $2 -l -o $3/$i -n --timeout 60000 --load-iter $i --chrome-dir $CUSTOMCHROMEDIR $DATAFLAGS
 		done
 		echo 'Done waiting'
@@ -91,8 +91,8 @@ replay(){
 	#avoid 9600 range because a certain kworker runs on port 9645
 	port=`shuf -i 9600-9900 -n 1`
 	echo "Running on port" $port
-	echo "$cmd node chrome-launcher.js -u $2 -l -o $3 -n --timeout 30000 --screenshot $DATAFLAGS"
-    $cmd node chrome-launcher.js -u $2 -l -o $3 -n --timeout 60000 $DATAFLAGS
+	echo "$cmd node chrome-launcher.js -u $2 -l -o $3 -n --timeout 60000 --screenshot $DATAFLAGS"
+    $cmd node chrome-launcher.js -u $2 -l -o $3 -n --timeout 80000 $DATAFLAGS
 	replay_pid=$!
 	echo "Done waiting"
 }
@@ -139,7 +139,8 @@ waitForChrome(){
 # help
 # clean
 
-while read url; do
+# while read url; do
+	url=$5
 	echo "replaying url: " $url
 	clean_url=`echo $url | cut -d'/' -f3-`
 	clean_url=`echo ${clean_url} | sed 's/\//_/g' | sed 's/\&/-/g'`
@@ -156,7 +157,7 @@ while read url; do
 	fi
 	toolmode=$3
 	conf=./chromeConfigs/$4
-	replay $mmpath $url $out $clean_url $toolmode $conf 5
+	replay $mmpath $url $out $clean_url $toolmode $conf
 	# replay $mmpath/1/${clean_url} $url $out/1/${clean_url} $clean_url $4
 	sleep 2
-done<"$5"
+# done<"$5"
