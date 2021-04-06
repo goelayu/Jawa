@@ -17,6 +17,7 @@ import multiprocessing as mp
 from functools import partial
 import random
 from adblockparser import AdblockRules
+from jsonrpclib import Server
 # from pyutils.mahimahi import Mahimahi
 
 deflate_compress = zlib.compressobj(9, zlib.DEFLATED, -zlib.MAX_WBITS)
@@ -88,9 +89,13 @@ def get_valid_filename(s):
     return re.sub(r'(?u)[^-\w.]', '_', s)
 
 def get_filter_rules():
+    start = time.time()
     with open(filter_list,'rb') as f:
         raw_rules = f.read().decode('utf8').splitlines()
+    end = time.time()
+    print 'read rules', end - start
     rules = AdblockRules(raw_rules,use_re2=True, max_mem=512*1024*1024)
+    print 'created filter', time.time()-end
     return rules
 
 def get_mm_header(mm_obj, key):
@@ -118,6 +123,9 @@ def instrument(root, fileType,args,file_obj):
     iframe_script_path = "iframeJs2/"
     log_directory = args.logDir
 
+
+    TEMP_FILE = str(os.getpid())
+
     fullurl = "http://{}{}".format(get_mm_header(http_response,'host'),filename)
 
     print "Instrumenting file {} with type {}".format(fullurl, fileType)
@@ -139,14 +147,14 @@ def instrument(root, fileType,args,file_obj):
     if filename == "/":
         filename = url+filename
 
-    filename = get_valid_filename(filename)
+    filename = get_valid_filename(filename) + TEMP_FILE
 
     # check whether its a analytics file or not
     if fileType == 'js' and args.filter and filter_rules.should_block(fullurl,options={'third-party':True}):
         print "Discovered analytics file", fullurl
         analytic_files.append(filename)
 
-    if fileType == 'js' and args.filter:
+    elif fileType == 'js' and args.filter:
         for rule in custom_filter:
             if rule in fullurl:
                 print "Discovered custom filtered file", fullurl
@@ -157,7 +165,6 @@ def instrument(root, fileType,args,file_obj):
     # pid = os.fork()
 
     # if pid == 0:
-    TEMP_FILE = str(os.getpid())
     TEMP_FILE_zip = TEMP_FILE + ".gz"
     for header in http_response.response.header:
         if header.key.lower() == "content-encoding":
@@ -212,16 +219,18 @@ def instrument(root, fileType,args,file_obj):
     cmd = subprocess.call(command, stdout=log_file, stderr =error_file, shell=True)
 
     if fileType == 'js':
-        content =  re.sub("FILE ARCHIVED(.|\n)*",'', content)
+        # content =  re.sub("FILE ARCHIVED(.|\n)*",'', content)
         src_file_data['length']=len(content)
         # src_file_data['hash']=hashlib.sha256().update(content).digest()
-        src_file_data['hash'] = hashlib.md5(content).hexdigest()
+        # src_file_data['hash'] = hashlib.md5(content).hexdigest()
+        src_file_data['url'] = fullurl
         src_file.write(json.dumps(src_file_data))
     else:
         log_file=open(_log_path+"logs","r")
         lf = log_file.read()
         src_file_data['length']=len(lf)
-        src_file_data['hash']=hashlib.md5(lf).hexdigest()
+        # src_file_data['hash']=hashlib.md5(lf).hexdigest()
+        src_file_data['url'] = fullurl
         src_file.write(json.dumps(src_file_data))
     
     log_file.close()
@@ -300,7 +309,7 @@ def main(args):
 
     global filter_rules
     filter_rules = get_filter_rules()
-
+    # filter_rules = Server('http://localhost:1006')
     for root, folder, files in os.walk(args.input):
         print "This directory has ", len(files), " number of files"
         url = root.split('/')[-2]
