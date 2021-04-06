@@ -8,7 +8,6 @@ import re
 import subprocess
 import sys
 from copy import deepcopy
-from Naked.toolshed.shell import execute_js
 import json
 import time
 import hashlib
@@ -35,7 +34,7 @@ analytic_files = mp_manager.list()
 custom_files = mp_manager.list()
 
 def copy(source, destination):
-    subprocess.Popen("cp -r {} {}/".format(source, destination), shell=True)
+    subprocess.Popen("ln {} {}/".format(source, destination), shell=True)
 
 def read_filter():
     path='../filter-lists/archive-filter.txt'
@@ -119,12 +118,11 @@ def instrument(root, fileType,args,file_obj):
     markedToBeDeleted = []
     gzip = False
     gzipType = ""
-    TEMP_FILE = "tmp"
     iframe_script_path = "iframeJs2/"
     log_directory = args.logDir
 
 
-    TEMP_FILE = str(os.getpid())
+    TEMP_FILE = str(os.getpid()) + str(random.randint(0, 100000))
 
     fullurl = "http://{}{}".format(get_mm_header(http_response,'host'),filename)
 
@@ -308,7 +306,10 @@ def main(args):
     # subprocess.Popen("mkdir -p {}".format(os.path.join(args.output, output_directory)), shell=True)
 
     global filter_rules
+    th = time.time()
     filter_rules = get_filter_rules()
+    if args.profile:
+        print '[Time] Initializing filter {}'.format(time.time()-th)
     # filter_rules = Server('http://localhost:1006')
     for root, folder, files in os.walk(args.input):
         print "This directory has ", len(files), " number of files"
@@ -318,7 +319,7 @@ def main(args):
         jsFiles = []
         file_obj = []
         urls = {'js':[], 'html':[]}
-
+        th = time.time()
         for file in files:
             try:
                 file_counter += 1
@@ -341,6 +342,7 @@ def main(args):
                 if status != '200' or req_method != 'GET':
                     copy(os.path.join(root,file), args.output)
                     continue
+                    
 
 
                 cur_file_obj = {'file':file, 'mm':http_response}
@@ -365,15 +367,20 @@ def main(args):
             except IOError as e:
                 print args.input + ": Could not open file ", e
 
+    if args.profile:
+        print '[Time] Create mahimahi objects {}'.format(time.time()-th)
+
     pool = mp.Pool(mp.cpu_count())
 
     instrument_singleton = partial(instrument, root, "js", args)
-        
+    
+    th = time.time()
     pool.map(instrument_singleton, jsFiles)
     pool.close()
     pool.join()
-    # for jsFile in jsFiles:
-    #     instrument(jsFile,root, "js", output_directory,args)
+    
+    if args.profile:
+        print '[Time] Done with JS {}'.format(time.time()-th)
 
     instrument_singleton = partial(instrument, root, "html", args)
     # for pid in childPids:
@@ -381,13 +388,19 @@ def main(args):
     #     os.waitpid(pid,0)
     print "All the JS child processes died..\n Main thread terminating"
 
+
     pool = mp.Pool(mp.cpu_count())
 
+    th = time.time()
     pool.map(instrument_singleton, htmlFiles)
     pool.close()
     pool.join()
     print "All the HTML child processes died..\n Main thread terminating"
+    if args.profile:
+        print '[Time] Done with html {}'.format(time.time()-th)
 
+
+    th = time.time()
     metadata_dir = "{}/{}".format(args.logDir, "__metadata__")
     subprocess.call("mkdir -p {}".format(metadata_dir), shell=True)
     analytics_file = open("{}/analytics".format(metadata_dir),'w')
@@ -403,6 +416,8 @@ def main(args):
 
     urls_file.write(json.dumps(urls))
     urls_file.close()
+    if args.profile:
+        print '[Time] Dump metadata {}'.format(time.time()-th)
     
 
 if __name__ == "__main__":
@@ -415,6 +430,7 @@ if __name__ == "__main__":
     parser.add_argument('--cgInfo',help="path to the cg info")
     parser.add_argument('--debug',help="enable node debugging using -inspect flag")
     parser.add_argument('--filter',help="enable analytics filtering",action='store_true')
+    parser.add_argument('--profile',help="turn on profiling of code", action='store_true')
     args = parser.parse_args()
     main(args)
 
