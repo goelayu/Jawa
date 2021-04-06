@@ -74,13 +74,13 @@ var getAllIds = function(dir){
     return allIds;
 }
 
-var getFileSize = function(dir, filenames){
+var getFileSize = function(dir, filenames, excluded){
     /**
      * Returns two sizes; one some total of all the content in a file
      * Second sum total of the self lengths of all the functions in the file
      */
     
-    var resTotal = resJS = 0, idSelfLen = 0;
+    var resTotal =  0, idSelfLen = 0, excludedTotal = 0;
     // console.log(`Reading # files ${filenames.length}`)
     filenames.forEach((file)=>{
         try {    
@@ -90,11 +90,14 @@ var getFileSize = function(dir, filenames){
             var _idSelfLen = JSON.parse(fs.readFileSync(_idFile, 'utf-8'));
             idSelfLen += Object.values(_idSelfLen).reduce((acc,cur)=>{return acc+cur[1]},0);
             resTotal += fileInfo.length;
+
+            if (excluded && excluded.indexOf(file)>=0)
+                excludedTotal += fileInfo.length;
         } catch (e) {
             console.error(`Error while reading file: ${file}`,e);
         }
     });
-    return [resTotal,idSelfLen];
+    return [resTotal,excludedTotal];
 }
 
 var getIdLen = function(allIds){
