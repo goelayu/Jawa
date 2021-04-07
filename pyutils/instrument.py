@@ -140,12 +140,15 @@ def instrument(root, fileType,args,file_obj):
         copy(os.path.join(root,file), args.output)
         return
 
+    #remove timestamp from filename
+    filename = re.sub('\/web\/\d{14}','',filename)
+
     if len(filename) > 50:
         filename = filename[-50:]
     if filename == "/":
         filename = url+filename
 
-    filename = get_valid_filename(filename) + TEMP_FILE
+    filename = get_valid_filename(filename)
 
     # check whether its a analytics file or not
     if fileType == 'js' and args.filter and filter_rules.should_block(fullurl,options={'third-party':True}):
@@ -176,13 +179,14 @@ def instrument(root, fileType,args,file_obj):
             markedToBeDeleted.append(header.key)
 
     f = open(TEMP_FILE, "w")
-    content = None
+    content = http_response.response.body
+    orig_content = content
     if gzip:
         try:
             if gzipType.lower() != "br":
-                decompressed_data = zlib.decompress(bytes(bytearray(http_response.response.body)), zlib.MAX_WBITS|32)
+                decompressed_data = zlib.decompress(bytes(bytearray(content)), zlib.MAX_WBITS|32)
             else:
-                decompressed_data = brotli.decompress(http_response.response.body)
+                decompressed_data = brotli.decompress(content)
             content = decompressed_data
             f.write(decompressed_data)
         except zlib.error as e:
@@ -193,8 +197,7 @@ def instrument(root, fileType,args,file_obj):
             return
             # os._exit(0)
     else: 
-        content = http_response.response.body
-        f.write(http_response.response.body)
+        f.write(content)
     f.close()
     command = " {} -i {} -n '{}' -t {} -r {}".format(analyzer_script,TEMP_FILE, url + ";;;;" + filename,fileType, args.rewriter)
 
@@ -210,6 +213,10 @@ def instrument(root, fileType,args,file_obj):
     error_file=open(_log_path+"errors","w")
     src_file = open(_log_path+'/'+filename,'w')
     id_file = open(_log_path+'ids','w')
+    content_file = open(_log_path+'content','w')
+
+    content_file.write(orig_content)
+    content_file.close()
 
     src_file_data = {'type':fileType}
 
@@ -221,15 +228,15 @@ def instrument(root, fileType,args,file_obj):
         src_file_data['length']=len(content)
         # src_file_data['hash']=hashlib.sha256().update(content).digest()
         # src_file_data['hash'] = hashlib.md5(content).hexdigest()
-        src_file_data['url'] = fullurl
-        src_file.write(json.dumps(src_file_data))
     else:
         log_file=open(_log_path+"logs","r")
         lf = log_file.read()
         src_file_data['length']=len(lf)
         # src_file_data['hash']=hashlib.md5(lf).hexdigest()
-        src_file_data['url'] = fullurl
-        src_file.write(json.dumps(src_file_data))
+
+    src_file_data['zip'] = gzipType
+    src_file_data['url'] = fullurl
+    src_file.write(json.dumps(src_file_data))
     
     log_file.close()
     error_file.close()
