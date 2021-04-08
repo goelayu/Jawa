@@ -48,7 +48,7 @@ function instrumentHTML(src, filename){
         return src;
 
     if (!isHtml)
-        return instrumentJavaScript(src, filename, false);
+        return instrumentJavaScript(src, {filename:filename}, false);
 
     var scriptLocs = [];
     var scriptBeginRegexp = /<\s*script[^>]*>/ig;
