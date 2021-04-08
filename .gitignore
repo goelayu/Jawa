@@ -9,7 +9,8 @@
 !parser/
 !pyutils/
 !tests/
-
+!deps/
+!deps/*
 !filter-lists/
 !filter-lists/*
 
