@@ -24,3 +24,7 @@ cdn.taboola.com
 cdn.blueconic.com
 ats.rlcdn.com
 s.skimresources.com
+assets.zephr.com
+www.googletagservices.com
+utag
+tags
