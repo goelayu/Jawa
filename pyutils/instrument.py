@@ -1,3 +1,10 @@
+import sys
+sys.path = [p for p in sys.path if 'vault' not in p]
+# for p in sys.path:
+#     if '/vault-home/goelayu/.local/' in p:
+#         print 'removing',p
+#         sys.path.remove(p)
+#         # break
 
 import brotli
 import http_record_pb2
@@ -15,8 +22,8 @@ import unicodedata
 import multiprocessing as mp
 from functools import partial
 import random
-from adblockparser import AdblockRules
-from jsonrpclib import Server
+# from adblockparser import AdblockRules
+# from jsonrpclib import Server
 # from pyutils.mahimahi import Mahimahi
 
 deflate_compress = zlib.compressobj(9, zlib.DEFLATED, -zlib.MAX_WBITS)
@@ -26,12 +33,12 @@ gzip_compress = zlib.compressobj(9, zlib.DEFLATED, zlib.MAX_WBITS | 16)
 # analyzer_script = 'instrument.js'
 DIR = os.path.dirname(os.path.abspath(__file__))
 analyzer_script = "{}/../program_analysis/instrument.js".format(DIR)
-filter_list = "{}/../filter-lists/combined.txt".format(DIR)
-filter_rules = None
+# filter_list = "{}/../filter-lists/combined.txt".format(DIR)
+# filter_rules = None
 
-mp_manager = mp.Manager()
-analytic_files = mp_manager.list()
-custom_files = mp_manager.list()
+# mp_manager = mp.Manager()
+# analytic_files = mp_manager.list()
+# custom_files = mp_manager.list()
 
 def copy(source, destination):
     subprocess.Popen("ln {} {}/".format(source, destination), shell=True)
@@ -48,7 +55,7 @@ def strip_list(l):
         r.append(i.strip())
     return r
 
-custom_filter = read_filter()
+# custom_filter = read_filter()
 
 def unchunk(body):
     new_body = ""
@@ -122,7 +129,7 @@ def instrument(root, fileType,args,file_obj):
     log_directory = args.logDir
 
 
-    TEMP_FILE = str(os.getpid()) + str(random.randint(0, 100000))
+    TEMP_FILE = log_directory + '/' + str(os.getpid()) + str(random.randint(0, 100000))
 
     fullurl = "http://{}{}".format(get_mm_header(http_response,'host'),filename)
 
@@ -148,18 +155,18 @@ def instrument(root, fileType,args,file_obj):
     if filename == "/":
         filename = url+filename
 
-    filename = get_valid_filename(filename)
+    filename = get_valid_filename(filename) + '-hash-' + hashlib.md5(origPath).hexdigest()
 
     # check whether its a analytics file or not
-    if fileType == 'js' and args.filter and filter_rules.should_block(fullurl,options={'third-party':True}):
-        print "Discovered analytics file", fullurl
-        analytic_files.append(filename)
+    # if fileType == 'js' and args.filter and filter_rules.should_block(fullurl,options={'third-party':True}):
+    #     print "Discovered analytics file", fullurl
+    #     analytic_files.append(filename)
 
-    elif fileType == 'js' and args.filter:
-        for rule in custom_filter:
-            if rule in fullurl:
-                print "Discovered custom filtered file", fullurl
-                custom_files.append(filename) 
+    # elif fileType == 'js' and args.filter:
+    #     for rule in custom_filter:
+    #         if rule in fullurl:
+    #             print "Discovered custom filtered file", fullurl
+    #             custom_files.append(filename) 
     
 
     node_debugging_port = random.randint(9300,9600)
@@ -314,7 +321,7 @@ def main(args):
 
     global filter_rules
     th = time.time()
-    filter_rules = get_filter_rules()
+    # filter_rules = get_filter_rules()
     if args.profile:
         print '[Time] Initializing filter {}'.format(time.time()-th)
     # filter_rules = Server('http://localhost:1006')
@@ -414,12 +421,12 @@ def main(args):
     urls_file = open("{}/urls".format(metadata_dir),'w')
     # for i in analytic_files:
     #     print 'dumping {}'.format(i)
-    filter_data = {}
-    filter_data['tracker'] = list(analytic_files)
-    filter_data['custom'] = list(custom_files)
-    print filter_data.copy()
-    analytics_file.write(json.dumps(filter_data.copy()))
-    analytics_file.close()
+    # filter_data = {}
+    # filter_data['tracker'] = list(analytic_files)
+    # filter_data['custom'] = list(custom_files)
+    # print filter_data.copy()
+    # analytics_file.write(json.dumps(filter_data.copy()))
+    # analytics_file.close()
 
     urls_file.write(json.dumps(urls))
     urls_file.close()
