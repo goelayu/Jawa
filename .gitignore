@@ -13,7 +13,8 @@
 !deps/*
 !filter-lists/
 !filter-lists/*
-
+!eval
+!eval/*
 !*js
 !*py
 !*sh
