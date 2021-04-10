@@ -7,8 +7,9 @@
  */
 
 var fs = require('fs'),
-program = require('commander'),
-utils = require('../../program_analysis/utils/util');
+    program = require('commander'),
+    utils = require('../../program_analysis/utils/util'),
+    crypto = require('crypto');
 
 program
     .option('-d, --dir [dir]',"directory containing resource files")
@@ -19,28 +20,38 @@ program
     .parse(process.argv);
 
 var parse = function(f){
-return JSON.parse(fs.readFileSync(f,'utf-8'));
+    return JSON.parse(fs.readFileSync(f,'utf-8'));
+}
+
+var stripHash = function(str){
+
 }
 
 var convertToFiles = function(fns, excludedFiles){
-fileFns = {};
-fns.forEach((f)=>{
-    var endIndx = 4;
-    if (f.indexOf('-script-')>=0)
-        endIndx = 6;
-    var fnFile = f.split('-').slice(0,f.split('-').length - endIndx).join('-');
-    if (excludedFiles.indexOf(fnFile)>=0) return;
-    if (fnFile == 'undefined'){
-        console.error('undefined filename');
-        return;
-    }
-    // console.log('filename is', fnFile)
-    if (!(fnFile in fileFns))
-        fileFns[fnFile] = [];
-    
-    fileFns[fnFile].push(f);
-});
-return fileFns;
+    fileFns = {};
+    fns.forEach((f)=>{
+        if (f.indexOf('-hash-')<0) return;
+        var endIndx = 4;
+        if (f.indexOf('-script-')>=0)
+            endIndx = 6;
+        var fnFile = f.split('-').slice(0,f.split('-').length - endIndx).join('-');
+        if (excludedFiles.indexOf(fnFile)>=0) return;
+        if (fnFile == 'undefined'){
+            console.error('undefined filename');
+            return;
+        }
+        // console.log('filename is', fnFile)
+        if (!(fnFile in fileFns))
+            fileFns[fnFile] = [];
+        
+        // splice hash from the function
+        // var fArr = f.split('-');
+        // fArr.splice(fArr.length - 6,2);
+        // f = fArr.join('-')
+        
+        fileFns[fnFile].push(f);
+    });
+    return fileFns;
 }
 
 /**
@@ -60,6 +71,7 @@ var getPerFileData = function(fns, resDir, excludedFiles){
     Object.keys(fileFns).forEach((file)=>{
         try {
         var allIds = getAllIds([file], resDir);
+        if (!allIds[file]) return; //TODO
         var fileSrc = JSON.parse(fs.readFileSync(`${resDir}/${file}/${file}`,'utf-8'));
         var fns = fileFns[file];
         // var storeKey = file.replace(/\d/g,'');
@@ -78,6 +90,15 @@ var getAllIds = function(filenames, dir){
         try {    
             var idFile = `${dir}/${file}/ids`;
             var ids = JSON.parse(fs.readFileSync(idFile, 'utf-8'));
+            // strip hash from ids
+            var stripIds = {};
+            // Object.keys(ids).forEach((f)=>{
+            //     var val = ids[f];
+            //     var fArr = f.split('-');
+            //     fArr.splice(fArr.length - 6,2);
+            //     f = fArr.join('-');
+            //     stripIds[f] = val;
+            // })
             allIds[file] = ids;
         } catch (e) {
             program.verbose && console.error(`Error while readings ids for ${file}`);
@@ -90,6 +111,11 @@ var mergeFns = function(src, dst){
     var res = new Set(src);
     dst.forEach(res.add, res);
     return [...res];
+}
+
+var getFileKey = function(f){
+    var hInd = f.indexOf('-hash-');
+    return f.slice(0,hInd);
 }
 
 /**
@@ -108,15 +134,17 @@ var queryAndUpdateStore = function(filesData, store, page){
     Object.keys(filesData).forEach((file)=>{
         var [curfns, curIds, curfileInfo] = filesData[file];
         var fnsSize = utils.sumFnSizes(curfns, curIds);
-        var storeKey = curIds + '-' + file;
-
+        // var fileKey = getFileKey(file)
+        // var _storeKey = Object.keys(curIds) + '' + fileKey;
+        //     storeKey = crypto.createHash('md5').update(_storeKey).digest('hex');
+        var storeKey = curfileInfo.url;
         var oldVersion = store.entries[storeKey];
+        var curFnOrder = curfns + '';
 
         if (oldVersion){
             //duplicate file
             var [oldFnOrders, oldUnion, oldIds, oldfileInfo] = oldVersion;
             // check for fn duplication
-            var curFnOrder = curfns + '';
             var fnOrderMatch = false;
             for (var o of oldFnOrders){
                 if (o == curFnOrder){
@@ -167,6 +195,16 @@ var queryAndUpdateStore = function(filesData, store, page){
     });
     console.log(`filetotal: ${fileTotal} fileDedup: ${fileDedup} fnTotal: ${fnTotal} fnDedup: ${fnDedup} fnUnion ${fnUnion}`);
 }
+
+var processFnUnion = function(store){
+    var size = 0;
+    Object.keys(store.entries).forEach((entry)=>{
+        var [oldFnOrders, oldUnion, oldIds, oldfileInfo] = store.entries[entry];
+        var _size = utils.sumFnSizes(oldUnion, oldIds);
+        size += _size;
+    });
+    return size;
+}
 /**
 * For each url it does the following
 * 1) Categories all executed functions in a set of files
@@ -188,9 +226,10 @@ var dedupAnalysis = function(){
         var _execFns = parse(`${program.performance}/${path}/allFns`),
             execFns = [...new Set(_execFns.preload.concat(_execFns.postload))];
 
-        var _filterFiles = parse(`${srcDir}/__metadata__/analytics`),
-            filterFiles = _filterFiles.tracker.concat(_filterFiles.custom);
+        // var _filterFiles = parse(`${srcDir}/__metadata__/analytics`),
+        //     filterFiles = _filterFiles.tracker.concat(_filterFiles.custom);
 
+        var filterFiles = [];
         if (!program.filter)
             filterFiles = [];
         
@@ -198,7 +237,7 @@ var dedupAnalysis = function(){
         queryAndUpdateStore(filesData, store, path);
     });
     with (store){
-        console.log(`{page} filetotal: ${fileTotal} fileDedup: ${fileDedup} fnTotal: ${fnTotal} fnDedup: ${fnDedup} fnUnion ${fnUnion}`);
+        console.log(`{page} filetotal: ${fileTotal} fileDedup: ${fileDedup} fnTotal: ${fnTotal} fnDedup: ${fnDedup} fnUnion ${processFnUnion(store)}`);
     }
 
 }
