@@ -103,9 +103,9 @@ async function launch(){
 
     if (program.wait){
         //turn on logging
-        await page.evaluateHandle(()=> window.__tracer.setTracingMode(true));
-        await page.evaluateHandle(()=> window.__tracer.setCaptureMode('postload'));
-        await sleep(5000)
+        // await page.evaluateHandle(()=> window.__tracer.setTracingMode(true));
+        // await page.evaluateHandle(()=> window.__tracer.setCaptureMode('postload'));
+        // await sleep(5000)
     }
 
 
@@ -130,7 +130,7 @@ async function launch(){
         let cstmEntries =  program.custom.split(',');
         for (var c of cstmEntries){
             switch (c) {
-                 case 'Handlers': await extractHandlers(page,cdp,100); break;
+                 case 'Handlers': await extractHandlers(page,cdp,50); break;
                  case 'DOM' : await extractDOM(page); break; 
                  case 'Distill' : await distillDOM(page); break;
                  case 'CG' : await chromeFns.getAllFns(page, program); break; 

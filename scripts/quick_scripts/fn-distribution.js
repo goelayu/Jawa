@@ -56,13 +56,55 @@ var execDistribution = function(exec, fnSizes){
         unexecSizes[fn] = cloneSizes[fn][1];
     })
     return [execSizes, unexecSizes]
-    
 
+}
+
+var getPerFileFns = function(execFns){
+    var fileFns = {};
+    execFns.forEach((fn)=>{
+        var endIndx = 4;
+        if (fn.indexOf('-script-')>=0)
+            endIndx = 6;
+        var fnFile = fn.split('-').slice(0,fn.split('-').length - endIndx).join('-');
+        if (!(fnFile in fileFns))
+            fileFns[fnFile]=[];
+        fileFns[fnFile].push(fn);
+    });
+    return fileFns;
+}
+
+var fileDistribution = function(allIds, execFns, fnSizes, ignoreFiles){
+    var filenames = Object.keys(allIds);
+    var fileUsed = {};
+    var fileFns = getPerFileFns(execFns);
+    filenames.forEach((file)=>{
+        if (ignoreFiles.indexOf(file)>=0) return;
+        fileUsed[file]=[];
+        var totalSize = Object.values(allIds[file]).reduce((acc,cur)=>{return acc+cur[2]},0);
+        var execSize = 0;
+        fileFns[file] && fileFns[file].forEach((fn)=>{
+            if (!(fn in fnSizes)) return;
+            execSize += fnSizes[fn][1];
+        });
+        // var fileLen = beautifier.js(fs.readFileSync(`${program.jsSrc}/${file}/${file}`,'utf-8')).length;
+        fileUsed[file]=[totalSize, execSize];
+    })
+    return fileUsed;
+}
+
+var prettyPrint = function(dict){
+    var total = exec = 0;
+    Object.keys(dict).forEach((file)=>{
+        console.log(file, ...dict[file]);
+        total += dict[file][0], exec += dict[file][1];
+    });
+    console.log(total, exec);
 }
 
 var cmpFileFnSize = function(){
     var allIds = utils.getAllIds(program.jsSrc);
     var filenames = fs.readdirSync(program.jsSrc);
+    var ignoreJS = JSON.parse(fs.readFileSync(`${program.jsSrc}/__metadata__/analytics`));
     var _execFns = JSON.parse(fs.readFileSync(`${program.performance}/allFns`),'utf-8');
     var execFns = new Set;
     _execFns.preload.forEach((fn)=>{
@@ -74,6 +116,10 @@ var cmpFileFnSize = function(){
     execFns = [...execFns];
     
     var fnSizes = utils.getIdLen(allIds);
+
+    var fileDst = fileDistribution(allIds, execFns, fnSizes, ignoreJS);
+    prettyPrint(fileDst)
+    return;
     // console.log(execFns)
     var [execSizes, unexecSizes] = execDistribution(execFns, fnSizes);
     var totalSelf = Object.values(fnSizes).reduce((acc,cur)=>{return acc+cur[1];},0);

@@ -334,6 +334,8 @@ def main(args):
         file_obj = []
         urls = {'js':[], 'html':[]}
         th = time.time()
+
+        remaining_files = []
         for file in files:
             try:
                 file_counter += 1
@@ -357,12 +359,13 @@ def main(args):
                     copy(os.path.join(root,file), args.output)
                     continue
                     
-
+                file_type = None
 
                 cur_file_obj = {'file':file, 'mm':http_response}
                 for header in http_response.response.header:
                     if header.key.lower() == "content-type":
-                        if "javascript" in header.value.lower():
+                        file_type = header.value.lower()
+                        if "javascript" in file_type:
                             fileType = "js"
                             copyFile = False
                             jsFiles.append(cur_file_obj)
@@ -372,11 +375,23 @@ def main(args):
                             copyFile = False
                             htmlFiles.append(cur_file_obj)
                             urls['html'].append([fullurl,filename])
+                
 
-                if copyFile:
+                if copyFile or fileType == 'html':
                     print "Simply copying the file without modification.. "
                     # print http_response.request.first_line
                     copy(os.path.join(root,file), args.output)
+
+                    # track metadata about this file
+                    file_info = {'type': file_type, 'url': fullurl}
+                    content = http_response.response.body
+                    content_length = len(content)
+                    content_hash = hashlib.md5(content).hexdigest()
+                    file_info['length'] = content_length
+                    file_info['content'] = content_hash
+
+                    remaining_files.append(file_info)
+
 
             except IOError as e:
                 print args.input + ": Could not open file ", e
@@ -410,8 +425,8 @@ def main(args):
     pool.close()
     pool.join()
     print "All the HTML child processes died..\n Main thread terminating"
-    if args.profile:
-        print '[Time] Done with html {}'.format(time.time()-th)
+    # if args.profile:
+    #     print '[Time] Done with html {}'.format(time.time()-th)
 
 
     th = time.time()
@@ -419,6 +434,9 @@ def main(args):
     subprocess.call("mkdir -p {}".format(metadata_dir), shell=True)
     analytics_file = open("{}/analytics".format(metadata_dir),'w')
     urls_file = open("{}/urls".format(metadata_dir),'w')
+    _remaining_file = open("{}/allfiles".format(metadata_dir),'w')
+    _remaining_file.write(json.dumps(remaining_files))
+    _remaining_file.close()
     # for i in analytic_files:
     #     print 'dumping {}'.format(i)
     # filter_data = {}

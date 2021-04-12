@@ -59,7 +59,7 @@ var removeComments = function(content, zip){
 
 var dedupMime = function(mimeData, jsData, store, page){
     mimeData.forEach((entry)=>{
-        var {url, content, length, type} = entry;
+        var {url, content, length, type} = entry, hash;
         var fType;
         if (!type) return;
         if (isFilterUrl(url)) return;
@@ -68,9 +68,12 @@ var dedupMime = function(mimeData, jsData, store, page){
         else if (type.indexOf('html')>=0) fType = 'html'
         else return;
 
-        if (store[fType].hashes.indexOf(content)<0){
+
+        if (fType == 'image') hash = content;
+        else hash = url;
+        if (store[fType].hashes.indexOf(hash)<0){
             store[fType].size+=length;
-            store[fType].hashes.push(content);
+            store[fType].hashes.push(hash);
         };
         store[fType].total+=length;
     })
@@ -114,6 +117,7 @@ function main(){
             var mimeData = JSON.parse(fs.readFileSync(`${srcDir}/__metadata__/allfiles`,'utf-8'));
             var jsData = fs.readdirSync(`${srcDir}`).filter(e=>e!='__metadata__' && e!='py_out');
         } catch (e) {
+            // console.log(e)
             return;
         }
         dedupMime(mimeData, jsData, store, srcDir);

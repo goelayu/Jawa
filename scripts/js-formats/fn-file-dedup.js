@@ -5,8 +5,8 @@
 
 var fs = require('fs'),
     program = require('commander'),
-    utils = require('../../program_analysis/utils/util'),
-    beautifier = require('js-beautify');
+    utils = require('../../program_analysis/utils/util');
+    // beautifier = require('js-beautify');
 
 program
     .option('-d, --dir [dir]',"directory containing resource files")
@@ -48,10 +48,12 @@ var getPerFileSize = function(fns, resDir, excludedFiles){
     var res = {};
     Object.keys(fileFns).forEach((file)=>{
         var fns = fileFns[file];
+        if (!allIds[file]) return; // TODO fix this , why are the ids missing
         var fnsSize = utils.sumFnSizes(fns, allIds[file]);
-        var totalSize = utils.getFileSize(resDir, [file])[1];
-        // program.verbose && console.log(file, fnsSize, totalSize)
-        res[file] = [fns,fnsSize]; // store a 2-tuple of fn arrays and their corresponding size
+        var totalSize = utils.getFileSize(resDir, [file])[0];
+        var storeKey = file.replace(/\d/g,'');
+        program.verbose && console.log(file, fnsSize, totalSize)
+        res[storeKey] = [fns,fnsSize]; // store a 2-tuple of fn arrays and their corresponding size
     });
     return res;
 }
@@ -80,25 +82,28 @@ var getRelevantFiles = function(path){
 var queryAndUpdateDedupStore = function(fnEntry, dedupStore){
     var total = dedup = 0;
     Object.keys(fnEntry).forEach((file)=>{
-        var fnOrders = dedupStore[file] || [];
+        var storeKey = file.replace(/\d/g,'');
+        var fnOrders = dedupStore[storeKey] || [];
 
-        var [curOrder, curSize] = fnEntry[file],
-            isDuplicate = false,
-            curOrder = curOrder + '' // convert array to strings for easier comparison
+        var [curOrder, curSize] = fnEntry[storeKey],
+            isDuplicate = false;
+            // curOrder = curOrder + '' // convert array to strings for easier comparison
+            curOrder = curOrder.map(e=>{var ar = e.split('-'); return ar.slice(ar.length-4,ar.length)}) + ' ' + storeKey;
         for (var o of fnOrders){
             var [fns,size] = o;
             if (fns == curOrder){
                 //match found ; dedup this entry
                 isDuplicate = true;
+                console.log(`[DUPLICATE] ${file}`)
                 break;
             }
         }
         if (!isDuplicate){
             //not a duplicate, update entry in dedup store
-            if (!(file in dedupStore))
-                dedupStore[file] = [];
+            if (!(storeKey in dedupStore))
+                dedupStore[storeKey] = [];
             
-            dedupStore[file].push([curOrder, curSize]);
+            dedupStore[storeKey].push([curOrder, curSize]);
             dedup += curSize;
         }
         total += curSize;
@@ -132,13 +137,14 @@ var dedupAnalysis = function(){
         var fnFileSizes = getPerFileSize(execFns, srcDir, filterFiles);
         // console.log(rfiles.filter(x => !Object.keys(fnFileSizes).includes(x)))
         var [_total, _dedup] = queryAndUpdateDedupStore(fnFileSizes, dedupStore);
-        console.log(rfiles, filterFiles)
-        var [_fileTotal, _excludedTotal] = utils.getFileSize(srcDir, rfiles, filterFiles);
+        // console.log(rfiles, filterFiles)
+        // var [_fileTotal, _excludedTotal] = utils.getFileSize(srcDir, rfiles, filterFiles);
 
-        total += _total, dedup += _dedup, fileTotal += _fileTotal, excludedTotal += _excludedTotal;
-        program.verbose && console.log(`${path}: Total- ${_total} Dedup- ${_dedup} FileTotal- ${_fileTotal} ExcludedTotal- ${_excludedTotal}`);
+        total += _total, dedup += _dedup;
+        //  fileTotal += _fileTotal, excludedTotal += _excludedTotal;
+        program.verbose && console.log(`${path}: Total- ${_total} Dedup- ${_dedup}`);
     });
-    console.log(total, dedup, fileTotal, excludedTotal);
+    console.log(`Fn-Total- ${total} Fn-dedup- ${dedup}`);
 
 }
 

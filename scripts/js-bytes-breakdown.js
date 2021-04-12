@@ -33,17 +33,19 @@ var unionSize = function(){
 }
 
 var breakdown = function(){
-    var allIds = utils.getAllIds(program.jsSrc);
-    var idSrcLen = utils.getIdLen(allIds);
-    var fns = parse(`${program.performance}/allFns`);
-    var analyticFiles = parse(`${program.jsSrc}/__metadata__/analytics`);
+    // var allIds = utils.getAllIds(program.jsSrc);
+    // var idSrcLen = utils.getIdLen(allIds);
+    // var fns = parse(`${program.performance}/allFns`);
+    // var analyticFiles = parse(`${program.jsSrc}/__metadata__/analytics`);
 
-    var [preload, preloadTotal] = utils.sumFnSizes([...fns.preload], idSrcLen, null, analyticFiles);
-    var [postload, postloadTotal] = utils.sumFnSizes([...fns.postload], idSrcLen, null, analyticFiles);
+    // var [preload, preloadTotal] = utils.sumFnSizes([...fns.preload], idSrcLen, null, analyticFiles);
+    // var [postload, postloadTotal] = utils.sumFnSizes([...fns.postload], idSrcLen, null, analyticFiles);
 
     var totalJs = utils.getFileSize(program.jsSrc, fs.readdirSync(program.jsSrc));
+    // var totalJs = utils.getFileSize(program.jsSrc, );
 
-    console.log(preload, postload, (preloadTotal+postloadTotal)-(preload+postload), totalJs);
+    // console.log(preload, postload, (preloadTotal+postloadTotal)-(preload+postload), totalJs);
+    console.log(totalJs)
 
 }
 

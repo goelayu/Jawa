@@ -1,8 +1,8 @@
 /**
  * Contains utility functions for program analysis
  */
-const fs = require('fs'),
-beautifier = require('js-beautify');
+const fs = require('fs');
+// beautifier = require('js-beautify');
 
 var mergeValsArr = function(dict){
     /**

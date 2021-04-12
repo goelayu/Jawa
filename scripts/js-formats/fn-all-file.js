@@ -20,11 +20,15 @@ var parse = function(f){
     return JSON.parse(fs.readFileSync(f,'utf-8'));
 }
 
-var convertToFiles = function(fns, rfiles){
+var convertToFiles = function(fns, excludedFiles){
     fileFns = {};
     fns.forEach((f)=>{
-        var fnFile = f.split('-').slice(0,f.split('-').length - 4).join('-');
-        if (rfiles.indexOf(fnFile)<0) return;
+        var endIndx = 4;
+        if (f.indexOf('-script-')>=0)
+            endIndx = 6;
+        var fnFile = f.split('-').slice(0,f.split('-').length - endIndx).join('-');
+        if (excludedFiles.indexOf(fnFile)>=0) return;
+        if (fnFile == undefined || fnFile == 'undefined') return; //TODO handle why are filenames undefined
         if (!(fnFile in fileFns))
             fileFns[fnFile] = [];
         
@@ -42,16 +46,22 @@ var convertToFiles = function(fns, rfiles){
  * returns a set of files, for each file  lists the functions and the corresponding
  * length information
  */
-var getPerFileData = function(fns, resDir, rfiles){
-    var fileFns = convertToFiles(fns, rfiles);
+var getPerFileData = function(fns, resDir, excludedFiles){
+    var fileFns = convertToFiles(fns, excludedFiles);
     //get all ids for this dir
     
     var res = {};
     Object.keys(fileFns).forEach((file)=>{
+        try {
         var allIds = getAllIds([file], resDir);
-        var fileSrc = fs.readFileSync(`${resDir}/${file}/${file}`,'utf-8');
+        var fileSrc = JSON.parse(fs.readFileSync(`${resDir}/${file}/${file}`,'utf-8'));
         var fns = fileFns[file];
-        res[file] = [fns,allIds[file],fileSrc]; // store a 3-tuple of fn arrays and their corresponding size, and the file src
+        // var storeKey = file.replace(/\d/g,'');
+        var storeKey = file;
+        res[storeKey] = [fns,allIds[file],fileSrc]; // store a 3-tuple of fn arrays and their corresponding size, and the file src
+        } catch (e) {
+            console.error(`Error while reading file ${file}, e`)
+        }
     });
     return res;
 }
@@ -102,48 +112,60 @@ var mergeFns = function(src, dst){
  *          filestore is a dict with keys as filenames
  *          and values as dictionaries: key is md5 hash of the source, value is list of fns and the fn sizes of all fns in the file
  */ 
-var updateFileStore = function(fnEntry, filestore){
+var updateFileStore = function(fnEntry, filestore, allJS){
     Object.keys(fnEntry).forEach((file)=>{
         // if (!firstUrl && filestore[file] == null) return;
-        if (!(file in filestore))
-            filestore[file] = {};
-        var fnsPast = filestore[file];
-
-        var fnsCur = fnEntry[file]; //[fns, length, source] length = {{id:length}}
+        // var storeKey = file.replace(/\d/g,'');
+        var storeKey = file;
+        var fnsCur = fnEntry[storeKey];
+        // var curHash = Object.keys(fnsCur[1]).map(e=>{var ar = e.split('-'); return ar.slice(ar.length-4,ar.length)}) + ' ' + storeKey;
+        //[fns, length, source] length = {{id:length}}
         // var curHash = crypto.createHash('md5').update(fnsCur[2]).digest('hex');
+        if (!fnsCur[1]) return; // TODO handle this case
         var curHash = Object.keys(fnsCur[1]) + '';
+        if (!(storeKey in filestore))
+            filestore[storeKey] = {};
+        var fnsPast = filestore[storeKey];
         var fileExists = false;
         Object.keys(fnsPast).forEach((hash)=>{
             if (hash == curHash)
                 fileExists = true;
         })
         if (fileExists){
+            // console.log(`[DUPLICATE] ${file}`)
+            // console.log('adding', fnsCur[2].length)
             var curFns = fnsCur[0];
             var unionFns = mergeFns(fnsPast[curHash][0],curFns);
             fnsPast[curHash][0] = unionFns;
-            program.verbose && console.log(`File: ${file} Orig fns: ${fnsCur[0].length} Final Fns: ${unionFns.length}`)
+            console.log(`[duplicate] ${utils.sumFnSizes(curFns, fnsCur[1])} ${fnsCur[2].length} ${file}`)
+            // program.verbose && console.log(`File: ${file} Orig fns: ${fnsCur[0].length} Final Fns: ${unionFns.length}`)
         } else {
-            fnsPast[curHash] = fnsCur.slice(0,2);
-            program.verbose && console.log(`No hash for file: ${file}`)
+            allJS.dedup += fnsCur[2].length;
+            fnsPast[curHash] = fnsCur;
+            console.log(`[unique] ${utils.sumFnSizes(fnsCur[0], fnsCur[1])} ${fnsCur[2].length} ${file}`)
+            // program.verbose && console.log(`No hash for file: ${file}`)
         }
+        console.log(`File: ${file} Orig fns: ${fnsCur[0].length}`)
+        
         
     });
 }
 
 var processFileStore = function(filestore){
-    var total = 0, idSrcLen = filestore.idSrcLen;
+    var totalUnion = 0, totalFile = 0;
     Object.keys(filestore).forEach((file)=>{
         
-        Object.keys(filestore[file]).forEach((hash)=>{
+        Object.keys(filestore[file]).forEach((hash,id)=>{
             var fns = filestore[file][hash][0];
             var allIds = filestore[file][hash][1];
-
+            totalFile += filestore[file][hash][2].length;
             var _size = utils.sumFnSizes(fns, allIds);
-            total += _size;
+            totalUnion += _size;
+            console.log(file, id, _size, filestore[file][hash][2].length)
         })
         
     });
-    return total;
+    return [totalUnion, totalFile];
 }
 
 /**
@@ -154,13 +176,13 @@ var processFileStore = function(filestore){
  */
 var allFunctionsAnalysis = function(){
     var total = 0, dedup = 0;
-    var filestore = {};
+    var filestore = {}, allJS = {total: 0, dedup:0};
 
     var paths = fs.readFileSync(program.urls,'utf-8').split('\n');
     // console.log(paths)
     paths.forEach((path, idx)=>{
         if (path == '') return;
-        program.verbose && console.log(`path: ${path}`)
+        // program.verbose && console.log(`path: ${path}`)
         if (!fs.existsSync(`${program.performance}/${path}/allFns`)) return;
         // get source files
         var srcDir = `${program.dir}/${path}`;
@@ -170,13 +192,15 @@ var allFunctionsAnalysis = function(){
 
         var _filterFiles = parse(`${srcDir}/__metadata__/analytics`),
             filterFiles = _filterFiles.tracker.concat(_filterFiles.custom);
-
-        var fnFileData = getPerFileData(execFns, srcDir, rfiles);
-        updateFileStore(fnFileData, filestore);
-
+        // console.log(filterFiles, filterFiles.length)
+        var fnFileData = getPerFileData(execFns, srcDir,filterFiles);
+        var prevTotal = allJS.dedup;
+        updateFileStore(fnFileData, filestore, allJS);
+        console.log(path, allJS.dedup - prevTotal)
         //for subsequent urls, don't update the filestore
         firstUrl = false;
     });
+    console.log(allJS)
     console.log(processFileStore(filestore));
 }
 
