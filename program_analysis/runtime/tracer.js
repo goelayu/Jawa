@@ -177,6 +177,8 @@ function __declareTracer__(){
             }
 
             allFns[captureMode].add(id);
+
+            if (!curEvt) return;
             // Store functions reachable from event handlers
             if (callStack.length == 1)
                 evtFns[`${curEvt};;;;${id}`] = new Set;
@@ -216,9 +218,10 @@ function __declareTracer__(){
         }
 
         this.getAllFns = function(){
-            allFns.preload = [...allFns.preload];
-            allFns.postload = [...allFns.postload];
-            return allFns;
+            var res = {}
+            res.preload = [...allFns.preload];
+            res.postload = [...allFns.postload];
+            return res;
         }
 
         var _getEvtFns = function(fns){
