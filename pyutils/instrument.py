@@ -111,6 +111,65 @@ def get_mm_header(mm_obj, key):
 
     return None
 
+def _intercept_location_wombat(body):
+    overrwrite_location_methods = '''
+        WombatLocation.prototype.replace = function replace(url) {
+            return;
+        }
+        ,
+        WombatLocation.prototype.assign = function assign(url) {
+            return;
+        }
+        ,
+        WombatLocation.prototype.reload = function reload(forcedReload) {
+            return;
+        },
+    '''
+    location = body.index('addToStringTagToClass(Wombat')
+
+    return body[:location] + overrwrite_location_methods + body[:location]
+
+def intercept_location_wombat(mm_obj, TEMP_FILE, args, file):
+    body = mm_obj.response.body
+    TEMP_FILE_zip='{}.zip'.format(TEMP_FILE)
+    print mm_obj.request.first_line
+    
+    is_zipped = False
+    # for header in mm_obj.response.header:
+    #     if header.key.lower() == "content-encoding":
+
+    #         open(TEMP_FILE_zip,'w').write(body)
+    #         zipCommand = "gzip -dc {} > {}".format(TEMP_FILE_zip, TEMP_FILE)
+    #         subprocess.call(zipCommand, shell=True)
+    #         body = open(TEMP_FILE,'r').read()
+    #         break
+    
+
+    # if is_zipped:
+    #     body = zlib.decompress(bytes(bytearray(body)), zlib.MAX_WBITS|32)
+    
+    # body = _intercept_location_wombat(body)
+
+    # open(TEMP_FILE,'w').write(body)
+    # TEMP_FILE_zip='{}.zip'.format(TEMP_FILE)
+    # zipCommand = "gzip -c {} > {}".format(TEMP_FILE, TEMP_FILE_zip)
+    # subprocess.call(zipCommand, shell=True)
+    mm_obj.response.body = open('wombat.js','r').read()
+    clone_mm_obj = deepcopy(mm_obj)
+    
+    for key in ['content-encoding','transfer-encoding']:
+        for header in mm_obj.response.header:
+            if header.key.lower() == key:
+                mm_obj.response.header.remove(header)
+                break
+    outputFile = open(os.path.join(args.output, file), "w")
+    outputFile.write(mm_obj.SerializeToString())
+
+    outputFile.close()
+    subprocess.call("rm {} {}".format(TEMP_FILE, TEMP_FILE_zip),stderr=open("/dev/null","r"), shell=True)
+
+
+
 def instrument(root, fileType,args,file_obj):
     http_response = file_obj['mm']
     file = file_obj['file']
@@ -134,6 +193,10 @@ def instrument(root, fileType,args,file_obj):
     fullurl = "http://{}{}".format(get_mm_header(http_response,'host'),filename)
 
     print "Instrumenting file {} with type {}".format(fullurl, fileType)
+
+    if 'wombat' in fullurl:
+        intercept_location_wombat(http_response, TEMP_FILE, args, file)
+        return
 
     if fileType == 'js' and ('web.archive.org/_static/js/' in fullurl or 'archive.org/includes/' in fullurl):
         print "Skipping client-side libraries for archive.org", fullurl
