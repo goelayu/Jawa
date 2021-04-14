@@ -35,6 +35,7 @@ DIR = os.path.dirname(os.path.abspath(__file__))
 analyzer_script = "{}/../program_analysis/instrument.js".format(DIR)
 # filter_list = "{}/../filter-lists/combined.txt".format(DIR)
 # filter_rules = None
+wombat_location = '/w/goelayu/webArchive/data/wombat.js'
 
 # mp_manager = mp.Manager()
 # analytic_files = mp_manager.list()
@@ -154,7 +155,7 @@ def intercept_location_wombat(mm_obj, TEMP_FILE, args, file):
     # TEMP_FILE_zip='{}.zip'.format(TEMP_FILE)
     # zipCommand = "gzip -c {} > {}".format(TEMP_FILE, TEMP_FILE_zip)
     # subprocess.call(zipCommand, shell=True)
-    mm_obj.response.body = open('wombat.js','r').read()
+    mm_obj.response.body = open(wombat_location,'r').read()
     clone_mm_obj = deepcopy(mm_obj)
     
     for key in ['content-encoding','transfer-encoding']:

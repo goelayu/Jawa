@@ -9,6 +9,8 @@ replay_cmd_dir='/vault-home/goelayu/webArchive/data/500k/stats/replay_cmds'
 
 replay_log_dir='/vault-home/goelayu/webArchive/logs/500k/'
 
+fin_tars_dir='/vault-home/goelayu/webArchive/data/500k/fin_tars'
+
 #  change directory to SSD
 mkdir -p /w/goelayu/webArchive/data/sites/
 cd /w/goelayu/webArchive/data/sites/
@@ -18,24 +20,30 @@ while read site; do
     mkdir -p $site/orig/;
     cd $site;
     echo 'Copying tar for site', $site
-    #extract the tar
+    # #extract the tar
     cp /vault-home/goelayu/webArchive/data/500k/tars/${site}.tar .
     echo 'done copying tar'
-    echo 'extracting tar from', $pwd
-    #extract the tar
+    # #extract the tar
     tar xf ${site}.tar
-    echo 'done extracting tar'
-    # mv data to correct directory
-    mv data/*/*/record/$site/* orig/ 
-    rm -r data
+    # echo 'done extracting tar'
+    # # mv data to correct directory
+    [ -d data ] && mv data/*/*/record/$site/* orig/  && rm -r data
+    [ -d $site ] && mv $site/* orig/ && rm -r $site
     rm -r ${site}.tar
-    echo 'done moving data'
+    # echo 'done moving data'
     # # run inst commands in program_analysis directory
     cd /vault-home/goelayu/webArchive/program_analysis
-    cat ${inst_cmd_dir}/${site} | parallel --max-proc 5
-    echo 'done launching inst commands from', pwd
+    cat ${inst_cmd_dir}/${site} | head -n 1 | parallel --max-proc 5
+    echo 'done launching inst commands from', $(pwd)
     # # load pages in chrome
     cd /vault-home/goelayu/webArchive/scripts/
-    cat ${replay_cmd_dir}/${site} | parallel --max-proc 10 &> ${replay_log_dir}/${site}
-    echo 'done launching replay commands from', pwd
+    cat ${replay_cmd_dir}/${site} | head -n 1 | parallel --max-proc 10 &> ${replay_log_dir}/${site}
+    echo 'done launching replay commands from', $(pwd)
+
+    #compute total allFns while and then tar the files
+    cd /w/goelayu/webArchive/data/sites/$site
+    find performance -iname allFns > /vault-home/goelayu/webArchive/data/500k/stats/fns/$site
+
+    cd ../ && tar zcf $site.tar.gz $site && mv $site.tar.gz $fin_tars_dir && rm -r $site &
+    echo 'Site ' $site, ' finished...'
 done<$1
