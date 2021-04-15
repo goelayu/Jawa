@@ -3,16 +3,26 @@
 # which are irrelevant for an archival page
 
 import argparse
-from pyutils.mahimahi import Mahimahi
 import os
 import re
 import json
+import hashlib
+from adblockparser import AdblockRules
 
-def read_filter():
-    path='filter-lists/archive-filter.txt'
+DIR = os.path.dirname(os.path.abspath(__file__))
+filter_list = "{}/../filter-lists/combined.txt".format(DIR)
+
+def get_custom_filter():
+    path="{}/../filter-lists/archive-filter.txt".format(DIR)
     with open(path,'rb') as f:
         filters = f.readlines()
     return strip_list(filters)
+
+def get_tracker_filter():
+    with open(filter_list,'rb') as f:
+        raw_rules = f.read().decode('utf8').splitlines()
+    rules = AdblockRules(raw_rules,use_re2=True, max_mem=512*1024*1024)
+    return rules
 
 def strip_list(l):
     r = []
@@ -21,11 +31,15 @@ def strip_list(l):
     return r
 
 def get_disk_filename(s):
+    orig = s
+    s = re.sub('\/web\/\d{14}','',s)
     if len(s) > 50:
-        filename = s[-50:]
+        s = s[-50:]
 
     s = str(s).strip().replace(' ', '_')
-    return re.sub(r'(?u)[^-\w.]', '', s)
+    s = str(s).strip().replace(' ', '_')
+    s =  re.sub(r'(?u)[^-\w.]', '_', s)
+    return s + '-hash-' + hashlib.md5(orig).hexdigest()
 
 def is_adblocked_url(url, adb_file):
     adb_urls = json.loads(open(adb_file,'rb').read())
@@ -35,41 +49,36 @@ def is_adblocked_url(url, adb_file):
     return False
 
 def main(args):
-    filters = read_filter()
-    filter_size = 0
-    total_size = 0
-    adb_size = 0
-    for root, folder, files in os.walk(args.original):
-        for file in files:
-            try:
-                mm = Mahimahi(os.path.join(root,file))
-                type = mm.getHeader('content-type')
-                # print type, mm.getUrl(),mm.getRequestHeader('host'), mm.getStatus()
-                if 'javascript' not in type or mm.getStatus() != '200':
-                    continue
-                url = mm.getUrl()
-                fullurl = "{}/{}".format(mm.getRequestHeader('host'),mm.getUrl())
-                file_size = len(mm._plainText)
-                filtered_url = False
-                for rule in filters:
-                    if rule in fullurl:
-                        filtered_url = True
-                
-                if is_adblocked_url(url, args.adblock):
-                    print "Adblock:", url
-                    adb_size += file_size
-                elif filtered_url:
-                    print "archive-filter:", url
-                    filter_size += file_size
-                
-                total_size += file_size
-            except:
-                pass
-    print "Res:", total_size, filter_size, adb_size
+    custom_filter = get_custom_filter()
+    tracker_filter = get_tracker_filter()
+
+    paths = open(args.paths,'r').readlines()
+    for path in paths:
+        if path == '':
+            continue
+        path = path.strip()
+        full_path = '{}/{}'.format(args.dir, path)
+        url_file = '{}/__metadata__/urls'.format(full_path)
+        urls = json.loads(open(url_file,'r').read())
+        filtered_file = {'tracker':[], 'custom':[]}
+        for u in urls['js']:
+            [full_url, upath] = u
+
+            if tracker_filter.should_block(full_url,options={'third-party':True}):
+                filename = get_disk_filename(upath)
+                filtered_file['tracker'].append(filename)
+            else:
+                for rule in custom_filter:
+                    if rule in full_url:
+                        filename = get_disk_filename(upath)
+                        filtered_file['custom'].append(filename) 
+
+        out_file = '{}/__metadata__/filtered'.format(full_path)
+        open(out_file,'w').write(json.dumps(filtered_file))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('original', help='path to input directory')
-    parser.add_argument('adblock', help='path to adblocked urls')
+    parser.add_argument('dir',help='path to data dir')
+    parser.add_argument('paths', help='list of paths')
     args = parser.parse_args()
     main(args)
