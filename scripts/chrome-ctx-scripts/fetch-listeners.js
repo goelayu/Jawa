@@ -133,6 +133,7 @@ function getCandidateElements(listeners){
     var elems = []; // each entry is a two-tupe [1st,2nd] where 1st is element, and 2nd is list of events
     listeners.forEach((l)=>{
         var [el, handler] = l;
+        if (el && el.href != "") return;
         if (IGNORE_ELEMENTS.filter(e=>el.nodeName == e).length == 0){
             var e = [el, []];
             Object.keys(handler).forEach((h)=>{
