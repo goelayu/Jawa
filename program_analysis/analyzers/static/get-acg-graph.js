@@ -6,10 +6,13 @@
 
 var fs = require('fs'),
     cgPatcher = require('../../utils/patch-cfg'),
-    {spawnSync} = require('child_process')
+    {spawnSync} = require('child_process'),
+    zlib = require('zlib');
 
 
-const STATICANALYSER = `${__dirname}/../javascript-call-graph/main.js`
+const STATICANALYSER = `${__dirname}/../javascript-call-graph/main.js`;
+
+var contentFiles = [];
 
 var extractFileNames = function(dynamicCfg){
     /**
@@ -17,22 +20,46 @@ var extractFileNames = function(dynamicCfg){
      */
     var filenames = [];
     dynamicCfg.forEach((id)=>{
-        var _filename =  id.split('-').slice(0,id.split('-').length - 4).join('-');
+        var idArr = id.split('-');
+        var _filename =  idArr.slice(0,idArr.length - 4).join('-');
         if (filenames.indexOf(_filename)<0 && _filename != '')
             filenames.push(_filename);
     })
     return filenames;
 }
 
+var extractContent = function(zipped){
+    try {
+        return zlib.gunzipSync(zipped).toString()
+    }catch (e) {
+        return "";
+    }
+}
+
 var execACGModule = function(filenames, srcDir){
     var baseCMD = `node --max-old-space-size=64512 ${STATICANALYSER} `;
     var cmdArgs = ' ';
+    var tmpDir = `${srcDir}/__metadata__/static_temp`;
+    !fs.existsSync(tmpDir) && fs.mkdirSync(tmpDir);
     // var filenames = fs.readdirSync(program.jsSrc)
     filenames.forEach((file)=>{
-        if (file == '' || file.indexOf('-script-')>=0) return;
-        cmdArgs += ` ${srcDir}/${file}/${file}`;
+        var fileDir = `${srcDir}/${file}`;
+        var fileInfo = JSON.parse(fs.readFileSync(`${fileDir}/${file}`));
+        var fileContent;
+        if (fileInfo.zip){
+            var _buffer = fs.readFileSync(`${fileDir}/content`);
+            fileContent = extractContent(_buffer);
+            var tmpFile = `${tmpDir}/${file}`
+            fs.writeFileSync(tmpFile, fileContent);
+            cmdArgs += ` ${tmpFile}`;
+            contentFiles.push(tmpFile);
+        } else 
+            cmdArgs += ` ${fileDir}/content`;
+            contentFiles.push(`${fileDir}/content`);
+        // cmdArgs += ` ${srcDir}/${file}/${file}`;
     });
-    var cfgCMD = baseCMD + `--cg --fg${cmdArgs} 2> ${srcDir}/cg 1>${srcDir}/fg`;
+    console.log(`Executing static analysis command with args: ${cmdArgs}`)
+    var cfgCMD = baseCMD + `--cg --fg ${cmdArgs} 2> ${srcDir}/__metadata__/cg 1>${srcDir}/__metadata__/fg`;
     //create cfg
     // program.verbose && console.log(`creating cfg: ${cfgCMD}`)
     var _cmdOut = spawnSync(cfgCMD, {shell:true} );
@@ -55,11 +82,11 @@ var getAllIds = function(srcDir){
     return allIds;
 }
 
-var patchCFG = function(allIds, srcDir){
-    var cg = `${srcDir}/cg`,
-        fg = `${srcDir}/fg`;
+var patchCFG = function(srcDir){
+    var cg = `${srcDir}/__metadata__/cg`,
+        fg = `${srcDir}/__metadata__/fg`;
     
-    var completeCg = cgPatcher.findMissingCallees(cg, fg, allIds);
+    var completeCg = cgPatcher.findMissingCallees(cg, fg);
     return completeCg;
 }
 
@@ -68,14 +95,20 @@ var patchCFG = function(allIds, srcDir){
  * @param {string} srcDir //path to the directory containing all JS files 
  * @param {Array} dynamicGraph // array containing all dynamic function nodes
  */
-var getCallGraph = function(srcDir, dynamicGraph, runModule){
+var getCallGraph = function(srcDir, dynamicGraph, runModule, time){
     var filenames = extractFileNames(dynamicGraph);
+    if (time)
+        var staticStart = process.hrtime();
     if (runModule) execACGModule(filenames, srcDir);
-    var allIds = getAllIds(srcDir);
-    var completeGraph = patchCFG(allIds, srcDir)
+    if (time)
+        var staticEnd = process.hrtime(staticStart);
+    // var allIds = getAllIds(srcDir);
+    var completeGraph = patchCFG(srcDir)
     
     var graph = new Graph(completeGraph);
     // graph.buildGraph();
+    if (time)
+        time.static = staticEnd;
     return graph;
 }
 
@@ -102,5 +135,6 @@ class Graph{
 }
 
 module.exports = {
-    getCallGraph : getCallGraph
+    getCallGraph : getCallGraph,
+    contentFiles: contentFiles
 }

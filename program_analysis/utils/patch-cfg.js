@@ -36,8 +36,11 @@ var read = function(f){
 var parseCfgId = function(strLoc){
     if (strLoc.indexOf('@')<0)
         return ['','NATIVE'];
-    var [file, _loc, fnLoc] = strLoc.split('@'), loc = _loc.split(':')[0]; 
-    return [file,Number.parseInt(loc), fnLoc];
+    // var [file, _loc, fnLoc] = strLoc.split('@'), loc = _loc.split(':')[0]; 
+    // return [file,Number.parseInt(loc), fnLoc];
+    var file = strLoc.split('@')[0],
+        fnLoc = strLoc.replace('@','-');
+    return [file, fnLoc];
 }
 
 var preprocessFnIds = function(fns){
@@ -97,8 +100,8 @@ var findMatchingFn = function(strLoc, fns, isCaller){
      * Doesn't need preprocessed fnIds since its a direct lookup
      */
     if (!strLoc) return null;
-    var [file, loc, fnLoc] = parseCfgId(strLoc);
-    if (loc == 'NATIVE') return strLoc;
+    var [file, fnLoc] = parseCfgId(strLoc);
+    if (fnLoc == 'NATIVE') return strLoc;
     // console.log(file,loc,fnLoc)
     var index;
     if (isCaller){
@@ -146,14 +149,17 @@ var patchCFG = function(cfg, fnIds){
     return res;
 }
 
-var dictStaticCFG = function(cfg, fnIds){
-    var fnLns = preprocessFnIds(fnIds),
-        res = {};
+var dictStaticCFG = function(cfg){
+    var res = {};
     cfg.forEach((entry,id)=>{
-        var caller = findMatchingFn(entry[0], fnIds, true),
-            callee = findMatchingFn(entry[1], fnIds, false);
-        var perc = id/cfg.length;
-        ((perc*100) % 10 == 0) && console.log(`${perc*100}% done...`)
+        var [_caller, _callee] = entry;
+        if (_caller.indexOf('@') <0 || _callee.indexOf('@')<0) return;
+        var caller = _caller.replace('@','-'),
+            callee = _callee.replace('@','-');
+        // var caller = findMatchingFn(entry[0], fnIds, true),
+        //     callee = findMatchingFn(entry[1], fnIds, false);
+        // var perc = id/cfg.length;
+        // ((perc*100) % 10 == 0) && console.log(`${perc*100}% done...`)
         if (!(caller in res))
             res[caller] = new Set;
         res[caller].add(callee);
@@ -173,14 +179,13 @@ var _findMissingCallees = function(cg, fg){
     // console.log(cg);
 }
 
-function findMissingCallees(cg, fg, allIds){
+function findMissingCallees(cg, fg){
     parsedCfg = parseCFG(read(cg));
-    var parsedFg = parseCFG(read(fg));
-    console.log(`done parsing cg and fg\nPatching cg and fg now`)
-    _findMissingCallees(parsedCfg, parsedFg);
+    // var parsedFg = parseCFG(read(fg));
+    // console.log(`done parsing cg and fg\nPatching cg and fg now`)
+    // _findMissingCallees(parsedCfg, parsedFg);
 
-    return dictStaticCFG(parsedCfg, allIds)
-    return patchCFG(parsedCfg, allIds);
+    return dictStaticCFG(parsedCfg)
 }
 
 module.exports = {

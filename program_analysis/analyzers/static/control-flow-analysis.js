@@ -8,8 +8,8 @@ var metadata = {allFnIds:{}};
 var _astCache = {}; // a cache which stores functions per file
 
 var getNodes = function(src, arr){
-    src = globalWrapper.wrap(src);
-    src = beautifier.js(src);
+    // src = globalWrapper.wrap(src);
+    // src = beautifier.js(src);
     return falafel(src, {
         locations: true, 
         ranges: true
