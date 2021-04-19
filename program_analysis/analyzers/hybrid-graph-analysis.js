@@ -22,6 +22,24 @@ var parse = function(f){
     return JSON.parse(fs.readFileSync(f,'utf-8'));
 }
 
+var extractFilteredFns = function(fns, excludedFiles){
+    var filFns = [];
+    fns.forEach((f)=>{
+        if (f.indexOf('-hash-')<0) return;
+        var endIndx = 4;
+        if (f.indexOf('-script-')>=0)
+            endIndx = 6;
+        var fnFile = f.split('-').slice(0,f.split('-').length - endIndx).join('-');
+        if (excludedFiles.indexOf(fnFile)>=0) return;
+        if (fnFile == 'undefined'){
+            console.error('undefined filename');
+            return;
+        }
+        filFns.push(f);
+    });
+    return filFns;
+}
+
 var extractFileNames = function(dynamicCfg){
     /**
      * Parses the dynamic cfg and creates a filename array
@@ -50,14 +68,15 @@ var mergeValsArr = function(dict){
     return arr;
 }
 
-var loadDynamicGraphs = function(dir, num){
+var loadDynamicGraphs = function(dir, filteredFiles, num){
     var graphs = [];
     for (var i = 0;i<num;i++){ 
         try {
             var g = parse(`${dir}/cg${i}`);
             var fns = unique(mergeValsArr(g));
             program.verbose && console.log(`extract graph ${i} with ${fns.length} nodes`)
-            graphs.push(fns);
+            var filFns = extractFilteredFns(fns, filteredFiles);
+            filFns.length != 0 && graphs.push(filFns);
         }catch (e) {
             program.verbose && console.error(`Error while fetching dynamic cg: ${i}`)
         }
@@ -65,9 +84,9 @@ var loadDynamicGraphs = function(dir, num){
     return graphs;
 }
 
-var getControlFlowFns  = function(dynamicCG, filenames){
+var getControlFlowFns  = function(dynamicCG, filenames, filepaths){
     var filenames = filenames.filter(e=>e.indexOf('-script-')<0)
-    var paths = filenames.map(e=>`${program.source}/${e}/${e}`);
+    var paths = filenames.map(e=>filepaths.filter(f=>f.indexOf(e)>=0)[0]);
     var options = {
         filepaths:paths, filenames:filenames, fns:[...dynamicCG]
     };
@@ -104,12 +123,12 @@ var sliceGraph = function(completeGraph, nodes){
  * @param {array} staticGraph 
  * @param {array} dynamicGraph 
  */
-var learnNodes = function(hybridGraph, dynamicGraph, completeGraph, filenames){
+var learnNodes = function(hybridGraph, dynamicGraph, completeGraph, filenames, filepaths){
     // learn all the nodes from the dynamic graph
     dynamicGraph.forEach(hybridGraph.add, hybridGraph);
 
     //extract static call graph for control flow functions
-    var cntrlFlowFns = getControlFlowFns(dynamicGraph, filenames);
+    var cntrlFlowFns = getControlFlowFns(dynamicGraph, filenames, filepaths);
     var staticCntrlFlowFns = sliceGraph(completeGraph, cntrlFlowFns);
     staticCntrlFlowFns.forEach(hybridGraph.add, hybridGraph);
     return hybridGraph;
@@ -138,26 +157,31 @@ var isComplete = function(hybridGraph, truthGraph){
  * Generates a static call graph and then
  * optimizes it using dynamic graphs
  */
-var tuneGraph = function(hybridGraph, dynamicGraphs, completeGraph, filenames){
+var tuneGraph = function(hybridGraph, dynamicGraphs, completeGraph, filenames, filepaths){
     /**
      * Initialize tunining parameters
-     * Learning param - 10
-     * Eval param - 50
+     * Learning param - 5
+     * Eval param - 10
      */
-    var learn = 10, eval = 30, evalLimit = dynamicGraphs.length;
+    var learn = 5, eval = 10, evalLimit = dynamicGraphs.length;
         learnGraph = graphUnions(dynamicGraphs, learn),
         evalGraph = graphUnions(dynamicGraphs, eval);
 
-    learnNodes(hybridGraph, learnGraph, completeGraph, filenames);
+    if (dynamicGraphs.length == 1){
+        program.verbose && console.log(`Only a single DCG obtained: Can't train`);
+        return;
+    }
+
+    learnNodes(hybridGraph, learnGraph, completeGraph, filenames, filepaths);
     while (!isComplete(hybridGraph, evalGraph)){
         program.verbose && console.log(`Comparing learnt ${learn} of size ${hybridGraph.size} with eval ${eval} of size ${evalGraph.size}`)
-        learn += 10;
+        learn += 5;
         learnGraph = graphUnions(dynamicGraphs, learn);
         if (learn == eval) {
-            eval += 30;
+            eval += 10;
             evalGraph = graphUnions(dynamicGraphs, eval);
         }
-        learnNodes(hybridGraph, learnGraph, completeGraph, filenames);
+        learnNodes(hybridGraph, learnGraph, completeGraph, filenames, filepaths);
 
         if (eval > Math.min(evalLimit,90))
             throw new Error(`Call graph didn't converge within the limit specified`);
@@ -166,17 +190,30 @@ var tuneGraph = function(hybridGraph, dynamicGraphs, completeGraph, filenames){
 }
 
 var buildCallGraph = function(){
+
+    var _filterFiles = parse(`${program.source}/__metadata__/filtered`),
+        filterFiles = _filterFiles.tracker.concat(_filterFiles.custom);
     //get all the dynamic call graphs
-    var dynamicGraphs = loadDynamicGraphs(program.performance, 100);
+    var dynamicGraphs = loadDynamicGraphs(program.performance, filterFiles, 50);
+    if (!dynamicGraphs.length){
+        program.verbose && console.log('No dynamic call graphs obtained');
+        fs.writeFileSync(`${program.performance}/hybridcg`,JSON.stringify([]));
+        return;
+    }
 
     // get the complete call graph
-    var completeGraph = staticGraph.getCallGraph(program.source, dynamicGraphs[0], false);
-
+    var time = {};
+    var completeGraph = staticGraph.getCallGraph(program.source, dynamicGraphs[0], true, time);
+    var filePaths = staticGraph.contentFiles;
     var filenames = extractFileNames(dynamicGraphs[0]);
 
     var hybridGraph = new Set;
-    tuneGraph(hybridGraph, dynamicGraphs, completeGraph, filenames);
+    var tuneStart = process.hrtime();
+    tuneGraph(hybridGraph, dynamicGraphs, completeGraph, filenames, filePaths);
+    var tuneEnd = process.hrtime(tuneStart);
 
+    var hybridBenchTime = tuneEnd[0] + time.static[0];
+    console.log(`Time: ${hybridBenchTime} ${tuneEnd[0]} ${time.static[0]}`)
     console.log(`Final call graph: ${hybridGraph.size} nodes`)
     fs.writeFileSync(`${program.performance}/hybridcg`,JSON.stringify([...hybridGraph]));
 }

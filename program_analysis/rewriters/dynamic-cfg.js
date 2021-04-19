@@ -1,5 +1,4 @@
 const falafel = require('falafel'),
-    beautifier = require('js-beautify'),
     astutils = require('../utils/astutils'),
     globalWrapper = require('./global-code-wrapper'),
     fs = require('fs');
