@@ -287,12 +287,15 @@ var extractHandlers = async function(page,cdp, nTimes){
     await cdp.send('Runtime.evaluate',{expression:handlerCode, includeCommandLineAPI:true})
     var _handlers = await page.evaluateHandle(()=> archive_listeners);
     var handlers = await _handlers.jsonValue();
+    var _fhandlers = await page.evaluateHandle(()=> _final_elems.map(e=>e[0].nodeName));
+    var fhandlers = await _fhandlers.jsonValue();
     dump(handlers, `${program.output}/handlers`);
+    dump(fhandlers, `${program.output}/handlersFinal`);
     //extract event handler call graph
     if (!nTimes) nTimes = 1;
     for (var i = 0;i<nTimes;i++){
         //trigger event handlers
-        await page.evaluateHandle(()=> triggerEvents(elems))
+        await page.evaluateHandle(()=> triggerEvents(_final_elems))
         await chromeFns.getCallGraph(page, program, i);
     } 
 }
