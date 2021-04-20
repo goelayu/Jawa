@@ -10,7 +10,7 @@ import hashlib
 from adblockparser import AdblockRules
 
 DIR = os.path.dirname(os.path.abspath(__file__))
-filter_list = "{}/../filter-lists/combined.txt".format(DIR)
+filter_list = "{}/../filter-lists/easyprivacy.txt".format(DIR)
 
 def get_custom_filter():
     path="{}/../filter-lists/archive-filter.txt".format(DIR)
