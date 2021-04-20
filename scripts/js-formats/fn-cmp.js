@@ -17,6 +17,7 @@ program
     .option('-u, --urls [urls]', 'file containing list of urls for dedup analysis')
     .option('-v, --verbose', 'enable verbose logging')
     .option('-f, --filter','filter out irrelevant files')
+    .option('-o, --output [output]','path to the output directory')
     .parse(process.argv);
 
 var parse = function(f){
@@ -118,6 +119,27 @@ var getFileKey = function(f){
     return f.slice(0,hInd);
 }
 
+function arraysEqual(a, b) {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length !== b.length) return false;
+
+    var aClone = Object.assign(a,[]).sort(),
+        bClone = Object.assign(b,[]).sort();
+  
+    for (var i = 0; i < aClone.length; ++i) {
+      if (a[i] !== bClone[i]) return false;
+    }
+    return true;
+  }
+
+  var getUnionIds = function(ids){
+      return ids.map((e)=>{
+          var i = e.split('-');
+          return i.slice(i.length - 4,).join('-');
+      });
+  }
+
 /**
 * 
 * @param {any} fnEntry  
@@ -129,8 +151,9 @@ var getFileKey = function(f){
                 1-2-3-4.js-a.js:[[fns1,fns2,fns3], [union-of-all-fns], allIds, fileInfo]
             }
 */ 
-var queryAndUpdateStore = function(filesData, store, page){
+var queryAndUpdateStore = function(filesData, store, page, pageMD){
     var fileTotal = fileDedup = fnTotal = fnDedup = fnUnion = 0;
+
     Object.keys(filesData).forEach((file)=>{
         var [curfns, curIds, curfileInfo] = filesData[file];
         var fnsSize = utils.sumFnSizes(curfns, curIds);
@@ -139,15 +162,19 @@ var queryAndUpdateStore = function(filesData, store, page){
         //     storeKey = crypto.createHash('md5').update(_storeKey).digest('hex');
         var storeKey = curfileInfo.url;
         var oldVersion = store.entries[storeKey];
-        var curFnOrder = curfns + '';
+        var curFnOrder = curfns;
 
+        pageMD._files.push(storeKey);
+
+        console.log(`copy: ${storeKey}`)
         if (oldVersion){
+            
             //duplicate file
             var [oldFnOrders, oldUnion, oldIds, oldfileInfo] = oldVersion;
             // check for fn duplication
             var fnOrderMatch = false;
             for (var o of oldFnOrders){
-                if (o == curFnOrder){
+                if (arraysEqual(o,curFnOrder)){
                     fnOrderMatch = true;
                     break;
                 }
@@ -156,6 +183,7 @@ var queryAndUpdateStore = function(filesData, store, page){
                 fnDedup += fnsSize;
                 store.fnDedup += fnsSize;
                 oldFnOrders.push(curFnOrder);
+                console.log(`fn-match: ${storeKey}`)
             }
 
             var newUnion = mergeFns(oldUnion, curfns);
@@ -163,9 +191,13 @@ var queryAndUpdateStore = function(filesData, store, page){
 
             // if union is updated, update union length;
             if (newUnion.length > oldUnion.length){
+                console.log(`union: ${storeKey}`)
                 var unionLen = utils.sumFnSizes(newUnion, curIds);
                 fnUnion += unionLen;
                 store.fnUnion += unionLen;
+                oldVersion[4]++; // update the number of unions
+
+                pageMD.cSize += (getUnionIds(newUnion) + '').length;
             }
 
         } else {
@@ -173,7 +205,8 @@ var queryAndUpdateStore = function(filesData, store, page){
                 [curFnOrder],
                 curfns,
                 curIds, 
-                curfileInfo
+                curfileInfo,
+                1
             ];
 
             //unique file
@@ -182,10 +215,13 @@ var queryAndUpdateStore = function(filesData, store, page){
 
             fnDedup += fnsSize;
             store.fnDedup += fnsSize;
+            console.log(`fn-match: ${storeKey}`)
 
             fnUnion += fnsSize;
             store.fnUnion += fnsSize;
+            console.log(`union: ${storeKey}`)
 
+            pageMD.cSize += (getUnionIds(curfns) + '').length;
         }
 
         fileTotal += curfileInfo.length;
@@ -199,12 +235,29 @@ var queryAndUpdateStore = function(filesData, store, page){
 var processFnUnion = function(store){
     var size = 0;
     Object.keys(store.entries).forEach((entry)=>{
-        var [oldFnOrders, oldUnion, oldIds, oldfileInfo] = store.entries[entry];
+        var [oldFnOrders, oldUnion, oldIds, oldfileInfo, unionCount] = store.entries[entry];
         var _size = utils.sumFnSizes(oldUnion, oldIds);
         size += _size;
     });
     return size;
 }
+
+var processPageMD = function(store, perPageMD){
+    Object.keys(perPageMD).forEach((page)=>{
+        var pageMD = perPageMD[page], nUnion = 0;
+        var files = pageMD._files;
+        files.forEach((f)=>{
+            var _nUnion = store.entries[f][4];
+            nUnion += _nUnion;
+        });
+        pageMD.lookups.union = nUnion;
+
+        //delete the files data
+    });
+    fs.writeFileSync(`${program.output}/pageMD`, JSON.stringify(perPageMD));
+
+}
+
 /**
 * For each url it does the following
 * 1) Categories all executed functions in a set of files
@@ -215,29 +268,38 @@ var dedupAnalysis = function(){
     var total = 0, dedup = 0, fileTotal = 0, excludedTotal = 0;
     var store = {entries:{}, fileTotal :0, fileDedup:0, fnTotal:0, fnDedup:0, fnUnion:0};
 
+    var perPageMD = {};
+
     var paths = fs.readFileSync(program.urls,'utf-8').split('\n');
     // console.log(paths)
     paths.forEach((path)=>{
         if (path == '') return;
         // get source files
         var srcDir = `${program.dir}/${path}`;
-        var rfiles = fs.readdirSync(srcDir).filter(e=>e!='__metadata__' && e!='py_out');
+        var jsFiles = fs.readdirSync(srcDir).filter(e=>e.indexOf('hash')>=0);
         // get all functions
         var _execFns = parse(`${program.performance}/${path}/allFns`),
             execFns = [...new Set(_execFns.preload.concat(_execFns.postload))];
 
-        // var _filterFiles = parse(`${srcDir}/__metadata__/analytics`),
-        //     filterFiles = _filterFiles.tracker.concat(_filterFiles.custom);
-
         var filterFiles = [];
-        if (!program.filter)
-            filterFiles = [];
+        if (program.filter) {
+            try {
+                var _filterFiles = parse(`${srcDir}/__metadata__/filtered`),
+                filterFiles = _filterFiles.tracker.concat(_filterFiles.custom);
+            } catch (e){
+                filterFiles = [];
+            }
+        }
+        
+        var pageMD = perPageMD[path] = {lookups:{orig:0, union:0}, cSize:0,_files:[]};
         
         var filesData = getPerFileData(execFns, srcDir, filterFiles);
-        queryAndUpdateStore(filesData, store, path);
+        pageMD.lookups.orig = Object.keys(filesData).length + filterFiles.length;
+        queryAndUpdateStore(filesData, store, path, pageMD);
     });
+    program.filter && processPageMD(store, perPageMD);
     with (store){
-        console.log(`{page} filetotal: ${fileTotal} fileDedup: ${fileDedup} fnTotal: ${fnTotal} fnDedup: ${fnDedup} fnUnion ${processFnUnion(store)}`);
+        console.log(`Final: filetotal: ${fileTotal} fileDedup: ${fileDedup} fnTotal: ${fnTotal} fnDedup: ${fnDedup} fnUnion ${processFnUnion(store, perPageMD)}`);
     }
 
 }
