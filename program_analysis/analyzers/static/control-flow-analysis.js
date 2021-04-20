@@ -1,8 +1,6 @@
 const falafel = require('falafel'),
-    beautifier = require('js-beautify'),
     astutils = require('../../utils/astutils'),
-    fs = require('fs'),
-    globalWrapper = require('../../rewriters/global-code-wrapper')
+    fs = require('fs');
 
 var metadata = {allFnIds:{}};
 var _astCache = {}; // a cache which stores functions per file
