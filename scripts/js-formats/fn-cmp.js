@@ -6,10 +6,30 @@
  * Copies content from the three other scripts doing this separately
  */
 
+/**
+ * Information about crawl and serving index sizes
+ * 
+ * crawl index:
+ * Format: {url: [<content-hash, warc-id>]}
+ * content-hash: 32 bytes length (eg: "398f4956d66fd21dea6cba445642a31b")
+ * warc-id: 45 bytes (eg: urn:uuid:23200706-de3e-3c61-a131-g65d7fd80cc1)
+ * 
+ * serving index:
+ * Format: CDX A b e a m s c k r V v D d g M n -- 275 bytes
+ * eg: 0-0-0checkmate.com/Bugs/Bug_Investigators.html 20010424210551 209.52.183.152 0-0-0checkmate.com:80/Bugs/Bug_Investigators.html text/html 200 58670fbe7432c5bed6f3dcd7ea32b221 a725a64ad6bb7112c55ed26c9e4cef63 - 17130110 59129865 1927657 6501523 DE_crawl6.20010424210458 - 5750
+ * and for set differences only filename and byte offset is added
+ * 6627262 DE_crawl6.20010424212307 -- 32 bytes
+ */
+
+const CRAWL_ENTRY_LEN= 77
+const SERVING_ENTRY_LEN = 275
+const SERVING_ENTRY_APPEND = 32
+
 var fs = require('fs'),
     program = require('commander'),
     utils = require('../../program_analysis/utils/util'),
     crypto = require('crypto');
+const { createRequire } = require('module');
 
 program
     .option('-d, --dir [dir]',"directory containing resource files")
@@ -197,7 +217,8 @@ var queryAndUpdateStore = function(filesData, store, page, pageMD){
                 store.fnUnion += unionLen;
                 oldVersion[4]++; // update the number of unions
 
-                pageMD.cSize += (getUnionIds(newUnion) + '').length;
+                pageMD.cSize.union += CRAWL_ENTRY_LEN + (getUnionIds(newUnion) + '').length; //update crawl index
+                pageMD.cWrites.union++ // update crawl index
             }
 
         } else {
@@ -221,7 +242,10 @@ var queryAndUpdateStore = function(filesData, store, page, pageMD){
             store.fnUnion += fnsSize;
             console.log(`union: ${storeKey}`)
 
-            pageMD.cSize += (getUnionIds(curfns) + '').length;
+            pageMD.cSize.orig += CRAWL_ENTRY_LEN
+            pageMD.cSize.union += CRAWL_ENTRY_LEN + (getUnionIds(curfns) + '').length; // updating crawl index
+            pageMD.cWrites.orig++
+            pageMD.cWrites.union++
         }
 
         fileTotal += curfileInfo.length;
@@ -251,10 +275,11 @@ var processPageMD = function(store, perPageMD){
             nUnion += _nUnion;
         });
         pageMD.lookups.union = nUnion;
-
+        pageMD.sSize.union = files.length*SERVING_ENTRY_LEN + (nUnion-files.length)*SERVING_ENTRY_APPEND
         //delete the files data
     });
-    fs.writeFileSync(`${program.output}/pageMD`, JSON.stringify(perPageMD));
+    var suffix = program.filter ? '.filter' :'';
+    fs.writeFileSync(`${program.output}/pageMD${suffix}`, JSON.stringify(perPageMD));
 
 }
 
@@ -278,8 +303,16 @@ var dedupAnalysis = function(){
         var srcDir = `${program.dir}/${path}`;
         var jsFiles = fs.readdirSync(srcDir).filter(e=>e.indexOf('hash')>=0);
         // get all functions
-        var _execFns = parse(`${program.performance}/${path}/allFns`),
+        var _execFns = parse(`${program.performance}/${path}/allFns`), _evtCG,
             execFns = [...new Set(_execFns.preload.concat(_execFns.postload))];
+
+        try {
+            _evtCG = parse(`${program.performance}/${path}/hybridcg`)
+            program.verbose && console.log(`Adding evt graph: ${_evtCG.length}`);
+            execFns = [...new Set(execFns.concat(_evtCG))]
+        } catch (e) {
+            //pass nothing can be done, no event handler graph
+        }
 
         var filterFiles = [];
         if (program.filter) {
@@ -291,13 +324,21 @@ var dedupAnalysis = function(){
             }
         }
         
-        var pageMD = perPageMD[path] = {lookups:{orig:0, union:0}, cSize:0,_files:[]};
+        var pageMD = perPageMD[path] = {
+            lookups:{orig:0, union:0}, 
+            cSize:{orig:0, union:0},
+            sSize:{orig:0, union:0},
+            _files:[],
+            cWrites:{orig:0, union:0}
+        };
         
         var filesData = getPerFileData(execFns, srcDir, filterFiles);
+
         pageMD.lookups.orig = Object.keys(filesData).length + filterFiles.length;
+        pageMD.sSize.orig = pageMD.lookups.orig * SERVING_ENTRY_LEN;
         queryAndUpdateStore(filesData, store, path, pageMD);
     });
-    program.filter && processPageMD(store, perPageMD);
+    processPageMD(store, perPageMD);
     with (store){
         console.log(`Final: filetotal: ${fileTotal} fileDedup: ${fileDedup} fnTotal: ${fnTotal} fnDedup: ${fnDedup} fnUnion ${processFnUnion(store, perPageMD)}`);
     }
