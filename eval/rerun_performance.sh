@@ -42,9 +42,7 @@ while read site; do
 
     cd ../
     tar --use-compress-program=pigz -cf $site.tar.src.pigz $site/orig $site/mod && mv $site.tar.src.pigz $src_tars_dir
-    tar --use-compress-program=pigz -cf ../out_tars/$site.tar.out.pigz $site/instOutput $site/performance
-
-    rm -r $site &
+    tar --use-compress-program=pigz -cf ../out_tars/$site.tar.out.pigz $site/instOutput $site/performance && rm -r $site
 
     echo 'Site ' $site, ' finished...'
 done<$1

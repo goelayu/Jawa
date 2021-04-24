@@ -10,6 +10,7 @@ replay_cmd_dir='/vault-home/goelayu/webArchive/data/500k/stats/replay_cmds'
 replay_log_dir='/vault-home/goelayu/webArchive/logs/500k/'
 
 fin_tars_dir='/vault-home/goelayu/webArchive/data/500k/fin_tars'
+src_tars_dir='/vault-home/goelayu/webArchive/data/500k/src_tars'
 
 #  change directory to SSD
 mkdir -p /w/goelayu/webArchive/data/sites/
@@ -33,7 +34,7 @@ while read site; do
     # echo 'done moving data'
     # # run inst commands in program_analysis directory
     cd /vault-home/goelayu/webArchive/program_analysis
-    cat ${inst_cmd_dir}/${site} | parallel --max-proc 5
+    cat ${inst_cmd_dir}/${site} | parallel --max-proc 3
     echo 'done launching inst commands from', $(pwd)
     # # load pages in chrome
     cd /vault-home/goelayu/webArchive/scripts/
@@ -44,6 +45,11 @@ while read site; do
     cd /w/goelayu/webArchive/data/sites/$site
     find performance -iname allFns > /vault-home/goelayu/webArchive/data/500k/stats/fns/$site
 
-    cd ../ && tar zcf $site.tar.gz $site && mv $site.tar.gz $fin_tars_dir && rm -r $site &
+    # cd ../ && tar zcf $site.tar.gz $site && mv $site.tar.gz $fin_tars_dir && rm -r $site &
+    echo Done running all scripts. Creating tars separately - src and out
+    cd ../
+    tar --use-compress-program=pigz -cf $site.tar.src.pigz $site/orig $site/mod && mv $site.tar.src.pigz $src_tars_dir
+    tar --use-compress-program=pigz -cf ../out_tars/$site.tar.out.pigz $site/instOutput $site/performance && rm -r $site
+
     echo 'Site ' $site, ' finished...'
 done<$1

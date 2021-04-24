@@ -13,6 +13,7 @@ program
     .option('-d, --dir [dir]','path to the src directory')
     .option('-u, --urls [urls]','list of urls the data needs to be processed on')
     .option('-v, --verbose')
+    .option('-o, --output [output]','path to output file')
     .parse(process.argv);
 
 var isFilterUrl = function(url){
@@ -57,7 +58,8 @@ var removeComments = function(content, zip){
     return content.replace(/FILE ARCHIVED [\s\S]*./g,"");
 }
 
-var dedupMime = function(mimeData, jsData, store, page){
+var dedupMime = function(mimeData, jsData, store, path, page, pageMD){
+    var cWrites = 0;
     mimeData.forEach((entry)=>{
         var {url, content, length, type} = entry, hash;
         var fType;
@@ -74,15 +76,24 @@ var dedupMime = function(mimeData, jsData, store, page){
         if (store[fType].hashes.indexOf(hash)<0){
             store[fType].size+=length;
             store[fType].hashes.push(hash);
+
+            cWrites++; // update the crawl index since a unique resource is crawled
         };
+        pageMD[page] = cWrites;
         store[fType].total+=length;
     })
 
     jsData.forEach((file)=>{
-        var fileDir = `${page}/${file}`;
+        var fileDir = `${path}/${file}`;
         // var content = fs.readFileSync(`${fileDir}/content`);
         var size = fs.statSync(`${fileDir}/content`).size;
-        var fileInfo = JSON.parse(fs.readFileSync(`${fileDir}/${file}`));
+        var fileInfo;
+        try {
+            fileInfo = JSON.parse(fs.readFileSync(`${fileDir}/${file}`));
+        } catch (e){
+            return;
+        }
+        if (fileInfo.type != "js") return;
         // var wocommentContent = removeComments(content, fileInfo.zip)
         // var hash = crypto.createHash('md5').update(wocommentContent).digest('hex');
         // var origUrl = getOriginalURL(fileInfo.url);
@@ -109,6 +120,8 @@ function main(){
         html:{size:0, hashes:[],total:0},
         js:{size:0, hashes:{},total:0},
     };
+
+    var pageMD = {}
     pages.forEach((page,idx)=>{
         if (page == '') return;
 
@@ -120,13 +133,15 @@ function main(){
             // console.log(e)
             return;
         }
-        dedupMime(mimeData, jsData, store, srcDir);
+        dedupMime(mimeData, jsData, store, srcDir, page, pageMD );
         // var perc = Number.parseInt(idx*100/pages.length);
         // program.verbose && perc%10 == 0 && console.log(`${perc}% Done...`)
 
     })
     console.log(`js ${store.js.size} image ${store.image.size} css ${store.css.size} html  ${store.html.size}`)
     console.log(`js ${store.js.total} image ${store.image.total} css ${store.css.total} html ${store.html.total}`)
+
+    fs.writeFileSync(program.output, JSON.stringify(pageMD));
 }
 main();
 

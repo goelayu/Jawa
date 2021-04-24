@@ -65,11 +65,6 @@ var convertToFiles = function(fns, excludedFiles){
         if (!(fnFile in fileFns))
             fileFns[fnFile] = [];
         
-        // splice hash from the function
-        // var fArr = f.split('-');
-        // fArr.splice(fArr.length - 6,2);
-        // f = fArr.join('-')
-        
         fileFns[fnFile].push(f);
     });
     return fileFns;
@@ -94,6 +89,7 @@ var getPerFileData = function(fns, resDir, excludedFiles){
         var allIds = getAllIds([file], resDir);
         if (!allIds[file]) return; //TODO
         var fileSrc = JSON.parse(fs.readFileSync(`${resDir}/${file}/${file}`,'utf-8'));
+        fileSrc.rlength = fs.statSync(`${resDir}/${file}/content`).size; //size transfered over the network, raw size
         var fns = fileFns[file];
         // var storeKey = file.replace(/\d/g,'');
         var storeKey = file;
@@ -111,15 +107,6 @@ var getAllIds = function(filenames, dir){
         try {    
             var idFile = `${dir}/${file}/ids`;
             var ids = JSON.parse(fs.readFileSync(idFile, 'utf-8'));
-            // strip hash from ids
-            var stripIds = {};
-            // Object.keys(ids).forEach((f)=>{
-            //     var val = ids[f];
-            //     var fArr = f.split('-');
-            //     fArr.splice(fArr.length - 6,2);
-            //     f = fArr.join('-');
-            //     stripIds[f] = val;
-            // })
             allIds[file] = ids;
         } catch (e) {
             program.verbose && console.error(`Error while readings ids for ${file}`);
@@ -176,7 +163,10 @@ var queryAndUpdateStore = function(filesData, store, page, pageMD){
 
     Object.keys(filesData).forEach((file)=>{
         var [curfns, curIds, curfileInfo] = filesData[file];
+        var zipRatio = curfileInfo.length == 0 ? 1 : parseFloat((curfileInfo.rlength/curfileInfo.length).toFixed(2));
+        curfileInfo.zipRatio = zipRatio;
         var fnsSize = utils.sumFnSizes(curfns, curIds);
+        program.verbose &&  console.log(`ratio is ${zipRatio}`)
         // var fileKey = getFileKey(file)
         // var _storeKey = Object.keys(curIds) + '' + fileKey;
         //     storeKey = crypto.createHash('md5').update(_storeKey).digest('hex');
@@ -186,7 +176,7 @@ var queryAndUpdateStore = function(filesData, store, page, pageMD){
 
         pageMD._files.push(storeKey);
 
-        console.log(`copy: ${storeKey}`)
+        program.verbose &&  console.log(`copy: ${storeKey}`)
         if (oldVersion){
             
             //duplicate file
@@ -200,10 +190,10 @@ var queryAndUpdateStore = function(filesData, store, page, pageMD){
                 }
             }
             if (!fnOrderMatch){
-                fnDedup += fnsSize;
-                store.fnDedup += fnsSize;
+                fnDedup += fnsSize*zipRatio;
+                store.fnDedup += fnsSize*zipRatio;
                 oldFnOrders.push(curFnOrder);
-                console.log(`fn-match: ${storeKey}`)
+                program.verbose &&  console.log(`fn-match: ${storeKey}`)
             }
 
             var newUnion = mergeFns(oldUnion, curfns);
@@ -211,10 +201,10 @@ var queryAndUpdateStore = function(filesData, store, page, pageMD){
 
             // if union is updated, update union length;
             if (newUnion.length > oldUnion.length){
-                console.log(`union: ${storeKey}`)
+                program.verbose &&  console.log(`union: ${storeKey}`)
                 var unionLen = utils.sumFnSizes(newUnion, curIds);
-                fnUnion += unionLen;
-                store.fnUnion += unionLen;
+                fnUnion += unionLen*zipRatio;
+                store.fnUnion += unionLen*zipRatio;
                 oldVersion[4]++; // update the number of unions
 
                 pageMD.cSize.union += CRAWL_ENTRY_LEN + (getUnionIds(newUnion) + '').length; //update crawl index
@@ -231,16 +221,16 @@ var queryAndUpdateStore = function(filesData, store, page, pageMD){
             ];
 
             //unique file
-            fileDedup += curfileInfo.length;
-            store.fileDedup += curfileInfo.length;
+            fileDedup += curfileInfo.rlength;
+            store.fileDedup += curfileInfo.rlength;
 
-            fnDedup += fnsSize;
-            store.fnDedup += fnsSize;
-            console.log(`fn-match: ${storeKey}`)
+            fnDedup += fnsSize*zipRatio;
+            store.fnDedup += fnsSize*zipRatio;
+            program.verbose &&  console.log(`fn-match: ${storeKey}`)
 
-            fnUnion += fnsSize;
-            store.fnUnion += fnsSize;
-            console.log(`union: ${storeKey}`)
+            fnUnion += fnsSize*zipRatio;
+            store.fnUnion += fnsSize*zipRatio;
+            program.verbose &&  console.log(`union: ${storeKey}`)
 
             pageMD.cSize.orig += CRAWL_ENTRY_LEN
             pageMD.cSize.union += CRAWL_ENTRY_LEN + (getUnionIds(curfns) + '').length; // updating crawl index
@@ -248,12 +238,12 @@ var queryAndUpdateStore = function(filesData, store, page, pageMD){
             pageMD.cWrites.union++
         }
 
-        fileTotal += curfileInfo.length;
-        store.fileTotal += curfileInfo.length;
-        fnTotal += fnsSize;
-        store.fnTotal += fnsSize;
+        fileTotal += curfileInfo.rlength;
+        store.fileTotal += curfileInfo.rlength;
+        fnTotal += fnsSize*zipRatio;
+        store.fnTotal += fnsSize*zipRatio;
     });
-    console.log(`filetotal: ${fileTotal} fileDedup: ${fileDedup} fnTotal: ${fnTotal} fnDedup: ${fnDedup} fnUnion ${fnUnion}`);
+    program.verbose &&  console.log(`filetotal: ${fileTotal} fileDedup: ${fileDedup} fnTotal: ${fnTotal} fnDedup: ${fnDedup} fnUnion ${fnUnion}`);
 }
 
 var processFnUnion = function(store){
@@ -261,7 +251,8 @@ var processFnUnion = function(store){
     Object.keys(store.entries).forEach((entry)=>{
         var [oldFnOrders, oldUnion, oldIds, oldfileInfo, unionCount] = store.entries[entry];
         var _size = utils.sumFnSizes(oldUnion, oldIds);
-        size += _size;
+        var zipRatio = oldfileInfo.zipRatio;
+        size += _size*zipRatio;
     });
     return size;
 }
@@ -278,8 +269,7 @@ var processPageMD = function(store, perPageMD){
         pageMD.sSize.union = files.length*SERVING_ENTRY_LEN + (nUnion-files.length)*SERVING_ENTRY_APPEND
         //delete the files data
     });
-    var suffix = program.filter ? '.filter' :'';
-    fs.writeFileSync(`${program.output}/pageMD${suffix}`, JSON.stringify(perPageMD));
+    fs.writeFileSync(`${program.output}`, JSON.stringify(perPageMD));
 
 }
 
@@ -301,16 +291,17 @@ var dedupAnalysis = function(){
         if (path == '') return;
         // get source files
         var srcDir = `${program.dir}/${path}`;
-        var jsFiles = fs.readdirSync(srcDir).filter(e=>e.indexOf('hash')>=0);
         // get all functions
-        var _execFns = parse(`${program.performance}/${path}/allFns`), _evtCG,
+        try {
+            var _execFns = parse(`${program.performance}/${path}/allFns`), _evtCG,
             execFns = [...new Set(_execFns.preload.concat(_execFns.postload))];
 
-        try {
+        
             _evtCG = parse(`${program.performance}/${path}/hybridcg`)
             program.verbose && console.log(`Adding evt graph: ${_evtCG.length}`);
             execFns = [...new Set(execFns.concat(_evtCG))]
         } catch (e) {
+            execFns = [];
             //pass nothing can be done, no event handler graph
         }
 
