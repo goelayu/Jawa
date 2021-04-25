@@ -86,9 +86,10 @@ var dedupMime = function(mimeData, jsData, store, path, page, pageMD){
     jsData.forEach((file)=>{
         var fileDir = `${path}/${file}`;
         // var content = fs.readFileSync(`${fileDir}/content`);
-        var size = fs.statSync(`${fileDir}/content`).size;
+        var size;
         var fileInfo;
         try {
+            size = fs.statSync(`${fileDir}/content`).size;
             fileInfo = JSON.parse(fs.readFileSync(`${fileDir}/${file}`));
         } catch (e){
             return;
