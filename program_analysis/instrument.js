@@ -103,7 +103,8 @@ function instrumentHTML(src, filename){
 
     var preStr = postStr = "";
     if (doctypeMatch){
-        preStr = doctypeMatch[0];
+        var preInd = src.indexOf(doctypeMatch[0]);
+        preStr = src.slice(0,preInd);
         postStr = src.slice(preStr.length);
     } else if (headIndx){
         preStr = src.slice(0,headIndx+6);
