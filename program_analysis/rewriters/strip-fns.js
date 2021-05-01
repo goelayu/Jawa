@@ -30,6 +30,9 @@ function instrument(src, options){
      * Construct AST from the source string
      */
 
+    if (!keepFns.length)
+        return src;
+
     var ASTNodes = [], 
      instSrc = getNodes(src, ASTNodes);
 

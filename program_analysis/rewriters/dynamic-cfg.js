@@ -63,7 +63,8 @@ function instrument(src, options){
                         try{
                             __tracer.__enter__('${id}');
                             ${nodeBody}
-                        } finally {
+                        } catch (e){}
+                        finally {
                             __tracer.__exit__();
                         }
                     }`
