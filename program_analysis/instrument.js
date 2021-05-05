@@ -3,6 +3,7 @@
 const fs = require('fs'),
     program = require('commander'),
     vm = require('vm');
+const { report } = require('process');
 
 program
     .version("0.1.0")
@@ -10,6 +11,7 @@ program
     .option("-n, --name [name]", "name of the file being instrumented")
     .option("-t , --type [type]", "[HTML | Javascript (js)]", "html")
     .option('-r, --rewriter [rewriter]', 'type of static rewriter to use')
+    .option('--fns [fns]','path to file containing relevant functions')
     .parse(process.argv)
 
 
@@ -27,7 +29,8 @@ function IsJsonString(str) {
 }
 
 function initRewriter(){
-    rewriter = require(`./rewriters/${program.rewriter}`);
+    rewriter = program.fns ? 
+        require(`./rewriters/strip-fns`) : require(`./rewriters/dynamic-cfg`);
 }
 
 function getTracerObj(){
@@ -35,7 +38,9 @@ function getTracerObj(){
 }
 
 function instrumentHTML(src, filename){
-
+    if (program.fns){
+        return src;
+    }
     var isHtml;
     try {
         var script = new vm.Script(src);
@@ -128,8 +133,50 @@ function instrumentHTML(src, filename){
 }
 
 function dumpMD(){
+    var dumpData = program.fns ? {} : rewriter.metadata.allFnIds;
     // dumps the metadata information post instrumentation
-    fs.writeFileSync(returnInfoFile, JSON.stringify(rewriter.metadata.allFnIds));
+    fs.writeFileSync(returnInfoFile, JSON.stringify(dumpData));
+}
+
+var mergeValsArr = function(dict){
+    /**
+     * Takes a dictionary where values are arrays
+     * and merges them together in a single array
+     */
+
+    var arr = [];
+    Object.values(dict).forEach((val)=>{
+        if (!Array.isArray(val)) return;
+        arr = arr.concat(val);
+    });
+    //add the keys as well since they are the root of the call gaphs
+    arr = arr.concat(Object.keys(dict).map(e=>e.split(';;;;')[1]));
+    return arr;
+}
+
+var getEVTFns = function(path){
+    var nGraphs = 10, fns = new Set;
+    try {   
+        for (var i =0; i<10;i++){
+            var evtFile = `${path}/cg${i}`,
+                evt = JSON.parse(fs.readFileSync(evtFile, 'utf-8'));
+            var _fns = mergeValsArr(evt);
+            _fns.forEach(fns.add, fns);
+        }
+    } catch (err) {}
+    console.log(`evt graph of size ${fns.size}`);
+    return [...fns];
+}
+
+var getAllFns = function(path){
+    var execFns = [];
+    try {
+        var fnFile = `${path}/allFns`;
+        var _execFns = JSON.parse(fs.readFileSync(fnFile,"utf-8")), _evtCG,
+        execFns = [...new Set(_execFns.preload.concat(_execFns.postload))];
+        execFns = execFns.concat(getEVTFns(path));
+    } catch (err) {};
+    return execFns;
 }
 
 function instrumentJavaScript(src, options, jsInHTML){
@@ -139,7 +186,11 @@ function instrumentJavaScript(src, options, jsInHTML){
         // else 
         return src;
     }
-    // console.log(`instrumenting src`)
+    if (program.fns){
+        var allfns = getAllFns(program.fns)
+         options.fns = allfns.filter(e=>e.indexOf(options.filename)>=0);
+
+    }
     try {
         src = rewriter.instrument(src, options);
     } catch (e) {

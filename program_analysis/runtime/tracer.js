@@ -5,6 +5,12 @@
 
 (function Intercepts(){
 
+    //preserve original functions
+
+    var dummyIframe = document.createElement('iframe');
+    document.head.appendChild(dummyIframe);
+    window.__Set = dummyIframe.contentWindow.Set;
+
     var _fetchSend = window.fetch;
         // override the native send()
     window.fetch = function(){
@@ -151,8 +157,8 @@ function __declareTracer__(){
             executionCounter = {},
             evtFns = {},
             allFns = {
-                preload: new Set,
-                postload: new Set
+                preload: new window.__Set,
+                postload: new window.__Set
             },
             captureMode = 'preload', // can be either preload or postload
             curEvt = null;
@@ -167,7 +173,6 @@ function __declareTracer__(){
             // var invocId = `${id}_count${executionCounter[id]}`;
             // callGraph[invocId] = [];
             // callStack.push(invocId);
-            callStack.push(`${curEvt};;;;${id}`);
             // if (shadowStackHead)
                 // callGraph[shadowStackHead].push(invocId);
             // shadowStackHead = invocId;
@@ -179,9 +184,10 @@ function __declareTracer__(){
             allFns[captureMode].add(id);
 
             if (!curEvt) return;
+            callStack.push(`${curEvt};;;;${id}`);
             // Store functions reachable from event handlers
             if (callStack.length == 1)
-                evtFns[`${curEvt};;;;${id}`] = new Set;
+                evtFns[`${curEvt};;;;${id}`] = new window.__Set;
             else {
                 var rootEvt = callStack[0];
                 evtFns[rootEvt].add(id);

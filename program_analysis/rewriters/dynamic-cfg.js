@@ -46,14 +46,19 @@ function instrument(src, options){
     try {
         ASTNodes.forEach((node)=>{
             if (node.type == 'Program'){
-                var tracerCheck = `\n(function(){if (typeof __tracer == 'undefined' && typeof window != 'undefined')
-                    { __tracer = window.top.__tracer;
+                var tracerCheck = `\n(function(){if (typeof __tracer == 'undefined')
+                    { 
+                        if (typeof window != 'undefined') __tracer = window.top.__tracer;
+                        else {__tracer = {__enter__:function(){}, __exit__:function(){}}}
                     }
                     })();\n`;
                 node.update(`${tracerCheck} ${node.source()}`);
             } else if (node.type == 'FunctionDeclaration' || node.type == 'FunctionExpression'){
                 var nodeBody = node.body.source().substring(1, node.body.source().length-1);
+                var hackForTDecl = 'The "original" argument must be of type Function';
+                if (nodeBody.indexOf(hackForTDecl)>=0) return;
                 var id = makeId(filename,node, offset);
+                if (id.indexOf('vendor')>=0) return;
                 var idLen = id.split('-').length;
                 var ln = Number.parseInt(id.split('-')[idLen - 4])
                 var nodeAttr = node.attr;
