@@ -13,6 +13,8 @@
 !deps/*
 !filter-lists/
 !filter-lists/*
+!data/
+!data/plot/*
 !eval
 !eval/*
 !*js

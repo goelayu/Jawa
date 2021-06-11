@@ -1,0 +1,3733 @@
+Starting mitm proxy
+goelayu   2992 41.0  0.5 876816 46788 pts/14   Rl   21:51   0:00 node mitm-proxy.js
+Launching site http://cnn.com
+(node:3005) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Timer fired before page could be loaded Error: net::ERR_PROXY_CONNECTION_FAILED at http://cnn.com
+    at navigate (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/FrameManager.js:115:23)
+    at process._tickCallback (internal/process/next_tick.js:68:7)
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+rm: cannot remove '/tmp/webarchive/*': No such file or directory
+goelayu   2992 19.0  0.7 888804 58696 pts/14   Dl   21:51   0:00 node mitm-proxy.js
+Launching site http://www.nytimes.com
+(node:3096) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 6.467982 .Length: 37230
+Injection time: 0 749.842389 .Length: 704241
+Injection time: 0 18.150756 .Length: 10877
+Injection time: 0 0.114848 .Length: 837
+Injection time: 0 1.191027 .Length: 623
+Injection time: 0 0.130796 .Length: 47
+Injection time: 0 0.230214 .Length: 77
+Injection time: 0 752.703054 .Length: 664119
+Injection time: 0 348.327126 .Length: 275414
+Injection time: 0 136.710355 .Length: 1079347
+Injection time: 0 0.098987 .Length: 112
+Injection time: 0 161.472622 .Length: 51
+Injection time: 0 0.469516 .Length: 320
+Injection time: 0 0.122595 .Length: 7324
+Injection time: 0 0.244723 .Length: 61052
+Injection time: 0 0.675699 .Length: 616
+Injection time: 0 0.51478 .Length: 814
+Injection time: 0 0.131592 .Length: 1969
+Injection time: 0 14.036861 .Length: 43469
+Injection time: 0 0.17929 .Length: 5431
+Injection time: 0 0.203024 .Length: 12612
+Injection time: 0 93.042597 .Length: 72907
+Injection time: 0 20.601151 .Length: 20253
+Injection time: 0 20.361745 .Length: 30814
+Injection time: 0 0.081359 .Length: 1220
+Injection time: 0 64.706567 .Length: 45471
+Site loaded
+extracting handlers
+http://www.nytimes.com Time EVT 0 25.3606
+extract graph 0 with 6 nodes
+extract graph 1 with 3 nodes
+extract graph 2 with 3 nodes
+extract graph 3 with 3 nodes
+extract graph 4 with 3 nodes
+extract graph 5 with 3 nodes
+extract graph 6 with 3 nodes
+extract graph 7 with 3 nodes
+extract graph 8 with 3 nodes
+extract graph 9 with 3 nodes
+Comparing learnt 1 of size 6 with eval 2 of size 6
+Done
+http://www.nytimes.com Time Static 0 779.105801
+goelayu   2992 58.5  5.0 1516632 398952 pts/14 Sl   21:51   0:08 node mitm-proxy.js
+Launching site http://www.theguardian.com
+(node:3402) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 116.060577 .Length: 95798
+Injection time: 0 0.148389 .Length: 136
+Injection time: 0 269.76356 .Length: 152873
+Injection time: 0 1.192474 .Length: 962
+Injection time: 0 2.880387 .Length: 962
+Injection time: 0 1.091975 .Length: 962
+Injection time: 0 1.141 .Length: 968
+Timer fired before page could be loaded { TimeoutError: Navigation timeout of 100000 ms exceeded
+    at Promise.then (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/LifecycleWatcher.js:106:111) name: 'TimeoutError' }
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+goelayu   2992  9.0  1.5 1268660 119256 pts/14 Sl   21:51   0:10 node mitm-proxy.js
+Launching site http://www.news.google.com/
+(node:5077) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 67.006199 .Length: 17049
+Injection time: 0 126.406915 .Length: 31857
+Injection time: 0 33.540045 .Length: 14725
+Injection time: 0 711.493236 .Length: 450625
+Injection time: 0 34.913685 .Length: 23260
+Injection time: 0 361.403829 .Length: 242219
+Injection time: 0 167.385383 .Length: 102394
+Injection time: 0 1.278446 .Length: 538
+Injection time: 0 14.82527 .Length: 12303
+Site loaded
+extracting handlers
+error while launchig Error: Evaluation failed: TypeError: Cannot read property 'setTracingMode' of undefined
+    at triggerEvents (<anonymous>:120:21)
+    at __puppeteer_evaluation_script__:1:8
+goelayu   2992 11.7  3.8 1421320 305104 pts/14 Sl   21:51   0:13 node mitm-proxy.js
+Launching site http://www.washingtonpost.com
+Injection time: 0 62.698514 .Length: 42903
+(node:5263) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 0.284775 .Length: 72
+Injection time: 0 11.863814 .Length: 1868
+Injection time: 0 164.033342 .Length: 65349
+Injection time: 0 366.603797 .Length: 242878
+Injection time: 1 266.410196 .Length: 1126989
+Injection time: 0 43.078748 .Length: 22202
+Error while instrumenting source: TypeError: Cannot read property 'totalLen' of undefined
+Injection time: 0 334.142104 .Length: 280299
+Injection time: 0 58.997624 .Length: 38262
+Injection time: 0 574.957843 .Length: 531535
+Injection time: 0 9.208191 .Length: 10975
+Injection time: 0 1.843589 .Length: 1358
+proxy error: { Error: read ECONNRESET
+    at TLSWrap.onread (net.js:659:25) errno: 'ECONNRESET', code: 'ECONNRESET', syscall: 'read' }
+Timer fired before page could be loaded { TimeoutError: Navigation timeout of 100000 ms exceeded
+    at Promise.then (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/LifecycleWatcher.js:106:111) name: 'TimeoutError' }
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+goelayu   2992  9.6  1.6 1278632 130332 pts/14 Sl   21:51   0:21 node mitm-proxy.js
+Launching site http://www.bbc.co.uk/news/
+(node:6688) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 85.739143 .Length: 17372
+Injection time: 0 46.092517 .Length: 9102
+Injection time: 0 11.901258 .Length: 919
+Injection time: 0 68.957287 .Length: 19559
+Injection time: 0 12.382357 .Length: 4969
+Injection time: 0 9.087561 .Length: 5548
+Injection time: 0 2.200541 .Length: 1390
+Injection time: 0 26.899601 .Length: 17605
+Injection time: 0 13.116372 .Length: 14598
+Injection time: 0 14.117404 .Length: 6772
+Injection time: 0 15.901873 .Length: 13291
+Injection time: 0 21.226054 .Length: 20123
+Injection time: 0 25.508448 .Length: 18100
+Injection time: 0 547.735158 .Length: 361648
+Injection time: 0 1.444248 .Length: 3200
+Injection time: 0 1.894129 .Length: 2888
+Injection time: 0 9.445095 .Length: 1604
+Site loaded
+extracting handlers
+http://www.bbc.co.uk/news/ Time EVT 0 433.491517
+extract graph 0 with 81 nodes
+extract graph 1 with 81 nodes
+extract graph 2 with 81 nodes
+extract graph 3 with 81 nodes
+extract graph 4 with 81 nodes
+extract graph 5 with 81 nodes
+extract graph 6 with 81 nodes
+extract graph 7 with 81 nodes
+extract graph 8 with 81 nodes
+extract graph 9 with 81 nodes
+Comparing learnt 1 of size 99 with eval 2 of size 81
+Done
+http://www.bbc.co.uk/news/ Time Static 0 318.39252
+goelayu   2992 10.5  3.3 1378800 262796 pts/14 Sl   21:51   0:24 node mitm-proxy.js
+Launching site http://www.indiatimes.com
+(node:6900) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 76.829883 .Length: 60060
+Injection time: 0 4.804632 .Length: 3500
+Injection time: 0 520.789763 .Length: 334144
+Injection time: 0 731.385157 .Length: 1028394
+Injection time: 0 47.570416 .Length: 18957
+Site loaded
+extracting handlers
+http://www.indiatimes.com Time EVT 0 73.472982
+extract graph 0 with 53 nodes
+extract graph 1 with 53 nodes
+extract graph 2 with 53 nodes
+extract graph 3 with 53 nodes
+extract graph 4 with 53 nodes
+extract graph 5 with 53 nodes
+extract graph 6 with 53 nodes
+extract graph 7 with 53 nodes
+extract graph 8 with 53 nodes
+extract graph 9 with 53 nodes
+Comparing learnt 1 of size 53 with eval 2 of size 53
+Done
+http://www.indiatimes.com Time Static 0 488.32778
+goelayu   2992 11.8  4.4 1470868 355812 pts/14 Sl   21:51   0:27 node mitm-proxy.js
+Launching site http://www.news.yahoo.com
+(node:7059) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 9.890604 .Length: 3075
+Injection time: 0 33.522739 .Length: 18614
+Injection time: 0 60.437583 .Length: 48857
+Injection time: 0 330.826378 .Length: 208087
+Injection time: 0 186.516998 .Length: 141786
+Injection time: 0 620.231827 .Length: 497159
+Injection time: 0 87.336013 .Length: 78753
+Injection time: 0 4.838749 .Length: 5500
+Injection time: 0 827.232689 .Length: 834393
+Injection time: 0 33.009387 .Length: 18715
+Injection time: 0 4.675077 .Length: 5568
+Injection time: 0 421.104501 .Length: 399821
+Injection time: 0 37.854148 .Length: 30072
+Injection time: 0 14.967209 .Length: 14495
+Injection time: 0 12.14344 .Length: 8008
+Injection time: 0 17.75415 .Length: 16923
+Injection time: 0 13.636496 .Length: 12619
+Injection time: 0 15.081871 .Length: 14326
+Injection time: 0 12.316362 .Length: 12554
+Injection time: 0 31.471142 .Length: 21557
+Injection time: 0 10.156758 .Length: 8372
+Injection time: 0 1.093755 .Length: 1017
+Injection time: 0 7.171473 .Length: 8374
+Injection time: 0 170.848901 .Length: 129217
+Injection time: 0 22.21956 .Length: 9000
+Injection time: 0 23.415453 .Length: 15022
+Injection time: 0 0.235918 .Length: 163
+Injection time: 0 0.351711 .Length: 281
+Injection time: 0 147.036472 .Length: 166727
+Injection time: 0 44.057616 .Length: 14189
+Injection time: 0 0.262477 .Length: 212
+Injection time: 0 0.65292 .Length: 734
+Injection time: 0 24.9832 .Length: 23112
+Injection time: 0 165.429452 .Length: 162343
+Injection time: 0 0.456911 .Length: 337
+Injection time: 0 0.531251 .Length: 187
+Injection time: 0 17.047961 .Length: 10264
+Injection time: 0 8.556498 .Length: 3826
+Injection time: 0 11.086377 .Length: 8683
+Injection time: 0 7.23891 .Length: 13304
+Injection time: 0 29.46889 .Length: 26882
+Injection time: 0 16.457998 .Length: 6639
+Injection time: 0 37.368215 .Length: 36058
+Injection time: 0 0.669517 .Length: 798
+Injection time: 0 4.52752 .Length: 5224
+Injection time: 0 57.100283 .Length: 75726
+Injection time: 0 51.095087 .Length: 50073
+Injection time: 0 7.317329 .Length: 3741
+Site loaded
+extracting handlers
+http://www.news.yahoo.com Time EVT 0 93.459834
+extract graph 0 with 260 nodes
+extract graph 1 with 194 nodes
+extract graph 2 with 194 nodes
+extract graph 3 with 194 nodes
+extract graph 4 with 194 nodes
+extract graph 5 with 194 nodes
+extract graph 6 with 194 nodes
+extract graph 7 with 194 nodes
+extract graph 8 with 194 nodes
+extract graph 9 with 194 nodes
+Comparing learnt 1 of size 568 with eval 2 of size 260
+Done
+http://www.news.yahoo.com Time Static 4 207.158035
+goelayu   2992 14.5  2.8 1343216 228764 pts/14 Sl   21:51   0:36 node mitm-proxy.js
+Launching site http://www.forbes.com
+(node:7293) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 67.669955 .Length: 95393
+Injection time: 0 123.903405 .Length: 107912
+Injection time: 0 229.257934 .Length: 269944
+Site loaded
+extracting handlers
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 14.7  2.9 1346908 231712 pts/14 Sl   21:51   0:37 node mitm-proxy.js
+Launching site http://www.foxnews.com
+(node:7421) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 3.880697 .Length: 720
+Injection time: 0 72.803031 .Length: 78450
+Injection time: 0 3.819838 .Length: 547
+Injection time: 0 342.08162 .Length: 281208
+Injection time: 0 10.066399 .Length: 2623
+Injection time: 0 310.770255 .Length: 220282
+Injection time: 0 2.405316 .Length: 1900
+Injection time: 0 85.122685 .Length: 84327
+Injection time: 0 513.434889 .Length: 438918
+Injection time: 0 100.315827 .Length: 91063
+Injection time: 0 32.445589 .Length: 25064
+Injection time: 0 0.44369 .Length: 207
+Injection time: 0 115.418823 .Length: 83692
+Injection time: 0 204.715596 .Length: 271987
+Injection time: 0 30.143009 .Length: 13924
+Injection time: 0 344.533031 .Length: 281208
+Injection time: 0 1.902201 .Length: 1682
+Injection time: 0 0.481714 .Length: 463
+Injection time: 0 68.125439 .Length: 70722
+Injection time: 0 61.650281 .Length: 65407
+Injection time: 0 6.702181 .Length: 11872
+Injection time: 0 68.905222 .Length: 64431
+Injection time: 0 939.870482 .Length: 773272
+Injection time: 0 1.357302 .Length: 976
+Injection time: 0 128.619782 .Length: 86233
+Injection time: 0 121.417127 .Length: 86256
+Injection time: 0 1.010624 .Length: 1106
+Injection time: 0 0.156434 .Length: 64
+Injection time: 0 3.767273 .Length: 1945
+Injection time: 0 25.090956 .Length: 31909
+Injection time: 0 1.411189 .Length: 1900
+Injection time: 0 18.88155 .Length: 13188
+Injection time: 0 0.501959 .Length: 230
+Injection time: 0 51.575124 .Length: 37654
+Injection time: 0 70.871095 .Length: 71782
+Injection time: 0 9.519726 .Length: 6331
+Injection time: 0 3.891718 .Length: 4462
+Injection time: 0 47.226393 .Length: 31909
+Injection time: 0 2.226128 .Length: 2623
+Injection time: 0 8.268687 .Length: 9354
+Injection time: 0 0.414841 .Length: 156
+Injection time: 0 0.605192 .Length: 230
+Injection time: 0 136.462928 .Length: 131373
+Injection time: 0 2.302755 .Length: 1023
+Injection time: 0 72.486013 .Length: 103233
+Injection time: 0 3.260208 .Length: 4462
+Injection time: 0 116.260884 .Length: 84930
+Injection time: 0 44.228147 .Length: 26227
+Injection time: 0 5.128298 .Length: 6364
+Injection time: 0 1.177419 .Length: 1261
+Injection time: 0 3.124979 .Length: 1041
+Injection time: 0 76.075472 .Length: 84327
+Injection time: 0 3.086263 .Length: 1282
+Injection time: 0 3.092986 .Length: 1222
+Injection time: 0 116.269715 .Length: 79613
+Injection time: 0 16.668499 .Length: 3559
+Injection time: 0 5.251526 .Length: 1553
+Injection time: 0 59.688477 .Length: 172670
+Injection time: 0 2.401764 .Length: 664
+Injection time: 0 26.073289 .Length: 6331
+Injection time: 0 2.136925 .Length: 849
+Injection time: 0 5.397487 .Length: 4410
+Injection time: 0 2.448118 .Length: 2620
+Injection time: 0 1.765209 .Length: 816
+Injection time: 0 104.119417 .Length: 65045
+Injection time: 0 4.275141 .Length: 1807
+Injection time: 0 1.701479 .Length: 1160
+Injection time: 0 43.052439 .Length: 47852
+Injection time: 0 8.600169 .Length: 9697
+Injection time: 0 53.615715 .Length: 29926
+Injection time: 0 0.850438 .Length: 669
+Injection time: 0 19.141604 .Length: 6626
+Injection time: 0 126.482883 .Length: 95931
+Injection time: 0 14.538179 .Length: 11152
+Injection time: 0 1.056668 .Length: 1696
+Injection time: 0 23.276619 .Length: 4358
+Injection time: 0 0.382701 .Length: 426
+Injection time: 0 2.631289 .Length: 876
+Injection time: 0 3.579896 .Length: 849
+Injection time: 0 378.804246 .Length: 281208
+Injection time: 0 3.879736 .Length: 3332
+Injection time: 0 0.368675 .Length: 230
+Injection time: 0 1.770303 .Length: 1900
+Injection time: 0 1.481601 .Length: 1419
+Injection time: 0 8.55413 .Length: 2684
+Injection time: 0 7.595751 .Length: 2623
+Injection time: 0 32.384458 .Length: 31909
+Injection time: 0 186.141371 .Length: 142934
+Injection time: 0 3.73359 .Length: 3706
+Injection time: 0 342.237779 .Length: 281208
+Injection time: 0 12.638781 .Length: 4462
+Injection time: 0 1.090569 .Length: 1076
+Injection time: 0 1.31972 .Length: 1450
+Injection time: 0 0.306641 .Length: 230
+Injection time: 0 2.689582 .Length: 1900
+Injection time: 0 11.473434 .Length: 2623
+Injection time: 0 38.124168 .Length: 31909
+Injection time: 0 1.771308 .Length: 3764
+Injection time: 0 6.399656 .Length: 4462
+Injection time: 0 6.97036 .Length: 2189
+Injection time: 0 9.824092 .Length: 1945
+Injection time: 0 1.770659 .Length: 1106
+Injection time: 0 2.169025 .Length: 1689
+Injection time: 0 19.290894 .Length: 6331
+Injection time: 0 1.583104 .Length: 860
+Injection time: 0 2.93104 .Length: 1023
+Injection time: 0 1.467006 .Length: 1261
+Injection time: 0 0.62868 .Length: 296
+Injection time: 0 4.047382 .Length: 1282
+Injection time: 0 12.377982 .Length: 5555
+Injection time: 0 1.587805 .Length: 565
+Injection time: 0 8.843878 .Length: 3559
+Injection time: 0 93.055 .Length: 65407
+Injection time: 0 3.295835 .Length: 4410
+Injection time: 0 4.530703 .Length: 2620
+Injection time: 0 5.663012 .Length: 1807
+Site loaded
+extracting handlers
+Injection time: 0 64.219156 .Length: 225684
+Injection time: 0 893.433368 .Length: 827193
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 19.4  5.2 1535744 421316 pts/14 Sl   21:51   0:52 node mitm-proxy.js
+Launching site http://www.weather.com
+Injection time: 0 0.83077 .Length: 547
+Injection time: 0 7.657891 .Length: 5686
+(node:7764) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+Injection time: 0 203.253868 .Length: 151772
+Injection time: 0 359.637284 .Length: 281208
+Injection time: 0 0.312995 .Length: 248
+global time out value 15000 100000
+Injection time: 0 0.213483 .Length: 72
+Injection time: 0 52.459541 .Length: 20173
+Injection time: 0 0.345341 .Length: 12573
+Injection time: 0 1.643262 .Length: 26818
+Injection time: 0 3.395942 .Length: 25519
+Injection time: 0 1.224257 .Length: 28049
+Injection time: 0 11.983175 .Length: 311804
+Injection time: 0 22.196719 .Length: 18204
+Injection time: 0 1.403278 .Length: 11285
+Injection time: 0 5.594234 .Length: 11176
+Injection time: 0 4.132639 .Length: 55761
+Injection time: 0 4.617853 .Length: 42957
+Injection time: 0 176.657868 .Length: 114664
+Injection time: 0 0.144574 .Length: 72
+Injection time: 0 1.502723 .Length: 1697
+Injection time: 0 0.6152 .Length: 2234
+Injection time: 0 9.531665 .Length: 5411
+Injection time: 0 5.416393 .Length: 15580
+Injection time: 0 0.68166 .Length: 342
+Injection time: 0 26.711118 .Length: 9377
+Injection time: 0 1.213763 .Length: 3195
+Injection time: 0 1.331196 .Length: 16355
+Injection time: 0 36.0067 .Length: 11109
+Injection time: 0 0.327898 .Length: 2223
+Injection time: 0 4.45058 .Length: 18941
+Injection time: 0 166.008248 .Length: 126119
+Injection time: 0 0.687331 .Length: 243517
+Injection time: 0 39.1497 .Length: 26475
+Injection time: 0 15.380466 .Length: 12453
+Injection time: 0 0.504254 .Length: 120053
+Injection time: 0 0.595745 .Length: 17442
+Injection time: 0 0.903844 .Length: 3011
+Injection time: 0 7.67265 .Length: 94256
+Injection time: 0 17.774396 .Length: 12456
+Injection time: 0 2.149343 .Length: 50687
+Injection time: 0 0.613571 .Length: 24811
+Injection time: 0 0.300616 .Length: 4171
+Injection time: 0 1.422253 .Length: 599
+Injection time: 0 9.65491 .Length: 659
+Site loaded
+extracting handlers
+http://www.weather.com Time EVT 0 32.050953
+extract graph 0 with 0 nodes
+extract graph 1 with 0 nodes
+extract graph 2 with 0 nodes
+extract graph 3 with 0 nodes
+extract graph 4 with 0 nodes
+extract graph 5 with 0 nodes
+extract graph 6 with 0 nodes
+extract graph 7 with 0 nodes
+extract graph 8 with 0 nodes
+extract graph 9 with 0 nodes
+Done
+http://www.weather.com Time Static 0 0.416138
+goelayu   2992 20.1  4.6 1483256 369632 pts/14 Sl   21:51   0:55 node mitm-proxy.js
+Launching site http://www.shutterstock.com
+Injection time: 0 0.50357 .Length: 1314
+(node:7847) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 44.679205 .Length: 16672
+Injection time: 0 73.184905 .Length: 72802
+Injection time: 0 120.48668 .Length: 99365
+Injection time: 0 153.009755 .Length: 297428
+Injection time: 0 627.149871 .Length: 528630
+Injection time: 0 13.480571 .Length: 13564
+Injection time: 0 45.083867 .Length: 23123
+Injection time: 0 1.180045 .Length: 5831
+Injection time: 0 17.234051 .Length: 171225
+Injection time: 0 428.667903 .Length: 324882
+Injection time: 0 4.335989 .Length: 23992
+Injection time: 0 8.720887 .Length: 73939
+Injection time: 1 418.478225 .Length: 1374761
+Injection time: 0 32.923588 .Length: 11152
+Site loaded
+extracting handlers
+Injection time: 0 3.097996 .Length: 2805
+http://www.shutterstock.com Time EVT 0 162.006859
+extract graph 0 with 55 nodes
+extract graph 1 with 55 nodes
+extract graph 2 with 55 nodes
+extract graph 3 with 55 nodes
+extract graph 4 with 55 nodes
+extract graph 5 with 55 nodes
+extract graph 6 with 55 nodes
+extract graph 7 with 55 nodes
+extract graph 8 with 55 nodes
+extract graph 9 with 55 nodes
+Injection time: 0 40.876577 .Length: 32879
+Comparing learnt 1 of size 83 with eval 2 of size 55
+Done
+http://www.shutterstock.com Time Static 1 356.620095
+goelayu   2992 21.9  6.7 1653520 539560 pts/14 Sl   21:51   1:01 node mitm-proxy.js
+Launching site http://www.huffingtonpost.com
+(node:8088) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 75.645305 .Length: 62997
+Injection time: 0 64.402239 .Length: 50275
+Injection time: 0 19.343262 .Length: 17737
+Injection time: 0 6.753625 .Length: 166445
+Injection time: 0 6.765576 .Length: 5808
+Injection time: 0 10.085683 .Length: 12041
+Injection time: 0 8.264843 .Length: 10499
+Injection time: 0 16.731302 .Length: 11908
+Injection time: 0 2.486552 .Length: 16013
+Injection time: 0 38.846539 .Length: 13737
+Injection time: 0 48.101504 .Length: 66294
+Injection time: 0 37.060269 .Length: 23103
+Injection time: 0 18.984235 .Length: 16711
+Injection time: 0 9.611682 .Length: 5292
+Injection time: 0 38.619169 .Length: 36101
+Site loaded
+extracting handlers
+http://www.huffingtonpost.com Time EVT 0 69.222457
+extract graph 0 with 13 nodes
+extract graph 1 with 13 nodes
+extract graph 2 with 13 nodes
+extract graph 3 with 13 nodes
+extract graph 4 with 13 nodes
+extract graph 5 with 13 nodes
+extract graph 6 with 13 nodes
+extract graph 7 with 13 nodes
+extract graph 8 with 13 nodes
+extract graph 9 with 13 nodes
+Comparing learnt 1 of size 18 with eval 2 of size 13
+Done
+http://www.huffingtonpost.com Time Static 0 451.645233
+goelayu   2992 21.8  7.9 1742880 628528 pts/14 Sl   21:51   1:02 node mitm-proxy.js
+Launching site http://www.accuweather.com
+(node:8242) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+proxy error: { Error: read ECONNRESET
+    at TLSWrap.onread (net.js:659:25) errno: 'ECONNRESET', code: 'ECONNRESET', syscall: 'read' }
+Timer fired before page could be loaded { TimeoutError: Navigation timeout of 100000 ms exceeded
+    at Promise.then (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/LifecycleWatcher.js:106:111) name: 'TimeoutError' }
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+rm: cannot remove '/tmp/webarchive/*': No such file or directory
+goelayu   2992 16.2  2.2 1322324 175380 pts/14 Sl   21:51   1:03 node mitm-proxy.js
+Launching site http://www.timesofindia.indiatimes.com
+(node:9682) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 188.76766 .Length: 75670
+Injection time: 0 21.664754 .Length: 21126
+Injection time: 0 418.046398 .Length: 280966
+Injection time: 0 13.306276 .Length: 3085
+Injection time: 0 55.375749 .Length: 43349
+Injection time: 0 40.973212 .Length: 32150
+Injection time: 0 10.590289 .Length: 9093
+Injection time: 0 59.438284 .Length: 55059
+Injection time: 0 385.105882 .Length: 275022
+Injection time: 0 36.589354 .Length: 12093
+Injection time: 0 123.044333 .Length: 95786
+Injection time: 0 117.636153 .Length: 92789
+Injection time: 0 11.48787 .Length: 18934
+Injection time: 1 443.027817 .Length: 1106943
+Timer fired before page could be loaded { TimeoutError: Navigation timeout of 100000 ms exceeded
+    at Promise.then (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/LifecycleWatcher.js:106:111) name: 'TimeoutError' }
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+goelayu   2992 14.3  2.2 1327652 181636 pts/14 Sl   21:51   1:09 node mitm-proxy.js
+Launching site http://www.bloomberg.com
+(node:11107) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Site loaded
+extracting handlers
+http://www.bloomberg.com Time EVT 0 56.521547
+extract graph 0 with 0 nodes
+extract graph 1 with 0 nodes
+extract graph 2 with 0 nodes
+extract graph 3 with 0 nodes
+extract graph 4 with 0 nodes
+extract graph 5 with 0 nodes
+extract graph 6 with 0 nodes
+extract graph 7 with 0 nodes
+extract graph 8 with 0 nodes
+extract graph 9 with 0 nodes
+Done
+http://www.bloomberg.com Time Static 0 0.436729
+rm: cannot remove '/tmp/webarchive/*': No such file or directory
+goelayu   2992 14.2  2.2 1327652 182196 pts/14 Sl   21:51   1:10 node mitm-proxy.js
+Launching site http://www.usatoday.com
+(node:11231) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 1.043495 .Length: 191
+Injection time: 0 152.904752 .Length: 59407
+Injection time: 0 143.572821 .Length: 77790
+Injection time: 0 205.906791 .Length: 128198
+Injection time: 0 0.119022 .Length: 1
+Site loaded
+extracting handlers
+http://www.usatoday.com Time EVT 0 15.644513
+extract graph 0 with 12 nodes
+extract graph 1 with 12 nodes
+extract graph 2 with 12 nodes
+extract graph 3 with 12 nodes
+extract graph 4 with 12 nodes
+extract graph 5 with 12 nodes
+extract graph 6 with 12 nodes
+extract graph 7 with 12 nodes
+extract graph 8 with 12 nodes
+extract graph 9 with 12 nodes
+Comparing learnt 1 of size 12 with eval 2 of size 12
+Done
+http://www.usatoday.com Time Static 0 266.04596
+goelayu   2992 14.4  3.2 1371636 257980 pts/14 Sl   21:51   1:11 node mitm-proxy.js
+Launching site http://www.wsj.com
+(node:11330) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 380.391669 .Length: 296149
+Injection time: 0 52.704066 .Length: 107720
+Injection time: 0 354.436701 .Length: 299547
+Injection time: 0 875.345928 .Length: 740856
+Injection time: 0 930.661267 .Length: 770122
+Injection time: 0 40.309348 .Length: 18588
+Injection time: 0 15.608117 .Length: 13261
+Injection time: 0 21.312267 .Length: 16566
+Injection time: 0 35.138782 .Length: 11415
+Injection time: 0 9.522403 .Length: 3892
+Injection time: 0 26.859644 .Length: 22180
+Injection time: 0 25.89903 .Length: 23547
+Injection time: 0 23.150522 .Length: 22376
+Injection time: 0 20.568894 .Length: 18455
+Injection time: 0 400.950964 .Length: 489354
+Injection time: 0 208.951469 .Length: 153032
+Injection time: 0 13.082629 .Length: 10687
+Injection time: 0 379.874225 .Length: 474161
+Injection time: 0 188.116615 .Length: 153032
+Injection time: 0 524.079499 .Length: 592002
+Injection time: 0 470.230834 .Length: 522785
+proxy error: { Error: read ECONNRESET
+    at TLSWrap.onread (net.js:659:25) errno: 'ECONNRESET', code: 'ECONNRESET', syscall: 'read' }
+proxy error: { Error: read ECONNRESET
+    at TLSWrap.onread (net.js:659:25) errno: 'ECONNRESET', code: 'ECONNRESET', syscall: 'read' }
+Injection time: 0 26.791695 .Length: 22616
+Injection time: 0 20.862604 .Length: 21475
+Injection time: 0 44.115973 .Length: 41369
+Injection time: 0 32.070903 .Length: 34459
+Injection time: 0 23.5452 .Length: 10680
+Injection time: 0 20.505605 .Length: 11114
+Injection time: 0 18.433516 .Length: 15564
+Injection time: 0 864.652738 .Length: 801101
+Injection time: 0 11.426426 .Length: 9457
+Injection time: 0 9.105358 .Length: 9960
+Injection time: 0 72.130227 .Length: 79657
+Injection time: 0 455.062475 .Length: 498424
+Injection time: 0 9.708469 .Length: 10660
+Injection time: 0 33.784293 .Length: 29033
+Injection time: 0 32.018196 .Length: 28709
+Injection time: 0 71.74185 .Length: 60649
+Injection time: 0 466.693478 .Length: 508756
+Injection time: 0 483.054645 .Length: 503093
+Injection time: 0 44.646062 .Length: 18390
+Injection time: 0 390.866696 .Length: 474197
+Injection time: 0 39.516091 .Length: 18675
+Injection time: 0 474.378452 .Length: 525367
+Injection time: 0 8.503559 .Length: 9510
+Injection time: 0 47.923638 .Length: 44279
+Injection time: 0 466.873634 .Length: 529650
+Injection time: 0 17.201158 .Length: 17725
+Injection time: 0 477.686758 .Length: 535525
+Injection time: 0 46.025015 .Length: 18662
+Injection time: 0 1.623825 .Length: 6841
+Injection time: 0 0.423132 .Length: 1081
+Injection time: 0 17.105904 .Length: 15300
+Injection time: 0 751.972506 .Length: 581253
+Injection time: 0 1.255636 .Length: 3257
+Injection time: 0 4.224974 .Length: 3913
+Injection time: 0 1.955541 .Length: 1755
+Injection time: 0 23.146732 .Length: 29714
+Injection time: 0 1.310387 .Length: 2969
+Injection time: 0 1.515841 .Length: 1366
+Injection time: 0 1.444179 .Length: 891
+Injection time: 0 11.845396 .Length: 17641
+Site loaded
+extracting handlers
+http://www.wsj.com Time EVT 0 54.960115
+extract graph 0 with 0 nodes
+extract graph 1 with 8 nodes
+extract graph 2 with 8 nodes
+extract graph 3 with 8 nodes
+extract graph 4 with 8 nodes
+extract graph 5 with 8 nodes
+extract graph 6 with 8 nodes
+extract graph 7 with 8 nodes
+extract graph 8 with 8 nodes
+extract graph 9 with 8 nodes
+Comparing learnt 1 of size 12 with eval 2 of size 8
+Done
+http://www.wsj.com Time Static 0 494.815786
+goelayu   2992 18.1  6.3 1614132 500824 pts/14 Sl   21:51   1:32 node mitm-proxy.js
+Launching site http://www.cnbc.com
+(node:11647) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 29.626799 .Length: 19772
+Injection time: 0 15.364334 .Length: 14717
+Injection time: 0 24.168706 .Length: 23729
+Injection time: 1 0.037905 .Length: 929332
+Injection time: 0 43.535726 .Length: 30472
+Injection time: 0 74.547446 .Length: 72133
+Site loaded
+extracting handlers
+Injection time: 0 25.197976 .Length: 16017
+Injection time: 0 14.020858 .Length: 10484
+Injection time: 0 18.395272 .Length: 13353
+Injection time: 0 35.442204 .Length: 47422
+http://www.cnbc.com Time EVT 0 174.892139
+extract graph 0 with 0 nodes
+extract graph 1 with 0 nodes
+extract graph 2 with 0 nodes
+extract graph 3 with 0 nodes
+extract graph 4 with 0 nodes
+extract graph 5 with 0 nodes
+extract graph 6 with 0 nodes
+extract graph 7 with 0 nodes
+extract graph 8 with 0 nodes
+extract graph 9 with 0 nodes
+Done
+http://www.cnbc.com Time Static 0 0.465154
+goelayu   2992 18.5  4.5 1470780 358744 pts/14 Rl   21:51   1:35 node mitm-proxy.js
+Launching site http://www.reuters.com
+Injection time: 0 109.91925 .Length: 176520
+proxy error: { Error: write EPIPE
+    at WriteWrap.afterWrite [as oncomplete] (net.js:835:14) errno: 'EPIPE', code: 'EPIPE', syscall: 'write' }
+Injection time: 0 8.353033 .Length: 10030
+proxy error: { Error: socket hang up
+    at TLSSocket.onSocketClose (_tls_wrap.js:765:23)
+    at TLSSocket.emit (events.js:187:15)
+    at _handle.close (net.js:598:12)
+    at Socket.done (_tls_wrap.js:383:7)
+    at Object.onceWrapper (events.js:273:13)
+    at Socket.emit (events.js:182:13)
+    at TCP._handle.close [as _onclose] (net.js:598:12) code: 'ECONNRESET' }
+Injection time: 0 44.801667 .Length: 82049
+Injection time: 0 1.438438 .Length: 1750
+(node:11801) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+Injection time: 0 212.162823 .Length: 297325
+Injection time: 0 9.392894 .Length: 4772
+Injection time: 0 49.007413 .Length: 45623
+global time out value 15000 100000
+Injection time: 0 173.246161 .Length: 213743
+Injection time: 0 310.390097 .Length: 314681
+Injection time: 0 21.131651 .Length: 19873
+Injection time: 0 112.160904 .Length: 91730
+Injection time: 1 690.022913 .Length: 1619531
+Site loaded
+extracting handlers
+http://www.reuters.com Time EVT 0 76.088213
+extract graph 0 with 56 nodes
+extract graph 1 with 54 nodes
+extract graph 2 with 54 nodes
+extract graph 3 with 54 nodes
+extract graph 4 with 54 nodes
+extract graph 5 with 54 nodes
+extract graph 6 with 54 nodes
+extract graph 7 with 54 nodes
+extract graph 8 with 54 nodes
+extract graph 9 with 54 nodes
+Comparing learnt 1 of size 129 with eval 2 of size 56
+Done
+http://www.reuters.com Time Static 6 296.86644
+goelayu   2992 19.3  9.2 1851592 737972 pts/14 Sl   21:51   1:41 node mitm-proxy.js
+Launching site http://www.wunderground.com
+(node:12050) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 6.910306 .Length: 4410
+Injection time: 1 329.202189 .Length: 1017264
+Error while instrumenting source: TypeError: Cannot read property 'totalLen' of undefined
+Injection time: 0 77.711878 .Length: 73779
+Injection time: 0 158.814607 .Length: 128441
+Injection time: 0 34.590624 .Length: 19836
+Injection time: 0 33.947037 .Length: 33848
+Injection time: 0 42.032483 .Length: 48149
+Injection time: 0 33.756865 .Length: 11145
+Injection time: 0 160.196839 .Length: 113875
+Injection time: 0 7.595486 .Length: 10121
+Injection time: 0 24.544855 .Length: 25749
+Injection time: 0 37.426409 .Length: 40918
+Injection time: 0 45.00283 .Length: 19215
+Injection time: 0 9.230164 .Length: 6292
+Injection time: 0 50.641439 .Length: 44070
+Injection time: 0 172.68405 .Length: 148616
+Injection time: 0 203.048513 .Length: 249060
+Injection time: 0 176.001334 .Length: 111458
+Injection time: 0 78.77924 .Length: 55667
+Injection time: 0 100.059054 .Length: 141900
+Site loaded
+extracting handlers
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 20.1  5.3 1531612 423080 pts/14 Sl   21:51   1:46 node mitm-proxy.js
+Launching site http://www.money.cnn.com
+(node:12232) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 398.153899 .Length: 329597
+Injection time: 0 31.108926 .Length: 12819
+Injection time: 1 801.355097 .Length: 1366479
+Injection time: 0 822.070214 .Length: 896122
+Injection time: 1 472.951338 .Length: 1221640
+Injection time: 0 15.88846 .Length: 12488
+Injection time: 0 148.149051 .Length: 90111
+Injection time: 0 8.827706 .Length: 10167
+Injection time: 0 14.698052 .Length: 14203
+Injection time: 0 1.331171 .Length: 1330
+Injection time: 0 4.792233 .Length: 2998
+Injection time: 0 6.175308 .Length: 2109
+Injection time: 0 3.554226 .Length: 1416
+Injection time: 0 43.120549 .Length: 17541
+Injection time: 0 39.519216 .Length: 87406
+Injection time: 0 53.419886 .Length: 102789
+Injection time: 0 63.175605 .Length: 83186
+Injection time: 0 592.880185 .Length: 677073
+Injection time: 0 15.610347 .Length: 16049
+Injection time: 0 80.86175 .Length: 82322
+Injection time: 0 27.736007 .Length: 16622
+Injection time: 0 212.692623 .Length: 181054
+Site loaded
+extracting handlers
+http://www.money.cnn.com Time EVT 0 262.980391
+extract graph 0 with 242 nodes
+extract graph 1 with 220 nodes
+extract graph 2 with 220 nodes
+extract graph 3 with 220 nodes
+extract graph 4 with 225 nodes
+extract graph 5 with 220 nodes
+extract graph 6 with 220 nodes
+extract graph 7 with 225 nodes
+extract graph 8 with 225 nodes
+extract graph 9 with 225 nodes
+Comparing learnt 1 of size 1704 with eval 2 of size 242
+Done
+http://www.money.cnn.com Time Static 22 653.78044
+goelayu   2992 21.2  3.1 1394004 251036 pts/14 Sl   21:51   1:59 node mitm-proxy.js
+Launching site http://www.time.com
+(node:12886) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 271.374518 .Length: 115954
+Injection time: 0 1.686341 .Length: 850
+Injection time: 0 69.39038 .Length: 45345
+Injection time: 0 181.511937 .Length: 103983
+Injection time: 0 171.084502 .Length: 159791
+Injection time: 0 568.743896 .Length: 342680
+Injection time: 0 9.538385 .Length: 8042
+Injection time: 0 4.807866 .Length: 10592
+Injection time: 0 15.409299 .Length: 7827
+Injection time: 0 12.901367 .Length: 14506
+Injection time: 0 9.2957 .Length: 5829
+Injection time: 0 18.313284 .Length: 7394
+Injection time: 0 43.093261 .Length: 47144
+Injection time: 0 33.096289 .Length: 138823
+Injection time: 0 4.552285 .Length: 11982
+Site loaded
+extracting handlers
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 21.6  6.0 1590688 481448 pts/14 Sl   21:51   2:02 node mitm-proxy.js
+Launching site http://www.drudgereport.com
+(node:12966) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 4.44278 .Length: 2465
+Injection time: 0 124.296108 .Length: 88145
+Site loaded
+extracting handlers
+http://www.drudgereport.com Time EVT 0 46.610668
+extract graph 0 with 0 nodes
+extract graph 1 with 0 nodes
+extract graph 2 with 0 nodes
+extract graph 3 with 0 nodes
+extract graph 4 with 0 nodes
+extract graph 5 with 0 nodes
+extract graph 6 with 0 nodes
+extract graph 7 with 0 nodes
+extract graph 8 with 0 nodes
+extract graph 9 with 0 nodes
+Done
+http://www.drudgereport.com Time Static 0 1.25864
+goelayu   2992 21.6  6.2 1601248 493064 pts/14 Sl   21:51   2:03 node mitm-proxy.js
+Launching site http://www.chron.com
+(node:13113) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 0.193744 .Length: 72
+Injection time: 0 27.04496 .Length: 12553
+Injection time: 0 24.988999 .Length: 18469
+Injection time: 0 134.779868 .Length: 85577
+Injection time: 0 3.498964 .Length: 2073
+Injection time: 0 96.897874 .Length: 66740
+Injection time: 0 47.625592 .Length: 75111
+Injection time: 0 543.367045 .Length: 390233
+Injection time: 0 1.349401 .Length: 2294
+Injection time: 0 8.320069 .Length: 4708
+Injection time: 0 0.084299 .Length: 72
+Injection time: 0 11.50931 .Length: 3561
+Injection time: 0 6.49134 .Length: 2978
+Injection time: 0 120.473872 .Length: 584044
+Site loaded
+extracting handlers
+http://www.chron.com Time EVT 0 265.228529
+extract graph 0 with 109 nodes
+extract graph 1 with 112 nodes
+extract graph 2 with 112 nodes
+extract graph 3 with 112 nodes
+extract graph 4 with 112 nodes
+extract graph 5 with 112 nodes
+extract graph 6 with 112 nodes
+extract graph 7 with 112 nodes
+extract graph 8 with 112 nodes
+extract graph 9 with 112 nodes
+Comparing learnt 1 of size 194 with eval 2 of size 121
+Comparing learnt 2 of size 228 with eval 4 of size 121
+Done
+http://www.chron.com Time Static 1 192.611506
+goelayu   2992 21.8  6.0 1591564 483200 pts/14 Sl   21:51   2:05 node mitm-proxy.js
+Launching site http://www.usnews.com
+(node:13288) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+proxy error: { Error: read ECONNRESET
+    at TLSWrap.onread (net.js:659:25) errno: 'ECONNRESET', code: 'ECONNRESET', syscall: 'read' }
+Timer fired before page could be loaded { TimeoutError: Navigation timeout of 100000 ms exceeded
+    at Promise.then (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/LifecycleWatcher.js:106:111) name: 'TimeoutError' }
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+rm: cannot remove '/tmp/webarchive/*': No such file or directory
+goelayu   2992 18.7  3.2 1399624 258268 pts/14 Sl   21:51   2:06 node mitm-proxy.js
+Launching site http://www.cbsnews.com
+(node:14724) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 38.514305 .Length: 608698
+Injection time: 0 177.863747 .Length: 62696
+Injection time: 0 93.267587 .Length: 57024
+Injection time: 0 305.548353 .Length: 185862
+Site loaded
+extracting handlers
+http://www.cbsnews.com Time EVT 0 44.508451
+extract graph 0 with 3 nodes
+extract graph 1 with 1 nodes
+extract graph 2 with 1 nodes
+extract graph 3 with 1 nodes
+extract graph 4 with 1 nodes
+extract graph 5 with 1 nodes
+extract graph 6 with 1 nodes
+extract graph 7 with 1 nodes
+extract graph 8 with 1 nodes
+extract graph 9 with 1 nodes
+Injection time: 0 0.99497 .Length: 20933
+Injection time: 0 93.946392 .Length: 62696
+Injection time: 0 62.604251 .Length: 57024
+Comparing learnt 1 of size 3 with eval 2 of size 3
+Done
+http://www.cbsnews.com Time Static 0 276.385711
+goelayu   2992 19.0  5.6 1559196 450120 pts/14 Rl   21:51   2:08 node mitm-proxy.js
+Launching site http://www.thehill.com
+(node:14815) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 1 285.700889 .Length: 992958
+proxy error: { Error: write EPIPE
+    at WriteWrap.afterWrite [as oncomplete] (net.js:835:14) errno: 'EPIPE', code: 'EPIPE', syscall: 'write' }
+Injection time: 0 141.246967 .Length: 114546
+Injection time: 1 96.283686 .Length: 1026299
+Injection time: 0 0.246211 .Length: 72
+Injection time: 0 31.410641 .Length: 20521
+Injection time: 0 79.069348 .Length: 55418
+Injection time: 0 120.338239 .Length: 113866
+Injection time: 0 40.84831 .Length: 32723
+Injection time: 0 16.869672 .Length: 20977
+Injection time: 0 53.421413 .Length: 86106
+Injection time: 0 87.493963 .Length: 97247
+Injection time: 0 0.073584 .Length: 72
+Injection time: 0 2.481534 .Length: 3224
+Injection time: 0 385.593539 .Length: 367650
+Injection time: 0 125.242088 .Length: 84966
+Injection time: 0 231.521933 .Length: 215667
+Injection time: 0 130.705745 .Length: 79574
+Site loaded
+extracting handlers
+http://www.thehill.com Time EVT 0 89.139368
+extract graph 0 with 93 nodes
+extract graph 1 with 93 nodes
+extract graph 2 with 93 nodes
+extract graph 3 with 93 nodes
+extract graph 4 with 93 nodes
+extract graph 5 with 93 nodes
+extract graph 6 with 93 nodes
+extract graph 7 with 93 nodes
+extract graph 8 with 93 nodes
+extract graph 9 with 93 nodes
+Comparing learnt 1 of size 167 with eval 2 of size 93
+Done
+http://www.thehill.com Time Static 1 128.477411
+goelayu   2992 19.9  5.6 1557500 450380 pts/14 Sl   21:51   2:16 node mitm-proxy.js
+Launching site http://www.news.com.au
+(node:15094) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 55.78586 .Length: 27664
+Injection time: 0 115.683927 .Length: 95390
+Injection time: 0 408.552237 .Length: 275582
+Injection time: 0 1.98137 .Length: 2518
+Injection time: 0 93.452391 .Length: 74551
+Site loaded
+extracting handlers
+http://www.news.com.au Time EVT 0 129.693384
+extract graph 0 with 158 nodes
+extract graph 1 with 121 nodes
+extract graph 2 with 121 nodes
+extract graph 3 with 121 nodes
+extract graph 4 with 121 nodes
+extract graph 5 with 121 nodes
+extract graph 6 with 121 nodes
+extract graph 7 with 121 nodes
+extract graph 8 with 121 nodes
+extract graph 9 with 121 nodes
+Comparing learnt 1 of size 173 with eval 2 of size 158
+Done
+http://www.news.com.au Time Static 0 485.867265
+goelayu   2992 19.8  6.0 1587288 478368 pts/14 Sl   21:51   2:18 node mitm-proxy.js
+Launching site http://www.nbcnews.com
+(node:15328) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 204.602257 .Length: 286655
+Injection time: 0 24.026663 .Length: 13967
+Injection time: 0 2.839656 .Length: 15272
+Injection time: 0 26.468776 .Length: 6422
+Injection time: 0 90.846799 .Length: 66657
+Injection time: 0 148.171977 .Length: 129924
+Injection time: 0 112.031902 .Length: 697235
+Injection time: 0 47.150786 .Length: 30582
+Injection time: 0 5.712197 .Length: 18129
+Injection time: 0 8.615482 .Length: 8433
+Injection time: 0 43.683897 .Length: 31175
+Injection time: 0 13.68588 .Length: 21508
+Injection time: 0 5.153548 .Length: 24257
+Injection time: 0 96.834816 .Length: 76617
+Injection time: 0 33.403501 .Length: 25757
+Injection time: 0 78.496032 .Length: 53215
+Injection time: 0 4.482153 .Length: 71139
+Injection time: 0 117.412585 .Length: 71585
+Injection time: 0 98.533934 .Length: 928181
+Injection time: 0 61.077478 .Length: 20121
+Injection time: 0 0.24456 .Length: 164
+Injection time: 0 21.674865 .Length: 153223
+Injection time: 0 51.661173 .Length: 20414
+Injection time: 0 40.866914 .Length: 36175
+Injection time: 0 32.650169 .Length: 11173
+Injection time: 0 11.336964 .Length: 9271
+Injection time: 0 28.31952 .Length: 25510
+Injection time: 0 180.745063 .Length: 243455
+Injection time: 0 43.683645 .Length: 19815
+Injection time: 0 18.671414 .Length: 20876
+Injection time: 0 5.103434 .Length: 637422
+Injection time: 0 101.787318 .Length: 59432
+Injection time: 0 4.319794 .Length: 26499
+Injection time: 0 1.778026 .Length: 76
+Injection time: 0 38.419871 .Length: 12438
+Site loaded
+extracting handlers
+http://www.nbcnews.com Time EVT 0 235.046495
+extract graph 0 with 38 nodes
+extract graph 1 with 251 nodes
+extract graph 2 with 251 nodes
+extract graph 3 with 251 nodes
+extract graph 4 with 251 nodes
+extract graph 5 with 251 nodes
+extract graph 6 with 251 nodes
+extract graph 7 with 251 nodes
+extract graph 8 with 251 nodes
+extract graph 9 with 251 nodes
+Comparing learnt 1 of size 38 with eval 2 of size 251
+Comparing learnt 2 of size 251 with eval 4 of size 251
+Done
+http://www.nbcnews.com Time Static 0 497.300852
+goelayu   2992 20.2  5.8 1573420 466248 pts/14 Sl   21:51   2:22 node mitm-proxy.js
+Launching site http://www.economictimes.indiatimes.com
+(node:15486) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 16.72775 .Length: 8160
+Injection time: 0 7.987444 .Length: 9316
+Injection time: 0 205.225005 .Length: 100719
+Injection time: 0 12.423619 .Length: 11706
+Injection time: 0 192.927911 .Length: 398560
+Injection time: 0 31.020411 .Length: 11422
+Injection time: 0 33.258504 .Length: 40412
+Injection time: 0 82.700704 .Length: 102978
+Injection time: 0 11.612442 .Length: 10296
+Injection time: 0 1.255181 .Length: 1529
+Injection time: 0 42.878359 .Length: 37629
+Injection time: 0 14.320026 .Length: 21126
+Injection time: 0 8.261637 .Length: 9093
+Injection time: 0 41.028539 .Length: 32150
+Injection time: 0 56.602242 .Length: 55059
+Injection time: 0 73.545268 .Length: 75670
+Injection time: 0 26.94647 .Length: 3085
+Injection time: 0 121.771059 .Length: 92789
+Injection time: 0 330.980475 .Length: 280966
+Injection time: 0 414.674135 .Length: 289539
+Injection time: 0 349.057576 .Length: 275022
+Injection time: 0 29.761279 .Length: 9739
+Injection time: 0 33.405909 .Length: 18934
+Injection time: 0 1.687927 .Length: 3224
+Injection time: 0 43.991336 .Length: 43349
+Injection time: 0 844.926137 .Length: 644852
+Injection time: 0 9.001892 .Length: 14119
+Injection time: 0 247.929603 .Length: 215963
+Injection time: 0 5.844187 .Length: 14684
+Site loaded
+extracting handlers
+Site navigation did not time out. Force KILL.
+error while launchig Error: Protocol error (Runtime.callFunctionOn): Target closed.
+goelayu   2992 20.6  7.9 1749128 630020 pts/14 Sl   21:51   2:29 node mitm-proxy.js
+Launching site http://www.theatlantic.com
+(node:15877) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 63.071365 .Length: 48050
+Injection time: 0 568.862296 .Length: 913760
+Injection time: 0 20.599963 .Length: 17845
+Injection time: 0 13.307164 .Length: 20977
+Injection time: 0 3.304206 .Length: 8652
+proxy error: { Error: read ECONNRESET
+    at TLSWrap.onread (net.js:659:25) errno: 'ECONNRESET', code: 'ECONNRESET', syscall: 'read' }
+Timer fired before page could be loaded { TimeoutError: Navigation timeout of 100000 ms exceeded
+    at Promise.then (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/LifecycleWatcher.js:106:111) name: 'TimeoutError' }
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+goelayu   2992 18.4  3.6 1443444 291044 pts/14 Sl   21:51   2:31 node mitm-proxy.js
+Launching site http://www.latimes.com
+(node:17307) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 18.394158 .Length: 3224
+Injection time: 0 229.097264 .Length: 89476
+Injection time: 0 123.134574 .Length: 84371
+Injection time: 0 31.49934 .Length: 30701
+Injection time: 0 24.681719 .Length: 27179
+Injection time: 0 71.306686 .Length: 171685
+Injection time: 0 50.628889 .Length: 17421
+Injection time: 0 371.502359 .Length: 331608
+Injection time: 0 270.069368 .Length: 215667
+Injection time: 0 6.206246 .Length: 6399
+Injection time: 0 51.361757 .Length: 43593
+Injection time: 0 3.6392 .Length: 3871
+Injection time: 0 22.040497 .Length: 28991
+Injection time: 0 5.11889 .Length: 5956
+Injection time: 0 0.931667 .Length: 2504
+Injection time: 0 623.896919 .Length: 600342
+Injection time: 0 1.430563 .Length: 980
+Injection time: 0 21.128181 .Length: 7326
+Injection time: 0 2.491907 .Length: 1230
+Injection time: 0 100.536558 .Length: 115794
+Injection time: 0 95.157337 .Length: 129744
+Injection time: 0 0.659571 .Length: 653
+Injection time: 0 2.769479 .Length: 3170
+Injection time: 0 150.289598 .Length: 122769
+Injection time: 0 72.590718 .Length: 79787
+Injection time: 0 1.21585 .Length: 1142
+Injection time: 0 7.949647 .Length: 3170
+Injection time: 0 85.661584 .Length: 49592
+Injection time: 0 678.828643 .Length: 600342
+Injection time: 0 340.375943 .Length: 447531
+Injection time: 0 428.856509 .Length: 449850
+Injection time: 0 10.291249 .Length: 8543
+Injection time: 0 241.650955 .Length: 192452
+Injection time: 2 337.518861 .Length: 1662686
+Injection time: 0 14.378838 .Length: 35222
+Injection time: 0 40.749399 .Length: 24992
+Injection time: 0 135.478427 .Length: 99696
+proxy error: { Error: read ECONNRESET
+    at TLSWrap.onread (net.js:659:25) errno: 'ECONNRESET', code: 'ECONNRESET', syscall: 'read' }
+proxy error: { Error: read ECONNRESET
+    at TLSWrap.onread (net.js:659:25) errno: 'ECONNRESET', code: 'ECONNRESET', syscall: 'read' }
+proxy error: { Error: read ECONNRESET
+    at TLSWrap.onread (net.js:659:25) errno: 'ECONNRESET', code: 'ECONNRESET', syscall: 'read' }
+Timer fired before page could be loaded { TimeoutError: Navigation timeout of 100000 ms exceeded
+    at Promise.then (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/LifecycleWatcher.js:106:111) name: 'TimeoutError' }
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+goelayu   2992 17.9  3.9 1458588 314456 pts/14 Sl   21:51   2:46 node mitm-proxy.js
+Launching site http://www.abcnews.go.com
+(node:18897) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 23.86599 .Length: 3313
+Injection time: 0 0.528239 .Length: 126
+Injection time: 0 39.978771 .Length: 16435
+Injection time: 0 82.290701 .Length: 47738
+Injection time: 0 359.604233 .Length: 272450
+Injection time: 0 509.382411 .Length: 542639
+Injection time: 1 69.498417 .Length: 904174
+Injection time: 0 116.898379 .Length: 93573
+Injection time: 0 55.203279 .Length: 79927
+Injection time: 0 112.111145 .Length: 289060
+Injection time: 0 286.398972 .Length: 282997
+Injection time: 0 0.304093 .Length: 33
+Injection time: 0 0.307025 .Length: 126
+Injection time: 0 75.68541 .Length: 60224
+Injection time: 0 115.098656 .Length: 93573
+Injection time: 0 14.489236 .Length: 14442
+Injection time: 0 109.80665 .Length: 100405
+Injection time: 1 905.865165 .Length: 1579827
+Injection time: 0 1.193226 .Length: 974
+Injection time: 0 11.979491 .Length: 8737
+Injection time: 0 0.554084 .Length: 358
+Injection time: 0 303.220558 .Length: 272450
+Injection time: 0 532.081967 .Length: 342680
+Site loaded
+extracting handlers
+Injection time: 0 13.506103 .Length: 14442
+http://www.abcnews.go.com Time EVT 0 439.006529
+extract graph 0 with 192 nodes
+extract graph 1 with 184 nodes
+extract graph 2 with 184 nodes
+extract graph 3 with 184 nodes
+extract graph 4 with 184 nodes
+extract graph 5 with 232 nodes
+extract graph 6 with 184 nodes
+extract graph 7 with 184 nodes
+extract graph 8 with 184 nodes
+extract graph 9 with 184 nodes
+Comparing learnt 1 of size 383 with eval 2 of size 192
+Done
+http://www.abcnews.go.com Time Static 4 742.655524
+goelayu   2992 19.0 13.2 2160368 1052516 pts/14 Sl  21:51   2:58 node mitm-proxy.js
+Launching site http://www.chinadaily.com.cn
+(node:19147) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 4.642346 .Length: 1747
+Injection time: 0 2.290135 .Length: 782
+Injection time: 0 14.498669 .Length: 7932
+Injection time: 0 129.265805 .Length: 95957
+Injection time: 0 48.689731 .Length: 49068
+Injection time: 0 0.803933 .Length: 1439
+Injection time: 0 1.848046 .Length: 2744
+Injection time: 0 13.09104 .Length: 7649
+Injection time: 0 3.597113 .Length: 1919
+Site loaded
+extracting handlers
+http://www.chinadaily.com.cn Time EVT 0 52.132175
+extract graph 0 with 43 nodes
+extract graph 1 with 43 nodes
+extract graph 2 with 43 nodes
+extract graph 3 with 43 nodes
+extract graph 4 with 43 nodes
+extract graph 5 with 43 nodes
+extract graph 6 with 43 nodes
+extract graph 7 with 43 nodes
+extract graph 8 with 43 nodes
+extract graph 9 with 43 nodes
+Comparing learnt 1 of size 52 with eval 2 of size 43
+Done
+http://www.chinadaily.com.cn Time Static 0 378.169972
+goelayu   2992 18.9 14.2 2365116 1130396 pts/14 Sl  21:51   2:59 node mitm-proxy.js
+Launching site http://www.dw.com
+(node:19313) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 28.869499 .Length: 17813
+Injection time: 0 189.478132 .Length: 114324
+Injection time: 0 2.376859 .Length: 3404
+Injection time: 0 2.480241 .Length: 2843
+Injection time: 0 16.38684 .Length: 16365
+Injection time: 0 1.696686 .Length: 848
+Injection time: 0 114.259456 .Length: 88145
+Injection time: 0 33.580979 .Length: 11890
+Injection time: 0 67.382326 .Length: 1056045
+Injection time: 0 2.96099 .Length: 852
+Injection time: 0 83.211646 .Length: 58530
+Injection time: 0 238.676542 .Length: 308774
+Injection time: 0 537.399581 .Length: 417306
+Injection time: 0 495.693363 .Length: 342680
+Site loaded
+extracting handlers
+http://www.dw.com Time EVT 0 192.855056
+extract graph 0 with 193 nodes
+extract graph 1 with 170 nodes
+extract graph 2 with 170 nodes
+extract graph 3 with 170 nodes
+extract graph 4 with 170 nodes
+extract graph 5 with 170 nodes
+extract graph 6 with 170 nodes
+extract graph 7 with 170 nodes
+extract graph 8 with 170 nodes
+extract graph 9 with 170 nodes
+Injection time: 0 84.561817 .Length: 251557
+Injection time: 1 169.366945 .Length: 959997
+Comparing learnt 1 of size 332 with eval 2 of size 193
+Done
+http://www.dw.com Time Static 2 409.592253
+goelayu   2992 19.4  8.5 1910912 677080 pts/14 Sl   21:51   3:06 node mitm-proxy.js
+Launching site http://www.indianexpress.com
+(node:19615) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 80.733123 .Length: 55692
+Injection time: 0 122.685981 .Length: 100724
+Injection time: 0 1.048677 .Length: 1003
+Injection time: 0 12.928778 .Length: 15318
+Injection time: 0 2.486064 .Length: 2701
+Injection time: 1 40.766097 .Length: 1099287
+Injection time: 0 5.472634 .Length: 1079
+Injection time: 0 166.753249 .Length: 180792
+Injection time: 0 72.187308 .Length: 45358
+Injection time: 0 65.745832 .Length: 95514
+Injection time: 0 21.006554 .Length: 25168
+Site loaded
+extracting handlers
+Injection time: 0 48.851493 .Length: 42089
+Injection time: 0 11.780745 .Length: 19563
+Injection time: 0 54.146791 .Length: 42001
+Injection time: 0 362.389143 .Length: 387042
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 19.7  7.2 1806192 573668 pts/14 Sl   21:51   3:11 node mitm-proxy.js
+Launching site http://www.thehindu.com
+(node:19798) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 51.772563 .Length: 17557
+Injection time: 0 26.577164 .Length: 12332
+Injection time: 0 7.524789 .Length: 7617
+Injection time: 0 19.680865 .Length: 12332
+Site loaded
+extracting handlers
+http://www.thehindu.com Time EVT 0 43.73506
+extract graph 0 with 0 nodes
+extract graph 1 with 0 nodes
+extract graph 2 with 0 nodes
+extract graph 3 with 0 nodes
+extract graph 4 with 0 nodes
+extract graph 5 with 0 nodes
+extract graph 6 with 0 nodes
+extract graph 7 with 0 nodes
+extract graph 8 with 0 nodes
+extract graph 9 with 0 nodes
+Done
+http://www.thehindu.com Time Static 0 0.438203
+Injection time: 0 17.813446 .Length: 18294
+proxy error: { Error: write EPIPE
+    at WriteWrap.afterWrite [as oncomplete] (net.js:835:14) errno: 'EPIPE', code: 'EPIPE', syscall: 'write' }
+Injection time: 0 0.594692 .Length: 745
+Injection time: 0 134.842133 .Length: 88151
+Injection time: 0 104.011616 .Length: 88145
+goelayu   2992 19.7  7.4 1822624 590296 pts/14 Sl   21:51   3:12 node mitm-proxy.js
+Launching site http://www.weather.gov
+(node:19935) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 40.511654 .Length: 17059
+Injection time: 0 1.785421 .Length: 1464
+Injection time: 0 116.140112 .Length: 93106
+Injection time: 0 1.316046 .Length: 1702
+Injection time: 0 1.933912 .Length: 6218
+Injection time: 0 241.510956 .Length: 228138
+Injection time: 0 0.960972 .Length: 262
+Injection time: 0 4.328576 .Length: 3038
+Injection time: 0 4.303345 .Length: 2160
+Injection time: 0 50.703692 .Length: 35774
+Injection time: 0 10.863646 .Length: 13595
+Site loaded
+extracting handlers
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 19.8  8.6 1917648 684540 pts/14 Sl   21:51   3:13 node mitm-proxy.js
+Launching site http://www.thedailybeast.com
+(node:20082) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 5.909855 .Length: 7617
+Injection time: 0 34.306718 .Length: 17845
+Injection time: 0 24.068733 .Length: 19856
+Injection time: 0 27.839298 .Length: 20245
+Injection time: 0 449.919413 .Length: 316196
+Injection time: 0 27.045766 .Length: 22189
+Injection time: 0 112.6752 .Length: 89184
+Injection time: 0 12.898743 .Length: 10373
+Injection time: 0 218.703432 .Length: 163046
+Injection time: 0 112.777113 .Length: 90092
+Injection time: 0 251.252674 .Length: 261311
+Injection time: 0 41.746766 .Length: 50194
+Injection time: 0 55.790456 .Length: 120567
+Injection time: 0 21.943989 .Length: 6342
+Injection time: 0 15.044406 .Length: 11045
+Site loaded
+extracting handlers
+http://www.thedailybeast.com Time EVT 0 25.209747
+extract graph 0 with 172 nodes
+extract graph 1 with 52 nodes
+extract graph 2 with 52 nodes
+extract graph 3 with 52 nodes
+extract graph 4 with 52 nodes
+extract graph 5 with 52 nodes
+extract graph 6 with 52 nodes
+extract graph 7 with 52 nodes
+extract graph 8 with 52 nodes
+extract graph 9 with 52 nodes
+Comparing learnt 1 of size 223 with eval 2 of size 172
+Done
+http://www.thedailybeast.com Time Static 1 4.089943
+goelayu   2992 20.0  7.5 1835280 601732 pts/14 Sl   21:51   3:16 node mitm-proxy.js
+Launching site http://www.sfgate.com
+(node:20250) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 4.228135 .Length: 2312
+Injection time: 0 121.287377 .Length: 85577
+Injection time: 0 7.999137 .Length: 12553
+Injection time: 0 0.10412 .Length: 72
+Injection time: 0 22.781116 .Length: 18469
+Injection time: 0 88.175754 .Length: 66741
+Injection time: 0 98.504408 .Length: 92824
+Injection time: 0 499.753769 .Length: 390243
+Injection time: 0 0.102165 .Length: 72
+Injection time: 0 183.258016 .Length: 650559
+Injection time: 0 5.892773 .Length: 3561
+Injection time: 0 0.198813 .Length: 897
+Injection time: 0 3.464291 .Length: 2978
+Injection time: 0 6.032659 .Length: 1633
+Injection time: 0 9.721067 .Length: 13151
+Injection time: 0 4.538392 .Length: 10186
+Injection time: 0 127.140329 .Length: 154627
+Injection time: 0 0.333527 .Length: 396
+Injection time: 0 0.320493 .Length: 428
+Injection time: 0 32.930398 .Length: 13406
+Site loaded
+extracting handlers
+http://www.sfgate.com Time EVT 0 218.901727
+extract graph 0 with 179 nodes
+extract graph 1 with 115 nodes
+extract graph 2 with 115 nodes
+extract graph 3 with 115 nodes
+extract graph 4 with 115 nodes
+extract graph 5 with 115 nodes
+extract graph 6 with 115 nodes
+extract graph 7 with 115 nodes
+extract graph 8 with 115 nodes
+extract graph 9 with 115 nodes
+Comparing learnt 1 of size 295 with eval 2 of size 180
+Comparing learnt 2 of size 296 with eval 4 of size 180
+Done
+http://www.sfgate.com Time Static 1 292.54751
+goelayu   2992 20.1  8.1 1879580 649216 pts/14 Sl   21:51   3:19 node mitm-proxy.js
+Launching site http://www.variety.com
+(node:20421) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 3.676356 .Length: 1890
+Injection time: 0 18.370088 .Length: 7164
+Injection time: 0 25.973987 .Length: 15862
+Injection time: 0 129.382383 .Length: 89496
+Injection time: 0 0.752414 .Length: 1175
+Injection time: 0 0.328513 .Length: 157
+Injection time: 0 8.249096 .Length: 15139
+Injection time: 0 24.538931 .Length: 14125
+Injection time: 0 12.148774 .Length: 6968
+Injection time: 0 0.487725 .Length: 329
+Injection time: 0 2.001021 .Length: 1712
+Injection time: 0 153.64095 .Length: 138609
+Injection time: 0 152.758894 .Length: 138495
+Injection time: 0 19.362312 .Length: 14416
+Injection time: 0 2.280385 .Length: 2234
+Injection time: 0 1.819754 .Length: 2311
+Injection time: 0 1.882925 .Length: 6020
+Injection time: 0 46.051969 .Length: 16045
+Injection time: 0 0.679363 .Length: 536
+Injection time: 0 445.569919 .Length: 535897
+Injection time: 0 2.439717 .Length: 2349
+Injection time: 0 7.953152 .Length: 6924
+Injection time: 0 8.490643 .Length: 14373
+Injection time: 0 1.251056 .Length: 2095
+Injection time: 0 4.199566 .Length: 2002
+Injection time: 0 34.839941 .Length: 129248
+Injection time: 0 1.059303 .Length: 1150
+Injection time: 0 1.8818 .Length: 1408
+Injection time: 0 1.142969 .Length: 1077
+Injection time: 0 6.244907 .Length: 5853
+Injection time: 0 74.961959 .Length: 63690
+Injection time: 0 3.110928 .Length: 3661
+Injection time: 0 27.45778 .Length: 13959
+Injection time: 0 20.900332 .Length: 12505
+Injection time: 0 0.333018 .Length: 326
+Injection time: 0 1.315034 .Length: 1398
+Injection time: 0 1.26639 .Length: 1426
+Injection time: 0 1.915218 .Length: 3004
+Injection time: 0 594.663985 .Length: 672667
+Injection time: 0 0.61883 .Length: 344
+Site loaded
+extracting handlers
+Injection time: 0 2.805603 .Length: 17854
+Injection time: 0 1.483567 .Length: 6877
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+Injection time: 0 0.626811 .Length: 5683
+goelayu   2992 20.4  8.3 1896832 665720 pts/14 Sl   21:51   3:22 node mitm-proxy.js
+Launching site http://www.cbc.ca/news/
+(node:20587) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+proxy error: { Error: read ECONNRESET
+    at TLSWrap.onread (net.js:659:25) errno: 'ECONNRESET', code: 'ECONNRESET', syscall: 'read' }
+Timer fired before page could be loaded { TimeoutError: Navigation timeout of 100000 ms exceeded
+    at Promise.then (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/LifecycleWatcher.js:106:111) name: 'TimeoutError' }
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+goelayu   2992 18.6  4.9 1658308 394560 pts/14 Sl   21:51   3:23 node mitm-proxy.js
+Launching site http://www.hollywoodreporter.com
+(node:22231) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 3.589046 .Length: 190
+Injection time: 0 13.001293 .Length: 782
+Injection time: 0 4.017629 .Length: 522
+Injection time: 0 11.808241 .Length: 1596
+Injection time: 0 228.423613 .Length: 97093
+Injection time: 0 238.867723 .Length: 219941
+Injection time: 0 718.440679 .Length: 568893
+Injection time: 0 2.500047 .Length: 3224
+Injection time: 0 1.285925 .Length: 850
+Injection time: 0 163.753501 .Length: 123887
+Injection time: 0 6.45433 .Length: 5343
+Injection time: 0 238.027461 .Length: 215667
+Injection time: 0 507.417306 .Length: 342680
+Site loaded
+extracting handlers
+http://www.hollywoodreporter.com Time EVT 0 26.389028
+extract graph 0 with 14 nodes
+extract graph 1 with 14 nodes
+extract graph 2 with 14 nodes
+extract graph 3 with 14 nodes
+extract graph 4 with 14 nodes
+extract graph 5 with 14 nodes
+extract graph 6 with 14 nodes
+extract graph 7 with 14 nodes
+extract graph 8 with 14 nodes
+extract graph 9 with 14 nodes
+Comparing learnt 1 of size 148 with eval 2 of size 14
+Done
+http://www.hollywoodreporter.com Time Static 1 608.163899
+goelayu   2992 18.9 10.4 2063204 830476 pts/14 Sl   21:51   3:28 node mitm-proxy.js
+Launching site http://www.newsweek.com
+(node:22463) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 160.279846 .Length: 113942
+Injection time: 0 54.782571 .Length: 31663
+Injection time: 0 6.851508 .Length: 7452
+Injection time: 0 2.895892 .Length: 2597
+Site loaded
+extracting handlers
+http://www.newsweek.com Time EVT 0 136.923978
+extract graph 0 with 113 nodes
+extract graph 1 with 88 nodes
+extract graph 2 with 88 nodes
+extract graph 3 with 88 nodes
+extract graph 4 with 88 nodes
+extract graph 5 with 88 nodes
+extract graph 6 with 88 nodes
+extract graph 7 with 88 nodes
+extract graph 8 with 88 nodes
+extract graph 9 with 88 nodes
+Injection time: 0 338.444998 .Length: 261467
+Comparing learnt 1 of size 124 with eval 2 of size 113
+Done
+http://www.newsweek.com Time Static 0 479.498709
+goelayu   2992 19.0  7.1 1798928 566292 pts/14 Sl   21:51   3:29 node mitm-proxy.js
+Launching site http://www.nationalgeographic.com
+(node:22562) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 5.969976 .Length: 8796
+Injection time: 0 77.622234 .Length: 66434
+Injection time: 1 622.082122 .Length: 1149868
+Injection time: 0 27.725408 .Length: 726829
+Injection time: 0 296.849723 .Length: 272450
+Injection time: 0 461.104969 .Length: 478418
+Injection time: 0 0.192188 .Length: 325
+Injection time: 0 114.713213 .Length: 100405
+Injection time: 0 4.630747 .Length: 7052
+Injection time: 0 0.739348 .Length: 974
+Injection time: 0 28.414976 .Length: 8737
+Injection time: 0 87.975167 .Length: 66434
+Injection time: 0 577.578721 .Length: 342680
+Injection time: 0 450.190278 .Length: 495127
+proxy error: { Error: write EPIPE
+    at WriteWrap.afterWrite [as oncomplete] (net.js:835:14) errno: 'EPIPE', code: 'EPIPE', syscall: 'write' }
+Injection time: 0 18.206954 .Length: 8796
+Injection time: 0 75.769883 .Length: 66434
+Injection time: 1 548.442382 .Length: 1149868
+Injection time: 0 41.418484 .Length: 726829
+Injection time: 0 294.082712 .Length: 272450
+Injection time: 0 446.97697 .Length: 478418
+Injection time: 0 0.680948 .Length: 325
+Injection time: 0 110.814786 .Length: 100405
+Injection time: 0 4.057098 .Length: 7052
+Injection time: 0 2.094404 .Length: 974
+Injection time: 0 20.642927 .Length: 8737
+Injection time: 0 84.886522 .Length: 66434
+Injection time: 0 529.564259 .Length: 495127
+Injection time: 0 483.600502 .Length: 342680
+Injection time: 0 9.333822 .Length: 8796
+Injection time: 0 98.353659 .Length: 66434
+Injection time: 1 462.461226 .Length: 1149868
+Injection time: 0 24.015931 .Length: 726829
+Injection time: 0 307.280967 .Length: 272450
+Injection time: 0 485.691349 .Length: 478418
+Injection time: 0 0.63216 .Length: 325
+Injection time: 0 115.31646 .Length: 100405
+Injection time: 0 11.394593 .Length: 7052
+Injection time: 0 2.158813 .Length: 974
+Injection time: 0 21.454515 .Length: 8737
+Injection time: 0 72.896202 .Length: 66434
+Injection time: 0 457.678221 .Length: 495127
+Injection time: 0 548.405022 .Length: 342680
+Injection time: 0 9.732702 .Length: 8796
+Injection time: 0 79.864223 .Length: 66434
+Injection time: 1 493.420066 .Length: 1149868
+Injection time: 0 27.903535 .Length: 726829
+Injection time: 0 285.292025 .Length: 272450
+Injection time: 0 506.546684 .Length: 478418
+Injection time: 0 0.293326 .Length: 325
+Injection time: 0 107.462686 .Length: 100405
+Injection time: 0 0.693539 .Length: 974
+Injection time: 0 10.387905 .Length: 7052
+Injection time: 0 12.997241 .Length: 8737
+Injection time: 0 90.090334 .Length: 66434
+Injection time: 0 546.274459 .Length: 342680
+Injection time: 0 431.693969 .Length: 495127
+Injection time: 0 14.86692 .Length: 8796
+Injection time: 0 83.783348 .Length: 66434
+Injection time: 1 586.010898 .Length: 1149868
+Injection time: 0 24.987855 .Length: 726829
+Injection time: 0 301.526882 .Length: 272450
+Injection time: 0 460.677895 .Length: 478418
+Injection time: 0 0.496493 .Length: 325
+Injection time: 0 108.385876 .Length: 100405
+Injection time: 0 3.731353 .Length: 7052
+Injection time: 0 1.085843 .Length: 974
+Injection time: 0 21.731731 .Length: 8737
+Injection time: 0 82.702499 .Length: 66434
+Injection time: 0 533.817017 .Length: 495127
+Injection time: 0 512.299706 .Length: 342680
+Injection time: 0 6.755107 .Length: 8796
+Injection time: 0 79.121851 .Length: 66434
+Injection time: 1 511.983314 .Length: 1149868
+Injection time: 0 32.334266 .Length: 726829
+Injection time: 0 290.173087 .Length: 272450
+Injection time: 0 474.130974 .Length: 478418
+Injection time: 0 151.940947 .Length: 100405
+Injection time: 0 2.052175 .Length: 974
+Injection time: 0 24.229102 .Length: 8737
+Injection time: 0 0.287974 .Length: 325
+Injection time: 0 482.96939 .Length: 342680
+Injection time: 0 84.781591 .Length: 66434
+Injection time: 0 3.548748 .Length: 7052
+Injection time: 0 67.965876 .Length: 66434
+Injection time: 0 3.569278 .Length: 8796
+Injection time: 1 507.690229 .Length: 1149868
+Injection time: 0 516.865532 .Length: 495127
+Injection time: 0 23.976492 .Length: 726829
+Injection time: 0 321.685684 .Length: 272450
+Injection time: 0 461.179059 .Length: 478418
+Injection time: 0 1.226645 .Length: 325
+Injection time: 0 115.663049 .Length: 100405
+Injection time: 0 11.987096 .Length: 7052
+Injection time: 0 2.545578 .Length: 974
+Injection time: 0 8.868646 .Length: 8737
+Injection time: 0 85.830575 .Length: 66434
+Injection time: 0 494.606093 .Length: 342680
+Injection time: 0 490.094161 .Length: 495127
+Injection time: 0 67.220501 .Length: 66434
+Injection time: 0 3.646473 .Length: 8796
+Injection time: 1 487.082796 .Length: 1149868
+Injection time: 0 38.710327 .Length: 726829
+Injection time: 0 554.581584 .Length: 478418
+Injection time: 0 281.59163 .Length: 272450
+Injection time: 0 0.4054 .Length: 325
+Injection time: 0 9.43389 .Length: 7052
+Injection time: 0 114.422726 .Length: 100405
+Injection time: 0 0.919467 .Length: 974
+Injection time: 0 25.017005 .Length: 8737
+Injection time: 0 79.369739 .Length: 66434
+Injection time: 0 552.952961 .Length: 342680
+Injection time: 0 5.975655 .Length: 8796
+Injection time: 0 70.416354 .Length: 66434
+Injection time: 0 448.837585 .Length: 495127
+Injection time: 1 548.939029 .Length: 1149868
+Injection time: 0 25.917193 .Length: 726829
+Injection time: 0 313.257731 .Length: 272450
+Injection time: 0 458.621145 .Length: 478418
+Injection time: 0 0.646185 .Length: 325
+Injection time: 0 112.191922 .Length: 100405
+Injection time: 0 3.203794 .Length: 974
+Injection time: 0 12.538134 .Length: 7052
+Injection time: 0 12.921348 .Length: 8737
+Injection time: 0 89.7527 .Length: 66434
+proxy error: { Error: write EPIPE
+    at WriteWrap.afterWrite [as oncomplete] (net.js:835:14) errno: 'EPIPE', code: 'EPIPE', syscall: 'write' }
+Injection time: 0 493.388521 .Length: 342680
+Injection time: 0 518.32972 .Length: 495127
+Injection time: 0 9.145284 .Length: 8796
+Injection time: 0 82.51216 .Length: 66434
+Injection time: 1 496.160104 .Length: 1149868
+Injection time: 0 25.545628 .Length: 726829
+Injection time: 0 297.900457 .Length: 272450
+Injection time: 0 487.780269 .Length: 478418
+Injection time: 0 0.594194 .Length: 325
+Injection time: 0 114.315097 .Length: 100405
+Injection time: 0 11.146735 .Length: 7052
+Injection time: 0 2.471564 .Length: 974
+Injection time: 0 8.806627 .Length: 8737
+Injection time: 0 73.340874 .Length: 66434
+Injection time: 0 505.391474 .Length: 342680
+Injection time: 0 499.748792 .Length: 495127
+Injection time: 0 5.574987 .Length: 8796
+Injection time: 0 96.201496 .Length: 66434
+Injection time: 1 556.135687 .Length: 1149868
+Injection time: 0 25.725757 .Length: 726829
+Injection time: 0 447.245156 .Length: 478418
+Injection time: 0 291.731053 .Length: 272450
+Injection time: 0 0.437773 .Length: 325
+Injection time: 0 6.351608 .Length: 7052
+Injection time: 0 111.323761 .Length: 100405
+Injection time: 0 29.586099 .Length: 8737
+Injection time: 0 1.968606 .Length: 974
+Injection time: 0 77.696735 .Length: 66434
+proxy error: { Error: write EPIPE
+    at WriteWrap.afterWrite [as oncomplete] (net.js:835:14) errno: 'EPIPE', code: 'EPIPE', syscall: 'write' }
+Injection time: 0 510.443173 .Length: 342680
+Injection time: 0 3.226161 .Length: 8796
+Injection time: 0 495.706137 .Length: 495127
+Injection time: 1 570.083451 .Length: 1149868
+Injection time: 0 80.655404 .Length: 66434
+Injection time: 0 28.141706 .Length: 726829
+Injection time: 0 460.83626 .Length: 478418
+Injection time: 0 298.653708 .Length: 272450
+Injection time: 0 0.277492 .Length: 325
+Injection time: 0 5.27609 .Length: 7052
+Injection time: 0 110.5671 .Length: 100405
+Injection time: 0 2.401556 .Length: 974
+Injection time: 0 10.41048 .Length: 8737
+Injection time: 0 76.844165 .Length: 66434
+Injection time: 0 520.60949 .Length: 342680
+Injection time: 0 497.877473 .Length: 495127
+Injection time: 0 5.499031 .Length: 8796
+Injection time: 0 71.711315 .Length: 66434
+Injection time: 1 566.784487 .Length: 1149868
+Injection time: 0 27.39915 .Length: 726829
+Injection time: 0 299.198278 .Length: 272450
+Injection time: 0 471.977251 .Length: 478418
+Injection time: 0 0.254494 .Length: 325
+Injection time: 0 108.103378 .Length: 100405
+Injection time: 0 7.955742 .Length: 7052
+Injection time: 0 21.129507 .Length: 8737
+Injection time: 0 1.580487 .Length: 974
+Injection time: 0 94.438903 .Length: 66434
+Injection time: 0 518.858571 .Length: 342680
+Injection time: 0 484.584877 .Length: 495127
+Injection time: 0 13.641357 .Length: 8796
+Injection time: 0 82.700908 .Length: 66434
+Injection time: 1 561.013784 .Length: 1149868
+Injection time: 0 40.828645 .Length: 726829
+Injection time: 0 305.150779 .Length: 272450
+Injection time: 0 463.439712 .Length: 478418
+Injection time: 0 0.402885 .Length: 325
+Injection time: 0 14.65523 .Length: 7052
+Injection time: 0 121.087654 .Length: 100405
+Injection time: 0 3.853122 .Length: 974
+Injection time: 0 22.232164 .Length: 8737
+Injection time: 0 602.480876 .Length: 342680
+Injection time: 0 70.149759 .Length: 66434
+Injection time: 0 15.111013 .Length: 8796
+Injection time: 0 472.218112 .Length: 495127
+Injection time: 1 537.826292 .Length: 1149868
+Injection time: 0 88.279314 .Length: 66434
+Injection time: 0 34.195806 .Length: 726829
+Injection time: 0 485.235749 .Length: 478418
+Injection time: 0 302.601042 .Length: 272450
+Injection time: 0 0.294739 .Length: 325
+Injection time: 0 3.876415 .Length: 7052
+Injection time: 0 109.497016 .Length: 100405
+Injection time: 0 1.044139 .Length: 974
+Injection time: 0 25.799958 .Length: 8737
+Injection time: 0 86.30137 .Length: 66434
+proxy error: { Error: write EPIPE
+    at WriteWrap.afterWrite [as oncomplete] (net.js:835:14) errno: 'EPIPE', code: 'EPIPE', syscall: 'write' }
+Injection time: 0 584.610917 .Length: 342680
+Injection time: 0 3.656506 .Length: 8796
+Injection time: 0 98.251073 .Length: 66434
+Injection time: 0 437.99363 .Length: 495127
+Injection time: 1 487.390491 .Length: 1149868
+Injection time: 0 22.491538 .Length: 726829
+Injection time: 0 466.886638 .Length: 478418
+Injection time: 0 276.912589 .Length: 272450
+Injection time: 0 0.457511 .Length: 325
+Injection time: 0 8.31983 .Length: 7052
+Injection time: 0 102.802334 .Length: 100405
+Injection time: 0 4.955176 .Length: 974
+Injection time: 0 95.201095 .Length: 66434
+Injection time: 0 10.604803 .Length: 8737
+Injection time: 0 511.700255 .Length: 342680
+Injection time: 0 487.689752 .Length: 495127
+Injection time: 0 6.075358 .Length: 8796
+Injection time: 0 72.615034 .Length: 66434
+Injection time: 1 482.130893 .Length: 1149868
+Injection time: 0 24.874428 .Length: 726829
+Injection time: 0 291.937605 .Length: 272450
+Injection time: 0 454.950546 .Length: 478418
+Injection time: 0 0.281249 .Length: 325
+Injection time: 0 107.85527 .Length: 100405
+Injection time: 0 4.098445 .Length: 7052
+Injection time: 0 2.222769 .Length: 974
+Injection time: 0 21.837392 .Length: 8737
+Injection time: 0 97.228812 .Length: 66434
+proxy error: { Error: write EPIPE
+    at WriteWrap.afterWrite [as oncomplete] (net.js:835:14) errno: 'EPIPE', code: 'EPIPE', syscall: 'write' }
+Injection time: 0 563.281021 .Length: 495127
+Injection time: 0 506.990557 .Length: 342680
+Injection time: 0 3.196863 .Length: 8796
+Injection time: 0 69.478073 .Length: 66434
+Injection time: 1 487.004797 .Length: 1149868
+Injection time: 0 27.930583 .Length: 726829
+Injection time: 0 362.10648 .Length: 272450
+Injection time: 0 506.178491 .Length: 478418
+Injection time: 0 0.362945 .Length: 325
+Injection time: 0 106.487855 .Length: 100405
+Injection time: 0 3.450125 .Length: 7052
+Injection time: 0 1.079681 .Length: 974
+Injection time: 0 24.218872 .Length: 8737
+Injection time: 0 74.991264 .Length: 66434
+Injection time: 0 531.346671 .Length: 495127
+Injection time: 0 490.451201 .Length: 342680
+Injection time: 0 9.932016 .Length: 8796
+Injection time: 0 85.399302 .Length: 66434
+Injection time: 1 490.530042 .Length: 1149868
+Injection time: 0 25.854915 .Length: 726829
+Injection time: 0 367.912545 .Length: 272450
+Injection time: 0 434.414227 .Length: 478418
+Injection time: 0 0.555005 .Length: 325
+Injection time: 0 105.03246 .Length: 100405
+Timer fired before page could be loaded { TimeoutError: Navigation timeout of 100000 ms exceeded
+    at Promise.then (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/LifecycleWatcher.js:106:111) name: 'TimeoutError' }
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+goelayu   2992 29.1 11.6 2143624 928556 pts/14 Sl   21:51   5:50 node mitm-proxy.js
+Launching site http://www.yr.no
+Injection time: 0 3.62562 .Length: 7052
+Injection time: 0 0.676098 .Length: 974
+(node:24029) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 27.101201 .Length: 197511
+Injection time: 0 6.665436 .Length: 11434
+Injection time: 0 408.381038 .Length: 327341
+Injection time: 0 54.407035 .Length: 11161
+Injection time: 0 33.984353 .Length: 34946
+Injection time: 0 22.313607 .Length: 16556
+Site loaded
+extracting handlers
+http://www.yr.no Time EVT 0 127.361062
+extract graph 0 with 66 nodes
+extract graph 1 with 68 nodes
+extract graph 2 with 68 nodes
+extract graph 3 with 68 nodes
+extract graph 4 with 68 nodes
+extract graph 5 with 68 nodes
+extract graph 6 with 68 nodes
+extract graph 7 with 68 nodes
+extract graph 8 with 68 nodes
+extract graph 9 with 68 nodes
+Comparing learnt 1 of size 66 with eval 2 of size 69
+Comparing learnt 2 of size 69 with eval 4 of size 69
+Done
+http://www.yr.no Time Static 0 449.131892
+goelayu   2992 29.1 10.6 2057224 842764 pts/14 Sl   21:51   5:52 node mitm-proxy.js
+Launching site http://www.chicagotribune.com
+(node:24175) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 50.412357 .Length: 86509
+Injection time: 0 1.962004 .Length: 27387
+Injection time: 0 52.682548 .Length: 79300
+Injection time: 0 151.57636 .Length: 120766
+Injection time: 0 3.113889 .Length: 36655
+Injection time: 0 140.449342 .Length: 83118
+Injection time: 0 0.164382 .Length: 1
+Injection time: 0 0.412228 .Length: 98
+Injection time: 0 34.632882 .Length: 78704
+Injection time: 0 451.098348 .Length: 341921
+Injection time: 0 223.87647 .Length: 105636
+Injection time: 0 115.646019 .Length: 83118
+Injection time: 0 1.612722 .Length: 288
+Injection time: 0 24.794397 .Length: 240699
+Injection time: 0 64.610934 .Length: 32988
+Injection time: 0 609.44583 .Length: 536639
+Site loaded
+extracting handlers
+Injection time: 0 0.567487 .Length: 438
+Injection time: 0 131.017318 .Length: 94840
+Injection time: 0 8.129031 .Length: 8307
+Injection time: 0 103.217015 .Length: 185649
+Injection time: 0 59.206414 .Length: 50631
+http://www.chicagotribune.com Time EVT 1 784.898019
+extract graph 0 with 48 nodes
+extract graph 1 with 45 nodes
+extract graph 2 with 45 nodes
+extract graph 3 with 48 nodes
+extract graph 4 with 48 nodes
+extract graph 5 with 45 nodes
+extract graph 6 with 45 nodes
+extract graph 7 with 39 nodes
+extract graph 8 with 39 nodes
+extract graph 9 with 39 nodes
+Injection time: 0 826.177256 .Length: 554279
+Injection time: 0 5.250358 .Length: 8543
+Injection time: 0 140.283824 .Length: 115422
+Injection time: 0 1.667378 .Length: 1241785
+Injection time: 0 4.626801 .Length: 438
+Injection time: 0 140.201023 .Length: 94840
+Injection time: 0 10.577949 .Length: 8543
+Injection time: 0 0.681443 .Length: 438
+Injection time: 0 93.658212 .Length: 50631
+Injection time: 0 132.602248 .Length: 115422
+Comparing learnt 1 of size 48 with eval 2 of size 48
+Done
+http://www.chicagotribune.com Time Static 0 939.019089
+(node:24175) UnhandledPromiseRejectionWarning: Error: Protocol error (Target.attachToTarget): Target closed.
+    at Promise (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:71:63)
+    at new Promise (<anonymous>)
+    at Connection.send (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:70:16)
+    at Connection.createSession (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:141:42)
+    at Target_js_1.Target [as _sessionFactory] (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Browser.js:157:91)
+    at Target.page (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Target.js:72:38)
+    at PuppeteerExtraPluginAdblocker._onTargetCreated (/home/goelayu/research/WebPeformance/node_modules/puppeteer-extra-plugin/dist/index.cjs.js:489:39)
+    at process._tickCallback (internal/process/next_tick.js:68:7)
+(node:24175) UnhandledPromiseRejectionWarning: Unhandled promise rejection. This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). (rejection id: 2)
+(node:24175) [DEP0018] DeprecationWarning: Unhandled promise rejections are deprecated. In the future, promise rejections that are not handled will terminate the Node.js process with a non-zero exit code.
+(node:24175) UnhandledPromiseRejectionWarning: Error: Protocol error (Target.attachToTarget): Target closed.
+    at Promise (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:71:63)
+    at new Promise (<anonymous>)
+    at Connection.send (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:70:16)
+    at Connection.createSession (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:141:42)
+    at Target_js_1.Target [as _sessionFactory] (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Browser.js:157:91)
+    at Target.page (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Target.js:72:38)
+    at PuppeteerExtraPluginAdblocker._onTargetCreated (/home/goelayu/research/WebPeformance/node_modules/puppeteer-extra-plugin/dist/index.cjs.js:489:39)
+    at process._tickCallback (internal/process/next_tick.js:68:7)
+(node:24175) UnhandledPromiseRejectionWarning: Unhandled promise rejection. This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). (rejection id: 3)
+(node:24175) UnhandledPromiseRejectionWarning: Error: Protocol error (Target.attachToTarget): Target closed.
+    at Promise (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:71:63)
+    at new Promise (<anonymous>)
+    at Connection.send (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:70:16)
+    at Connection.createSession (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:141:42)
+    at Target_js_1.Target [as _sessionFactory] (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Browser.js:157:91)
+    at Target.page (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Target.js:72:38)
+    at PuppeteerExtraPluginAdblocker._onTargetCreated (/home/goelayu/research/WebPeformance/node_modules/puppeteer-extra-plugin/dist/index.cjs.js:489:39)
+    at process._tickCallback (internal/process/next_tick.js:68:7)
+(node:24175) UnhandledPromiseRejectionWarning: Unhandled promise rejection. This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). (rejection id: 4)
+(node:24175) UnhandledPromiseRejectionWarning: Error: Protocol error (Target.attachToTarget): Target closed.
+    at Promise (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:71:63)
+    at new Promise (<anonymous>)
+    at Connection.send (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:70:16)
+    at Connection.createSession (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:141:42)
+    at Target_js_1.Target [as _sessionFactory] (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Browser.js:157:91)
+    at Target.page (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Target.js:72:38)
+    at PuppeteerExtraPluginAdblocker._onTargetCreated (/home/goelayu/research/WebPeformance/node_modules/puppeteer-extra-plugin/dist/index.cjs.js:489:39)
+    at process._tickCallback (internal/process/next_tick.js:68:7)
+(node:24175) UnhandledPromiseRejectionWarning: Unhandled promise rejection. This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). (rejection id: 5)
+(node:24175) UnhandledPromiseRejectionWarning: Error: Protocol error (Target.attachToTarget): Target closed.
+    at Promise (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:71:63)
+    at new Promise (<anonymous>)
+    at Connection.send (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:70:16)
+    at Connection.createSession (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:141:42)
+    at Target_js_1.Target [as _sessionFactory] (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Browser.js:157:91)
+    at Target.page (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Target.js:72:38)
+    at PuppeteerExtraPluginAdblocker._onTargetCreated (/home/goelayu/research/WebPeformance/node_modules/puppeteer-extra-plugin/dist/index.cjs.js:489:39)
+    at process._tickCallback (internal/process/next_tick.js:68:7)
+(node:24175) UnhandledPromiseRejectionWarning: Unhandled promise rejection. This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). (rejection id: 6)
+(node:24175) UnhandledPromiseRejectionWarning: Error: Protocol error (Target.attachToTarget): Target closed.
+    at Promise (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:71:63)
+    at new Promise (<anonymous>)
+    at Connection.send (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:70:16)
+    at Connection.createSession (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:141:42)
+    at Target_js_1.Target [as _sessionFactory] (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Browser.js:157:91)
+    at Target.page (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Target.js:72:38)
+    at PuppeteerExtraPluginAdblocker._onTargetCreated (/home/goelayu/research/WebPeformance/node_modules/puppeteer-extra-plugin/dist/index.cjs.js:489:39)
+    at process._tickCallback (internal/process/next_tick.js:68:7)
+(node:24175) UnhandledPromiseRejectionWarning: Unhandled promise rejection. This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). (rejection id: 7)
+Injection time: 0 134.527154 .Length: 94840
+proxy error: { Error: write EPIPE
+    at WriteWrap.afterWrite [as oncomplete] (net.js:835:14) errno: 'EPIPE', code: 'EPIPE', syscall: 'write' }
+goelayu   2992 29.4 12.1 2177540 961884 pts/14 Rl   21:51   6:00 node mitm-proxy.js
+Launching site http://www.hindustantimes.com
+Injection time: 0 7.389061 .Length: 8307
+Injection time: 0 95.606696 .Length: 185649
+Injection time: 0 10.557751 .Length: 6726
+Injection time: 0 2.594379 .Length: 5860
+(node:24458) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 827.192951 .Length: 554279
+Injection time: 0 1.673266 .Length: 1241785
+Injection time: 0 0.335633 .Length: 438
+Injection time: 0 20.278701 .Length: 17695
+Site loaded
+extracting handlers
+http://www.hindustantimes.com Time EVT 0 36.385128
+extract graph 0 with 0 nodes
+extract graph 1 with 0 nodes
+extract graph 2 with 0 nodes
+extract graph 3 with 0 nodes
+extract graph 4 with 0 nodes
+extract graph 5 with 0 nodes
+extract graph 6 with 0 nodes
+extract graph 7 with 0 nodes
+extract graph 8 with 0 nodes
+extract graph 9 with 0 nodes
+Done
+http://www.hindustantimes.com Time Static 0 0.469352
+Injection time: 0 9.982732 .Length: 54313
+goelayu   2992 29.6 11.9 2165068 950928 pts/14 Sl   21:51   6:02 node mitm-proxy.js
+Launching site http://www.owl.english.purdue.edu
+(node:24591) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+proxy error: { Error: getaddrinfo ENOTFOUND www.owl.english.purdue.edu www.owl.english.purdue.edu:80
+    at GetAddrInfoReqWrap.onlookup [as oncomplete] (dns.js:50:26)
+  errno: 'ENOTFOUND',
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'www.owl.english.purdue.edu',
+  host: 'www.owl.english.purdue.edu',
+  port: 80 }
+Site loaded
+extracting handlers
+error while launchig Error: Evaluation failed: TypeError: Cannot read property 'setTracingMode' of undefined
+    at triggerEvents (<anonymous>:120:21)
+    at __puppeteer_evaluation_script__:1:8
+rm: cannot remove '/tmp/webarchive/*': No such file or directory
+goelayu   2992 29.5 11.9 2165068 950928 pts/14 Sl   21:51   6:02 node mitm-proxy.js
+Launching site http://www.economist.com
+(node:24676) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 85.193288 .Length: 58372
+Injection time: 0 4.507742 .Length: 1596
+Injection time: 0 20.852317 .Length: 18747
+Injection time: 0 16.981418 .Length: 46463
+Injection time: 0 144.08335 .Length: 129301
+Injection time: 0 247.974137 .Length: 320297
+Injection time: 1 28.326141 .Length: 1018507
+Injection time: 0 0.46148 .Length: 1421
+Injection time: 0 0.19048 .Length: 76
+Site loaded
+extracting handlers
+http://www.economist.com Time EVT 0 53.010845
+extract graph 0 with 52 nodes
+extract graph 1 with 52 nodes
+extract graph 2 with 52 nodes
+extract graph 3 with 52 nodes
+extract graph 4 with 52 nodes
+extract graph 5 with 52 nodes
+extract graph 6 with 52 nodes
+extract graph 7 with 52 nodes
+extract graph 8 with 52 nodes
+extract graph 9 with 52 nodes
+Comparing learnt 1 of size 56 with eval 2 of size 52
+Done
+http://www.economist.com Time Static 0 445.789616
+goelayu   2992 29.7 12.8 2237480 1022980 pts/14 Sl  21:51   6:05 node mitm-proxy.js
+Launching site http://www.aljazeera.com
+(node:24881) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 21.378741 .Length: 6953
+Injection time: 0 432.619963 .Length: 310677
+Injection time: 0 23.028387 .Length: 20237
+Injection time: 0 150.380772 .Length: 134439
+Injection time: 0 147.085567 .Length: 376092
+Injection time: 0 344.934658 .Length: 257381
+Injection time: 0 328.612178 .Length: 240766
+Injection time: 0 233.340135 .Length: 275790
+Injection time: 0 307.980969 .Length: 277868
+Site loaded
+extracting handlers
+http://www.aljazeera.com Time EVT 0 52.723538
+extract graph 0 with 59 nodes
+extract graph 1 with 59 nodes
+extract graph 2 with 59 nodes
+extract graph 3 with 59 nodes
+extract graph 4 with 59 nodes
+extract graph 5 with 59 nodes
+extract graph 6 with 59 nodes
+extract graph 7 with 59 nodes
+extract graph 8 with 59 nodes
+extract graph 9 with 59 nodes
+Comparing learnt 1 of size 119 with eval 2 of size 59
+Done
+http://www.aljazeera.com Time Static 1 916.433358
+goelayu   2992 29.8 12.3 2192928 978096 pts/14 Sl   21:51   6:09 node mitm-proxy.js
+Launching site http://www.yonhapnews.co.kr
+(node:25061) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 36.330397 .Length: 23577
+Injection time: 0 9.143863 .Length: 11760
+Injection time: 0 2.681025 .Length: 4945
+Injection time: 0 51.80616 .Length: 116033
+Injection time: 0 99.694113 .Length: 159283
+Injection time: 0 6.210137 .Length: 6109
+Injection time: 0 56.586211 .Length: 18069
+Injection time: 0 121.778668 .Length: 97166
+Injection time: 0 104.934104 .Length: 941309
+Injection time: 0 17.417984 .Length: 33595
+Injection time: 0 73.566176 .Length: 130083
+Injection time: 0 144.608161 .Length: 179100
+Injection time: 0 95.72032 .Length: 246588
+Injection time: 0 5.002434 .Length: 4034
+Injection time: 0 227.488426 .Length: 510072
+Injection time: 0 19.054889 .Length: 8543
+Injection time: 0 235.229064 .Length: 192452
+Injection time: 2 317.308973 .Length: 1662686
+Injection time: 0 4.376187 .Length: 35222
+Injection time: 0 43.556818 .Length: 24992
+Injection time: 0 124.806939 .Length: 99696
+Injection time: 0 0.830696 .Length: 980
+Timer fired before page could be loaded { TimeoutError: Navigation timeout of 100000 ms exceeded
+    at Promise.then (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/LifecycleWatcher.js:106:111) name: 'TimeoutError' }
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+goelayu   2992 28.3  7.8 1870996 621192 pts/14 Sl   21:51   6:19 node mitm-proxy.js
+Launching site http://www.my.yahoo.com
+(node:26669) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 56.181748 .Length: 7370
+Injection time: 0 13.213751 .Length: 4988
+Injection time: 0 9.977812 .Length: 3962
+Injection time: 0 108.709353 .Length: 53518
+Injection time: 0 102.056529 .Length: 78753
+Injection time: 0 408.045804 .Length: 207362
+Injection time: 0 188.560299 .Length: 154957
+Injection time: 0 5.008092 .Length: 1627
+Injection time: 0 26.729585 .Length: 12784
+Injection time: 0 8.103029 .Length: 3097
+Injection time: 0 3.895747 .Length: 3569
+Injection time: 0 40.373396 .Length: 28645
+Injection time: 0 19.641621 .Length: 16415
+Injection time: 0 23.619895 .Length: 13998
+Injection time: 0 26.953826 .Length: 7504
+Injection time: 0 11.598222 .Length: 12285
+Injection time: 0 7.617987 .Length: 5285
+Injection time: 0 18.645446 .Length: 13822
+Injection time: 0 2.789107 .Length: 3351
+Injection time: 0 14.054642 .Length: 12115
+Injection time: 0 15.574022 .Length: 4744
+Injection time: 0 16.813766 .Length: 6495
+Injection time: 0 30.150862 .Length: 26739
+Injection time: 0 17.95203 .Length: 17701
+Injection time: 0 31.870116 .Length: 28340
+Injection time: 0 4.723378 .Length: 1144
+Injection time: 0 1.12772 .Length: 1017
+Injection time: 0 3.322597 .Length: 904
+Injection time: 0 11.290238 .Length: 2331
+Injection time: 0 15.7332 .Length: 4806
+Injection time: 0 23.588647 .Length: 12347
+Injection time: 0 27.812146 .Length: 9806
+Injection time: 0 14.179747 .Length: 7326
+Injection time: 0 14.417925 .Length: 6560
+Injection time: 0 6.922376 .Length: 3608
+Injection time: 0 4.947628 .Length: 2785
+Injection time: 0 0.206364 .Length: 222
+Injection time: 0 32.625517 .Length: 9908
+Injection time: 0 2.411611 .Length: 2283
+Injection time: 0 2.512208 .Length: 2063
+Injection time: 0 1.768105 .Length: 1473
+Injection time: 0 8.965889 .Length: 3963
+Injection time: 0 7.177837 .Length: 5756
+Injection time: 0 0.837982 .Length: 332
+Injection time: 0 3.799111 .Length: 1069
+Injection time: 0 3.738628 .Length: 864
+Injection time: 0 24.961248 .Length: 8118
+Injection time: 0 1.514915 .Length: 1440
+Injection time: 0 1.398389 .Length: 930
+Injection time: 0 2.700174 .Length: 2271
+Injection time: 0 4.97907 .Length: 1786
+Injection time: 0 16.823316 .Length: 4935
+Injection time: 0 7.810649 .Length: 1958
+Injection time: 0 1.115917 .Length: 1138
+Injection time: 0 5.26198 .Length: 4223
+Injection time: 0 2.220169 .Length: 2574
+Injection time: 0 7.760823 .Length: 2852
+Injection time: 0 2.02226 .Length: 515
+Injection time: 0 22.371872 .Length: 7520
+Injection time: 0 4.141178 .Length: 2898
+Injection time: 0 4.375156 .Length: 3393
+Injection time: 0 4.476956 .Length: 1216
+Injection time: 0 5.029387 .Length: 2111
+Injection time: 0 0.3683 .Length: 411
+Injection time: 0 5.553308 .Length: 2100
+Injection time: 0 1.44606 .Length: 571
+Injection time: 0 3.68799 .Length: 1272
+Injection time: 0 3.191459 .Length: 1193
+Injection time: 0 1.936499 .Length: 526
+Injection time: 0 20.26445 .Length: 5388
+Injection time: 0 3.284655 .Length: 996
+Injection time: 0 2.01839 .Length: 490
+Injection time: 0 19.356513 .Length: 6928
+Injection time: 0 2.461078 .Length: 1215
+Injection time: 0 2.038999 .Length: 712
+Injection time: 0 10.106421 .Length: 2544
+Injection time: 0 5.548878 .Length: 2072
+Injection time: 0 11.441835 .Length: 2801
+Injection time: 0 4.166757 .Length: 1349
+Injection time: 0 4.170707 .Length: 1209
+Injection time: 0 5.391634 .Length: 5302
+Injection time: 0 1.194536 .Length: 1333
+Injection time: 0 0.490712 .Length: 698
+Injection time: 0 1.279468 .Length: 882
+Injection time: 0 11.739232 .Length: 1489
+Injection time: 0 14.688807 .Length: 4409
+Injection time: 0 10.60225 .Length: 2834
+Injection time: 0 1.678223 .Length: 685
+Injection time: 0 2.392787 .Length: 531
+Injection time: 0 1.583842 .Length: 524
+Injection time: 0 2.886704 .Length: 2861
+Injection time: 0 0.909011 .Length: 295
+Injection time: 0 16.597393 .Length: 2095
+Injection time: 0 7.266348 .Length: 3034
+Injection time: 0 28.106847 .Length: 17856
+Injection time: 0 15.63875 .Length: 4126
+Injection time: 0 51.909763 .Length: 32190
+Injection time: 0 3.20225 .Length: 2422
+Injection time: 0 1.109757 .Length: 391
+Injection time: 0 10.743512 .Length: 1923
+Injection time: 0 53.406659 .Length: 33591
+Injection time: 0 0.864927 .Length: 226
+Injection time: 0 12.032448 .Length: 3719
+Injection time: 0 2.396098 .Length: 1035
+Injection time: 0 2.342483 .Length: 754
+Injection time: 0 14.966313 .Length: 2602
+Injection time: 0 4.757279 .Length: 1369
+Injection time: 0 8.239126 .Length: 6279
+Injection time: 0 5.414564 .Length: 1712
+Injection time: 0 11.537172 .Length: 2923
+Injection time: 0 10.367312 .Length: 4323
+Injection time: 0 4.807892 .Length: 1604
+Injection time: 0 7.711035 .Length: 4617
+Injection time: 0 0.918528 .Length: 1082
+Injection time: 0 0.190466 .Length: 422
+Injection time: 0 2.341562 .Length: 2081
+Injection time: 0 1.385676 .Length: 1658
+Injection time: 0 2.503863 .Length: 1047
+Injection time: 0 5.619707 .Length: 1579
+Injection time: 0 19.866504 .Length: 3041
+Injection time: 0 10.06423 .Length: 3205
+Injection time: 0 3.508171 .Length: 972
+Injection time: 0 3.057032 .Length: 997
+Injection time: 0 2.51105 .Length: 936
+Injection time: 0 1.12603 .Length: 489
+Injection time: 0 3.13515 .Length: 2014
+Injection time: 0 3.407023 .Length: 2642
+Injection time: 0 12.242895 .Length: 3037
+Injection time: 0 5.869983 .Length: 2555
+Injection time: 0 3.42464 .Length: 1173
+Injection time: 0 23.6 .Length: 8385
+Injection time: 0 7.082909 .Length: 2143
+Injection time: 0 4.361113 .Length: 4005
+Injection time: 0 1.102756 .Length: 1194
+Injection time: 0 3.872641 .Length: 1203
+Injection time: 0 2.421712 .Length: 2759
+Injection time: 0 0.635017 .Length: 776
+Injection time: 0 0.441106 .Length: 387
+Injection time: 0 1.152166 .Length: 1049
+Injection time: 0 24.493363 .Length: 5957
+Injection time: 0 5.127399 .Length: 3136
+Injection time: 0 7.641212 .Length: 2477
+Injection time: 0 7.464917 .Length: 2241
+Injection time: 0 0.959616 .Length: 317
+Injection time: 0 1.92392 .Length: 637
+Injection time: 0 10.128141 .Length: 5490
+Injection time: 0 13.446735 .Length: 4345
+Injection time: 0 2.04663 .Length: 658
+Injection time: 0 1.286366 .Length: 1461
+Injection time: 0 5.404293 .Length: 5606
+Injection time: 0 1.604602 .Length: 1869
+Injection time: 0 0.582138 .Length: 645
+Injection time: 0 1.526645 .Length: 1814
+Injection time: 0 1.017319 .Length: 1128
+Injection time: 0 4.258844 .Length: 1498
+Injection time: 0 5.339779 .Length: 2011
+Injection time: 0 0.988836 .Length: 487
+Injection time: 0 8.172396 .Length: 2062
+Injection time: 0 5.099059 .Length: 5883
+Injection time: 0 2.479884 .Length: 2643
+Injection time: 0 1.61861 .Length: 530
+Injection time: 0 5.148827 .Length: 1352
+Injection time: 0 2.369759 .Length: 712
+Injection time: 0 1.605325 .Length: 620
+Injection time: 0 2.864229 .Length: 907
+Injection time: 0 13.79382 .Length: 4132
+Injection time: 0 5.887447 .Length: 2208
+Injection time: 0 4.292502 .Length: 1922
+Injection time: 0 15.586813 .Length: 14937
+Injection time: 0 1.171996 .Length: 1092
+Injection time: 0 3.17816 .Length: 3563
+Injection time: 0 19.75622 .Length: 3741
+Site loaded
+extracting handlers
+http://www.my.yahoo.com Time EVT 0 138.711127
+extract graph 0 with 423 nodes
+extract graph 1 with 78 nodes
+extract graph 2 with 78 nodes
+extract graph 3 with 78 nodes
+extract graph 4 with 78 nodes
+extract graph 5 with 78 nodes
+extract graph 6 with 78 nodes
+extract graph 7 with 78 nodes
+extract graph 8 with 78 nodes
+extract graph 9 with 78 nodes
+Injection time: 0 25.647097 .Length: 16605
+Injection time: 0 31.621278 .Length: 16605
+Comparing learnt 1 of size 530 with eval 2 of size 423
+Done
+http://www.my.yahoo.com Time Static 1 326.961323
+goelayu   2992 28.5  9.4 1962564 747736 pts/14 Sl   21:51   6:25 node mitm-proxy.js
+Launching site http://www.alarabiya.net
+(node:26918) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Timer fired before page could be loaded { TimeoutError: Navigation timeout of 100000 ms exceeded
+    at Promise.then (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/LifecycleWatcher.js:106:111) name: 'TimeoutError' }
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+rm: cannot remove '/tmp/webarchive/*': No such file or directory
+goelayu   2992 26.9  7.8 1869972 624380 pts/14 Sl   21:51   6:31 node mitm-proxy.js
+Launching site http://www.newsnow.co.uk
+(node:28418) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 223.381379 .Length: 88145
+Injection time: 0 66.108067 .Length: 41863
+Injection time: 0 317.157717 .Length: 306791
+Injection time: 0 439.487809 .Length: 301944
+Injection time: 0 84.234932 .Length: 97875
+Injection time: 0 47.260963 .Length: 81457
+Site loaded
+extracting handlers
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 27.0  9.8 1994680 779640 pts/14 Sl   21:51   6:34 node mitm-proxy.js
+Launching site http://www.mathrubhumi.com
+(node:28565) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 5.768712 .Length: 3224
+Injection time: 0 134.370055 .Length: 84991
+Injection time: 0 19.618317 .Length: 14631
+Injection time: 0 26.486765 .Length: 18975
+Injection time: 0 122.031113 .Length: 85580
+Injection time: 0 4.22294 .Length: 3622
+Injection time: 0 2.454514 .Length: 2385
+Injection time: 0 10.788237 .Length: 10429
+Injection time: 0 38.751848 .Length: 36938
+Injection time: 0 123.751048 .Length: 86709
+Injection time: 0 9.221626 .Length: 3930
+Injection time: 0 337.596187 .Length: 215667
+Injection time: 0 112.9053 .Length: 86709
+Injection time: 0 119.162698 .Length: 79569
+Injection time: 0 134.732286 .Length: 86709
+Injection time: 0 340.797946 .Length: 281073
+Injection time: 0 57.448568 .Length: 48944
+Injection time: 0 135.771111 .Length: 85580
+Injection time: 0 1.398276 .Length: 3224
+Injection time: 0 13.875783 .Length: 5445
+Injection time: 0 69.517614 .Length: 48778
+Injection time: 0 113.858113 .Length: 112692
+Injection time: 0 24.694244 .Length: 23543
+Injection time: 0 427.848004 .Length: 520714
+Injection time: 0 370.078547 .Length: 289539
+Injection time: 0 37.82187 .Length: 65888
+Injection time: 0 191.234314 .Length: 129682
+Injection time: 0 267.243056 .Length: 215667
+Injection time: 0 91.171251 .Length: 65023
+Injection time: 0 105.525818 .Length: 112369
+Injection time: 0 344.998724 .Length: 137155
+Injection time: 1 868.105468 .Length: 1433491
+Injection time: 0 38.487011 .Length: 27632
+Injection time: 0 62.768786 .Length: 41165
+Site loaded
+extracting handlers
+Injection time: 0 0.671198 .Length: 438
+Injection time: 0 94.131458 .Length: 65064
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 27.6 14.4 2357660 1149480 pts/14 Sl  21:51   6:46 node mitm-proxy.js
+Launching site http://www.smh.com.au
+Injection time: 0 37.147164 .Length: 77274
+Injection time: 0 36.673711 .Length: 28915
+(node:28800) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+Injection time: 0 433.388478 .Length: 331170
+Injection time: 0 324.737927 .Length: 1769945
+global time out value 15000 100000
+Injection time: 0 16.390776 .Length: 5667
+Injection time: 0 4.095657 .Length: 3515
+Injection time: 0 674.394263 .Length: 569320
+Injection time: 0 410.49294 .Length: 348589
+Injection time: 0 407.634883 .Length: 497360
+Injection time: 0 797.278689 .Length: 1096055
+Injection time: 0 15.642413 .Length: 11830
+Injection time: 0 368.685186 .Length: 404261
+Site loaded
+extracting handlers
+http://www.smh.com.au Time EVT 0 77.883519
+extract graph 0 with 14 nodes
+extract graph 1 with 71 nodes
+extract graph 2 with 71 nodes
+extract graph 3 with 71 nodes
+extract graph 4 with 71 nodes
+extract graph 5 with 71 nodes
+extract graph 6 with 71 nodes
+extract graph 7 with 71 nodes
+extract graph 8 with 71 nodes
+extract graph 9 with 71 nodes
+Comparing learnt 1 of size 42 with eval 2 of size 71
+Comparing learnt 2 of size 158 with eval 4 of size 71
+Done
+http://www.smh.com.au Time Static 3 782.419381
+goelayu   2992 27.9 14.1 2332024 1125292 pts/14 Sl  21:51   6:54 node mitm-proxy.js
+Launching site http://www.fortune.com
+(node:29073) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 0.203926 .Length: 72
+Injection time: 0 0.183271 .Length: 72
+Injection time: 0 234.642547 .Length: 265798
+Injection time: 0 2.778561 .Length: 1323
+Injection time: 0 670.286764 .Length: 996637
+Injection time: 0 2.321113 .Length: 1815
+Injection time: 0 0.720824 .Length: 616
+Injection time: 0 74.814319 .Length: 62000
+Injection time: 0 0.139103 .Length: 72
+Injection time: 0 9.372232 .Length: 2670
+Injection time: 0 37.950085 .Length: 19978
+Injection time: 0 1.927905 .Length: 1552
+Injection time: 0 8.623976 .Length: 3875
+Injection time: 0 6.014008 .Length: 7915
+Injection time: 0 44.758529 .Length: 43285
+Injection time: 0 0.766 .Length: 802
+Injection time: 0 110.523582 .Length: 82254
+Injection time: 0 9.482553 .Length: 3653
+Injection time: 0 5.813452 .Length: 1861
+Injection time: 0 11.453235 .Length: 4154
+Injection time: 0 9.145092 .Length: 2225
+Injection time: 0 5.170346 .Length: 3091
+Injection time: 0 12.806626 .Length: 4734
+Injection time: 0 1.606792 .Length: 628
+Injection time: 0 3.686528 .Length: 1066
+Injection time: 0 3.795777 .Length: 1006
+Injection time: 0 30.432088 .Length: 9122
+Injection time: 0 291.796457 .Length: 215557
+Injection time: 0 1.291404 .Length: 1130
+Injection time: 0 9.968737 .Length: 8884
+Injection time: 0 0.534102 .Length: 521
+Injection time: 0 1.872175 .Length: 1117
+Injection time: 0 0.338927 .Length: 249
+Injection time: 0 2.802199 .Length: 1932
+Injection time: 0 0.733585 .Length: 208
+Injection time: 0 0.594586 .Length: 222
+Injection time: 0 18.605984 .Length: 5263
+Injection time: 0 15.587526 .Length: 4654
+Injection time: 0 46.272371 .Length: 29099
+Injection time: 0 3.994497 .Length: 1551
+Injection time: 0 78.486318 .Length: 53171
+Injection time: 0 3.579258 .Length: 1140
+Injection time: 0 9.980674 .Length: 2629
+Injection time: 0 2.371653 .Length: 927
+Injection time: 0 5.64552 .Length: 1817
+Injection time: 0 8.549168 .Length: 2206
+Injection time: 0 3.240841 .Length: 754
+Injection time: 0 20.209995 .Length: 6626
+Injection time: 0 6.961951 .Length: 3340
+Injection time: 0 2.419826 .Length: 1778
+Injection time: 0 136.325091 .Length: 117316
+Injection time: 0 15.842292 .Length: 12008
+Injection time: 0 0.837699 .Length: 197
+Injection time: 0 7.685953 .Length: 2581
+Injection time: 0 14.38534 .Length: 4086
+Injection time: 0 36.024283 .Length: 21746
+Injection time: 0 1.769557 .Length: 2545
+Injection time: 0 7.92104 .Length: 8852
+Injection time: 0 35.868098 .Length: 9516
+Injection time: 0 1.861587 .Length: 440
+Injection time: 0 31.584093 .Length: 6489
+Injection time: 0 2.857321 .Length: 1750
+Injection time: 0 25.454917 .Length: 13524
+Injection time: 0 52.559377 .Length: 51413
+Injection time: 0 25.670706 .Length: 6628
+Injection time: 0 0.421601 .Length: 408
+Injection time: 0 9.479479 .Length: 6732
+Injection time: 0 6.425083 .Length: 6661
+Injection time: 0 0.868161 .Length: 622
+Injection time: 0 28.26132 .Length: 18863
+Injection time: 0 6.505761 .Length: 1876
+Injection time: 0 18.494605 .Length: 4940
+Injection time: 0 1.113932 .Length: 324
+Injection time: 0 4.884191 .Length: 785
+Injection time: 0 11.742528 .Length: 5049
+Injection time: 0 437.711556 .Length: 238976
+Injection time: 0 0.862611 .Length: 557
+Injection time: 0 2.222319 .Length: 938
+Injection time: 0 0.565527 .Length: 241
+Injection time: 0 1.116219 .Length: 604
+Injection time: 0 5.668079 .Length: 3906
+Injection time: 0 44.355016 .Length: 9370
+Injection time: 0 21.856478 .Length: 8343
+Site loaded
+extracting handlers
+http://www.fortune.com Time EVT 0 101.120006
+extract graph 0 with 112 nodes
+extract graph 1 with 110 nodes
+extract graph 2 with 110 nodes
+extract graph 3 with 110 nodes
+extract graph 4 with 110 nodes
+extract graph 5 with 110 nodes
+extract graph 6 with 110 nodes
+extract graph 7 with 110 nodes
+extract graph 8 with 110 nodes
+extract graph 9 with 110 nodes
+Injection time: 0 717.438187 .Length: 769517
+Comparing learnt 1 of size 176 with eval 2 of size 117
+Comparing learnt 2 of size 181 with eval 4 of size 117
+Done
+http://www.fortune.com Time Static 1 166.468857
+goelayu   2992 28.2 13.9 2309144 1109484 pts/14 Sl  21:51   7:01 node mitm-proxy.js
+Launching site http://www.thestar.com
+(node:29559) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 0.361383 .Length: 22
+Injection time: 0 5.151781 .Length: 1469
+Injection time: 0 286.098195 .Length: 301692
+Injection time: 0 16.471822 .Length: 18635
+Injection time: 0 903.746479 .Length: 949283
+Injection time: 1 121.852305 .Length: 1054161
+Injection time: 0 0.684838 .Length: 16
+Injection time: 0 333.676587 .Length: 211596
+Injection time: 0 62.359382 .Length: 117245
+Injection time: 0 29.646539 .Length: 28627
+Site loaded
+extracting handlers
+http://www.thestar.com Time EVT 0 709.583942
+extract graph 0 with 81 nodes
+extract graph 1 with 133 nodes
+extract graph 2 with 133 nodes
+extract graph 3 with 133 nodes
+extract graph 4 with 133 nodes
+extract graph 5 with 133 nodes
+extract graph 6 with 133 nodes
+extract graph 7 with 133 nodes
+extract graph 8 with 133 nodes
+extract graph 9 with 133 nodes
+Comparing learnt 1 of size 274 with eval 2 of size 133
+Comparing learnt 2 of size 330 with eval 4 of size 133
+Done
+http://www.thestar.com Time Static 2 196.826619
+goelayu   2992 28.4 12.3 2177656 981108 pts/14 Sl   21:51   7:06 node mitm-proxy.js
+Launching site http://www.voanews.com
+(node:29810) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 19.697071 .Length: 14401
+Injection time: 0 1.254291 .Length: 2018
+Injection time: 0 12.259569 .Length: 14745
+Injection time: 0 3.057716 .Length: 5090
+Injection time: 0 203.937629 .Length: 167944
+Injection time: 0 446.095468 .Length: 452187
+Site loaded
+extracting handlers
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 28.5 13.0 2231656 1034164 pts/14 Sl  21:51   7:08 node mitm-proxy.js
+Launching site http://www.theonion.com
+(node:29889) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 12.685285 .Length: 10489
+Injection time: 0 6.213639 .Length: 5876
+Injection time: 0 65.758926 .Length: 48306
+Injection time: 0 56.195825 .Length: 62787
+Injection time: 0 182.856108 .Length: 159162
+Injection time: 0 0.316409 .Length: 197
+Injection time: 0 4.281965 .Length: 7364
+Injection time: 0 11.768739 .Length: 8205
+Injection time: 0 6.466032 .Length: 4408
+Injection time: 0 77.713198 .Length: 9668
+Injection time: 0 57.028443 .Length: 7047
+Injection time: 0 5.320785 .Length: 3519
+Injection time: 0 4.166278 .Length: 3845
+Injection time: 0 142.271402 .Length: 118265
+Injection time: 0 141.501285 .Length: 191765
+Injection time: 0 149.247935 .Length: 120213
+Injection time: 0 38.145785 .Length: 19601
+Injection time: 0 3.55625 .Length: 2686
+Injection time: 0 6.626745 .Length: 6795
+Injection time: 0 2.925741 .Length: 2687
+Injection time: 0 25.955351 .Length: 17985
+Injection time: 0 50.075321 .Length: 45082
+Injection time: 0 536.765802 .Length: 469876
+Injection time: 0 17.652475 .Length: 5409
+Injection time: 0 29.38405 .Length: 16650
+Injection time: 0 16.98105 .Length: 16404
+Injection time: 0 7.406208 .Length: 7649
+Injection time: 0 10.303021 .Length: 7152
+Injection time: 1 241.495894 .Length: 1235387
+Injection time: 0 17.33472 .Length: 7733
+Site loaded
+extracting handlers
+Injection time: 0 85.294406 .Length: 79028
+Injection time: 0 11.321338 .Length: 13655
+Injection time: 0 27.734448 .Length: 24774
+http://www.theonion.com Time EVT 1 149.614874
+extract graph 0 with 407 nodes
+extract graph 1 with 156 nodes
+extract graph 2 with 156 nodes
+extract graph 3 with 156 nodes
+extract graph 4 with 176 nodes
+extract graph 5 with 176 nodes
+extract graph 6 with 203 nodes
+extract graph 7 with 176 nodes
+extract graph 8 with 175 nodes
+extract graph 9 with 203 nodes
+Comparing learnt 1 of size 911 with eval 2 of size 407
+Done
+http://www.theonion.com Time Static 5 176.240436
+goelayu   2992 28.6 14.3 2338932 1142356 pts/14 Sl  21:51   7:14 node mitm-proxy.js
+Launching site http://www.theglobeandmail.com
+(node:30441) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 0.115914 .Length: 72
+Injection time: 0 9.70876 .Length: 3293
+Injection time: 0 10.032518 .Length: 6274
+Injection time: 0 66.788284 .Length: 32351
+Injection time: 0 177.835412 .Length: 137052
+Injection time: 0 34.84134 .Length: 25001
+Injection time: 0 118.207359 .Length: 97853
+Injection time: 0 187.674342 .Length: 189730
+Injection time: 0 125.917535 .Length: 135551
+Injection time: 0 71.115059 .Length: 19412
+Injection time: 0 10.336403 .Length: 12243
+Site loaded
+extracting handlers
+Injection time: 0 36.099166 .Length: 34274
+Injection time: 0 8.764372 .Length: 5453
+Injection time: 0 187.89431 .Length: 213177
+Injection time: 0 0.284708 .Length: 1099
+http://www.theglobeandmail.com Time EVT 0 762.181152
+extract graph 0 with 67 nodes
+extract graph 1 with 39 nodes
+extract graph 2 with 39 nodes
+extract graph 3 with 39 nodes
+extract graph 4 with 39 nodes
+extract graph 5 with 47 nodes
+extract graph 6 with 39 nodes
+extract graph 7 with 39 nodes
+extract graph 8 with 39 nodes
+extract graph 9 with 47 nodes
+Injection time: 0 438.36736 .Length: 426797
+Injection time: 0 40.727848 .Length: 33872
+Comparing learnt 1 of size 167 with eval 2 of size 67
+Done
+http://www.theglobeandmail.com Time Static 1 56.739121
+(node:30441) UnhandledPromiseRejectionWarning: Error: Protocol error (Page.setLifecycleEventsEnabled): Target closed.
+    at Promise (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:208:63)
+    at new Promise (<anonymous>)
+    at CDPSession.send (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/Connection.js:207:16)
+    at FrameManager.initialize (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/FrameManager.js:75:26)
+    at process._tickCallback (internal/process/next_tick.js:68:7)
+(node:30441) UnhandledPromiseRejectionWarning: Unhandled promise rejection. This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). (rejection id: 2)
+(node:30441) [DEP0018] DeprecationWarning: Unhandled promise rejections are deprecated. In the future, promise rejections that are not handled will terminate the Node.js process with a non-zero exit code.
+goelayu   2992 28.8 13.8 2301684 1103568 pts/14 Rl  21:51   7:18 node mitm-proxy.js
+Launching site http://www.theroot.com
+(node:30688) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+Injection time: 0 798.266837 .Length: 580549
+proxy error: { Error: write EPIPE
+    at WriteWrap.afterWrite [as oncomplete] (net.js:835:14) errno: 'EPIPE', code: 'EPIPE', syscall: 'write' }
+Injection time: 0 0.941662 .Length: 1099
+Injection time: 0 192.036899 .Length: 213177
+global time out value 15000 100000
+Injection time: 0 59.582686 .Length: 33872
+Injection time: 0 15.446056 .Length: 8205
+Injection time: 0 7.56523 .Length: 5876
+Injection time: 0 16.065708 .Length: 10489
+Injection time: 0 0.21242 .Length: 197
+Injection time: 0 53.575074 .Length: 48306
+Injection time: 0 54.487546 .Length: 62787
+Injection time: 0 5.430638 .Length: 4408
+Injection time: 0 4.306498 .Length: 7364
+Injection time: 0 174.720011 .Length: 159162
+Injection time: 0 10.894435 .Length: 9668
+Injection time: 0 138.234369 .Length: 118265
+Injection time: 0 3.826969 .Length: 3845
+Injection time: 0 6.63147 .Length: 3519
+Injection time: 0 2.776093 .Length: 2686
+Injection time: 0 7.093607 .Length: 6795
+Injection time: 0 143.530434 .Length: 120213
+Injection time: 0 7.731028 .Length: 7047
+Injection time: 0 2.440972 .Length: 2687
+Injection time: 0 150.971525 .Length: 191765
+Injection time: 0 20.539297 .Length: 19601
+Injection time: 0 50.078659 .Length: 17985
+Injection time: 0 52.593412 .Length: 45082
+Injection time: 0 7.231336 .Length: 5409
+Injection time: 0 21.400844 .Length: 16650
+Injection time: 0 678.266884 .Length: 469876
+Injection time: 0 16.997886 .Length: 16404
+Injection time: 0 26.089599 .Length: 7649
+Injection time: 0 17.118308 .Length: 7152
+Injection time: 1 145.988028 .Length: 1235387
+Injection time: 0 11.136535 .Length: 7733
+Site loaded
+extracting handlers
+Injection time: 0 11.693133 .Length: 13655
+Injection time: 0 30.771401 .Length: 24774
+Injection time: 0 67.780902 .Length: 79028
+http://www.theroot.com Time EVT 1 68.720202
+extract graph 0 with 399 nodes
+extract graph 1 with 152 nodes
+extract graph 2 with 152 nodes
+extract graph 3 with 152 nodes
+extract graph 4 with 199 nodes
+extract graph 5 with 199 nodes
+extract graph 6 with 172 nodes
+extract graph 7 with 199 nodes
+extract graph 8 with 172 nodes
+extract graph 9 with 172 nodes
+Comparing learnt 1 of size 903 with eval 2 of size 399
+Done
+http://www.theroot.com Time Static 5 21.399816
+goelayu   2992 29.0 15.8 2458124 1260452 pts/14 Sl  21:51   7:25 node mitm-proxy.js
+Launching site http://www.theconversation.com
+(node:30937) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 6.131162 .Length: 1449
+Injection time: 0 92.780405 .Length: 67905
+Injection time: 1 559.218465 .Length: 1118614
+Site loaded
+extracting handlers
+http://www.theconversation.com Time EVT 0 125.548838
+extract graph 0 with 2 nodes
+extract graph 1 with 2 nodes
+extract graph 2 with 2 nodes
+extract graph 3 with 2 nodes
+extract graph 4 with 2 nodes
+extract graph 5 with 2 nodes
+extract graph 6 with 2 nodes
+extract graph 7 with 2 nodes
+extract graph 8 with 2 nodes
+extract graph 9 with 2 nodes
+Comparing learnt 1 of size 9 with eval 2 of size 2
+Done
+http://www.theconversation.com Time Static 3 28.462184
+goelayu   2992 29.1 14.3 2333676 1141108 pts/14 Sl  21:51   7:29 node mitm-proxy.js
+Launching site http://www.ctvnews.ca
+(node:31094) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 172.914381 .Length: 352491
+Injection time: 0 58.534324 .Length: 22962
+Injection time: 0 0.324684 .Length: 0
+Injection time: 0 0.134936 .Length: 0
+Injection time: 0 20.884215 .Length: 5687
+Injection time: 0 13.659875 .Length: 5161
+Injection time: 0 10.445435 .Length: 3660
+Injection time: 0 6.819059 .Length: 6013
+Injection time: 0 158.466212 .Length: 100237
+Injection time: 0 11.90742 .Length: 30773
+Injection time: 0 27.126494 .Length: 7054
+Injection time: 0 5.417186 .Length: 2146
+Injection time: 0 2.192855 .Length: 982
+Injection time: 0 59.73471 .Length: 41700
+Injection time: 0 4.580262 .Length: 2994
+Injection time: 0 319.85445 .Length: 1433759
+Injection time: 0 31.798263 .Length: 3984
+Injection time: 0 14.998035 .Length: 9915
+Injection time: 0 165.717622 .Length: 352491
+Injection time: 0 130.441371 .Length: 113314
+Injection time: 0 0.670509 .Length: 521
+Injection time: 0 1.228817 .Length: 2207
+Injection time: 0 132.690631 .Length: 139520
+Injection time: 0 13.461629 .Length: 8365
+Injection time: 0 0.136277 .Length: 16
+Injection time: 0 21.349332 .Length: 24190
+Injection time: 0 11.104623 .Length: 8054
+Injection time: 0 136.685571 .Length: 110796
+Injection time: 0 185.51093 .Length: 199100
+Injection time: 0 8.996871 .Length: 7732
+Injection time: 0 5.704055 .Length: 4767
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.callFunctionOn): Cannot find context with specified id
+goelayu   2992 29.2 13.7 2286340 1094668 pts/14 Sl  21:51   7:33 node mitm-proxy.js
+Launching site http://www.irna.ir
+(node:31310) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 71.67624 .Length: 42863
+Injection time: 0 125.759005 .Length: 97163
+Injection time: 0 76.438155 .Length: 70279
+Injection time: 0 373.619752 .Length: 296565
+Injection time: 0 166.14042 .Length: 141339
+Injection time: 0 189.767309 .Length: 149218
+Site loaded
+extracting handlers
+http://www.irna.ir Time EVT 0 91.54088
+extract graph 0 with 72 nodes
+extract graph 1 with 72 nodes
+extract graph 2 with 72 nodes
+extract graph 3 with 72 nodes
+extract graph 4 with 72 nodes
+extract graph 5 with 72 nodes
+extract graph 6 with 72 nodes
+extract graph 7 with 72 nodes
+extract graph 8 with 72 nodes
+extract graph 9 with 72 nodes
+Comparing learnt 1 of size 72 with eval 2 of size 72
+Done
+http://www.irna.ir Time Static 0 691.698806
+goelayu   2992 29.1 13.9 2299304 1107632 pts/14 Sl  21:51   7:35 node mitm-proxy.js
+Launching site http://www.intellicast.com
+(node:31616) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 20.06822 .Length: 4410
+Injection time: 0 198.410433 .Length: 128441
+Error while instrumenting source: TypeError: Cannot read property 'totalLen' of undefined
+Injection time: 0 90.829212 .Length: 73779
+Injection time: 1 315.983231 .Length: 1017264
+Injection time: 0 21.276956 .Length: 6292
+Injection time: 0 160.225478 .Length: 148616
+Injection time: 0 7.502036 .Length: 6411
+Injection time: 0 181.668625 .Length: 111458
+Site loaded
+extracting handlers
+http://www.intellicast.com Time EVT 0 22.842987
+extract graph 0 with 130 nodes
+extract graph 1 with 130 nodes
+extract graph 2 with 130 nodes
+extract graph 3 with 130 nodes
+extract graph 4 with 130 nodes
+extract graph 5 with 130 nodes
+extract graph 6 with 130 nodes
+extract graph 7 with 130 nodes
+extract graph 8 with 130 nodes
+extract graph 9 with 130 nodes
+Injection time: 0 104.235704 .Length: 141900
+Comparing learnt 1 of size 130 with eval 2 of size 131
+Comparing learnt 2 of size 131 with eval 4 of size 131
+Done
+http://www.intellicast.com Time Static 0 983.103977
+goelayu   2992 29.3 15.1 2392656 1201048 pts/14 Sl  21:51   7:39 node mitm-proxy.js
+Launching site http://www.blastingnews.com
+(node:31784) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Site loaded
+extracting handlers
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+rm: cannot remove '/tmp/webarchive/*': No such file or directory
+goelayu   2992 29.2 15.1 2395492 1203688 pts/14 Sl  21:51   7:40 node mitm-proxy.js
+Launching site http://www.bankrate.com
+(node:31932) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 5.63909 .Length: 42768
+Injection time: 0 148.643129 .Length: 93675
+Injection time: 0 4.645994 .Length: 326504
+Injection time: 0 70.270651 .Length: 66425
+Injection time: 0 2.508999 .Length: 4689
+Injection time: 0 10.293155 .Length: 6854
+Injection time: 0 37.14922 .Length: 31551
+Injection time: 0 192.518967 .Length: 140778
+Injection time: 0 6.075672 .Length: 1712
+Site loaded
+extracting handlers
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 29.2 15.6 2437012 1244868 pts/14 Sl  21:51   7:41 node mitm-proxy.js
+Launching site http://www.rd.com
+(node:32085) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 26.762375 .Length: 5540
+Injection time: 0 135.529287 .Length: 96866
+Injection time: 0 145.915384 .Length: 99093
+Injection time: 0 25.707381 .Length: 16963
+Injection time: 0 135.129212 .Length: 90585
+Injection time: 0 367.523929 .Length: 371647
+Injection time: 0 156.885061 .Length: 125742
+Injection time: 0 3.793642 .Length: 1142
+Injection time: 0 76.012925 .Length: 58530
+Injection time: 0 242.269373 .Length: 308774
+Injection time: 0 155.363049 .Length: 128660
+Injection time: 0 73.784697 .Length: 49592
+Site loaded
+extracting handlers
+http://www.rd.com Time EVT 0 174.888255
+extract graph 0 with 158 nodes
+extract graph 1 with 99 nodes
+extract graph 2 with 99 nodes
+extract graph 3 with 99 nodes
+extract graph 4 with 99 nodes
+extract graph 5 with 99 nodes
+extract graph 6 with 99 nodes
+extract graph 7 with 99 nodes
+extract graph 8 with 99 nodes
+extract graph 9 with 99 nodes
+Comparing learnt 1 of size 261 with eval 2 of size 158
+Done
+http://www.rd.com Time Static 1 206.412683
+goelayu   2992 29.3 13.7 2284792 1094480 pts/14 Sl  21:51   7:44 node mitm-proxy.js
+Launching site http://www.dailycaller.com
+(node:32246) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 8.589251 .Length: 7617
+Injection time: 0 50.261742 .Length: 169806
+Site loaded
+extracting handlers
+http://www.dailycaller.com Time EVT 0 144.205892
+extract graph 0 with 0 nodes
+extract graph 1 with 0 nodes
+extract graph 2 with 0 nodes
+extract graph 3 with 0 nodes
+extract graph 4 with 0 nodes
+extract graph 5 with 0 nodes
+extract graph 6 with 0 nodes
+extract graph 7 with 0 nodes
+extract graph 8 with 0 nodes
+extract graph 9 with 0 nodes
+Done
+http://www.dailycaller.com Time Static 0 0.444605
+Injection time: 0 0.220089 .Length: 291
+Injection time: 0 6.4228 .Length: 2387
+Injection time: 0 248.876792 .Length: 171427
+goelayu   2992 29.3 15.1 2396860 1205096 pts/14 Rl  21:51   7:45 node mitm-proxy.js
+Launching site http://www.financialexpress.com
+(node:32326) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+Injection time: 0 669.649329 .Length: 474404
+global time out value 15000 100000
+Injection time: 0 19.77969 .Length: 6355
+Injection time: 0 145.59128 .Length: 96873
+Injection time: 0 13.235649 .Length: 5537
+Injection time: 0 75.966598 .Length: 42863
+Injection time: 0 20.082256 .Length: 9122
+Injection time: 0 2.6307 .Length: 2897
+Injection time: 0 1.360828 .Length: 2431
+Injection time: 0 2.006506 .Length: 1048
+Injection time: 0 4.674663 .Length: 1403
+Injection time: 0 1.947982 .Length: 920
+Injection time: 0 9.48452 .Length: 1573
+Injection time: 0 5.134088 .Length: 3014
+Injection time: 0 60.357328 .Length: 48284
+Injection time: 0 44.380806 .Length: 42001
+Injection time: 0 74.449528 .Length: 84265
+Injection time: 0 123.691761 .Length: 96873
+Injection time: 0 95.061912 .Length: 95514
+Injection time: 0 114.815478 .Length: 86926
+Injection time: 0 162.481599 .Length: 143945
+Injection time: 1 321.139922 .Length: 1004858
+Injection time: 0 7.337093 .Length: 1596
+Site loaded
+extracting handlers
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 29.5 14.9 2376512 1189416 pts/14 Sl  21:51   7:50 node mitm-proxy.js
+Launching site http://www.business-standard.com
+(node:32561) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 0.270648 .Length: 26
+Injection time: 0 160.71798 .Length: 127945
+Injection time: 0 117.663445 .Length: 94839
+Injection time: 0 8.582055 .Length: 4483
+Injection time: 0 200.284473 .Length: 265285
+Injection time: 0 977.217818 .Length: 801913
+Injection time: 0 29.017395 .Length: 22988
+Injection time: 0 3.634342 .Length: 3442
+Injection time: 0 225.508251 .Length: 210265
+Injection time: 0 22.292405 .Length: 8838
+Injection time: 0 376.804068 .Length: 361291
+Site loaded
+extracting handlers
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 29.7 15.3 2409664 1221408 pts/14 Sl  21:51   7:55 node mitm-proxy.js
+Launching site http://www.bostonglobe.com
+(node:32717) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 71.802576 .Length: 37648
+Injection time: 0 501.329432 .Length: 312675
+Injection time: 0 323.81078 .Length: 276733
+Injection time: 0 48.789991 .Length: 38262
+Injection time: 1 687.454254 .Length: 1349652
+Injection time: 0 54.265312 .Length: 40213
+Injection time: 0 51.444981 .Length: 125159
+Injection time: 0 58.735754 .Length: 167615
+Injection time: 0 73.726467 .Length: 50386
+Injection time: 0 312.709566 .Length: 280097
+Injection time: 0 15.0257 .Length: 8381
+Site loaded
+extracting handlers
+Injection time: 0 344.812122 .Length: 239091
+http://www.bostonglobe.com Time EVT 1 32.568471
+extract graph 0 with 385 nodes
+extract graph 1 with 410 nodes
+extract graph 2 with 410 nodes
+extract graph 3 with 410 nodes
+extract graph 4 with 262 nodes
+extract graph 5 with 410 nodes
+extract graph 6 with 262 nodes
+extract graph 7 with 415 nodes
+extract graph 8 with 410 nodes
+extract graph 9 with 311 nodes
+Comparing learnt 1 of size 802 with eval 2 of size 413
+Comparing learnt 2 of size 833 with eval 4 of size 414
+Comparing learnt 3 of size 834 with eval 4 of size 414
+Done
+http://www.bostonglobe.com Time Static 7 470.784105
+goelayu   2992 29.9 14.1 2312592 1128408 pts/14 Sl  21:51   8:03 node mitm-proxy.js
+Launching site http://www.adweek.com
+(node:1427) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 131.709962 .Length: 88145
+Injection time: 0 22.781801 .Length: 9632
+Injection time: 0 6.251974 .Length: 1619
+Injection time: 0 2.540672 .Length: 1989
+Injection time: 0 170.343995 .Length: 136908
+Injection time: 0 0.968832 .Length: 1042
+Injection time: 0 46.389424 .Length: 42863
+Injection time: 0 161.739543 .Length: 99270
+Injection time: 0 0.574075 .Length: 326
+Injection time: 0 1.267764 .Length: 27666
+Injection time: 0 13.45071 .Length: 5884
+Injection time: 0 0.130295 .Length: 142
+Injection time: 0 1.613266 .Length: 1363
+Injection time: 0 1.686517 .Length: 857
+Injection time: 0 45.117632 .Length: 34325
+Injection time: 0 41.916387 .Length: 16023
+Injection time: 0 0.472474 .Length: 463
+Injection time: 0 30.093392 .Length: 14280
+Injection time: 0 1.604953 .Length: 2000
+Injection time: 0 1.873804 .Length: 1745
+Injection time: 0 1.367887 .Length: 1171
+Injection time: 1 4.469996 .Length: 1119267
+Injection time: 0 1.270637 .Length: 1895
+Injection time: 0 35.350609 .Length: 17271
+Injection time: 0 28.631167 .Length: 9833
+Injection time: 0 4.06397 .Length: 2735
+Injection time: 0 136.893519 .Length: 124417
+Injection time: 0 6.683316 .Length: 1426
+Injection time: 0 0.218869 .Length: 343
+Site loaded
+extracting handlers
+http://www.adweek.com Time EVT 1 535.243782
+extract graph 0 with 337 nodes
+extract graph 1 with 306 nodes
+extract graph 2 with 306 nodes
+extract graph 3 with 306 nodes
+extract graph 4 with 319 nodes
+extract graph 5 with 306 nodes
+extract graph 6 with 306 nodes
+extract graph 7 with 306 nodes
+extract graph 8 with 306 nodes
+extract graph 9 with 319 nodes
+Comparing learnt 1 of size 481 with eval 2 of size 337
+Done
+http://www.adweek.com Time Static 1 901.784011
+goelayu   2992 30.0 15.9 2449036 1264064 pts/14 Sl  21:51   8:07 node mitm-proxy.js
+Launching site http://www.thetimes.co.uk
+(node:1604) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 0.174218 .Length: 26
+Injection time: 0 212.962375 .Length: 154244
+Injection time: 0 90.096368 .Length: 67086
+Injection time: 0 44.915502 .Length: 24399
+Injection time: 0 296.862691 .Length: 221094
+Injection time: 0 491.670893 .Length: 1631756
+Injection time: 0 88.046624 .Length: 63377
+Injection time: 0 14.366724 .Length: 11418
+Injection time: 0 21.839648 .Length: 17934
+Injection time: 0 168.117471 .Length: 155560
+Injection time: 0 294.236912 .Length: 298489
+Site loaded
+extracting handlers
+http://www.thetimes.co.uk Time EVT 0 708.278335
+extract graph 0 with 135 nodes
+extract graph 1 with 114 nodes
+extract graph 2 with 115 nodes
+extract graph 3 with 114 nodes
+extract graph 4 with 134 nodes
+extract graph 5 with 115 nodes
+extract graph 6 with 116 nodes
+extract graph 7 with 116 nodes
+extract graph 8 with 114 nodes
+extract graph 9 with 135 nodes
+Comparing learnt 1 of size 203 with eval 2 of size 136
+Comparing learnt 2 of size 204 with eval 4 of size 136
+Done
+http://www.thetimes.co.uk Time Static 1 169.191356
+goelayu   2992 30.1 14.6 2344076 1161932 pts/14 Sl  21:51   8:12 node mitm-proxy.js
+Launching site http://www.prnewswire.com
+(node:2860) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 135.398428 .Length: 85814
+Injection time: 0 108.739297 .Length: 87167
+Injection time: 0 0.16522 .Length: 0
+Injection time: 0 154.094622 .Length: 100237
+Injection time: 0 103.07101 .Length: 87691
+Injection time: 0 20.855129 .Length: 8118
+Injection time: 0 1.827696 .Length: 904
+Injection time: 0 7.206885 .Length: 3681
+Injection time: 0 31.126382 .Length: 15742
+Injection time: 0 2.411291 .Length: 13269
+Injection time: 0 19.855182 .Length: 8717
+Injection time: 0 2.032037 .Length: 512
+Injection time: 0 13.403367 .Length: 2852
+Injection time: 0 211.459314 .Length: 200299
+Injection time: 0 273.631921 .Length: 133300
+Injection time: 0 73.5854 .Length: 46884
+Site loaded
+extracting handlers
+http://www.prnewswire.com Time EVT 0 31.595397
+extract graph 0 with 43 nodes
+extract graph 1 with 43 nodes
+extract graph 2 with 43 nodes
+extract graph 3 with 43 nodes
+extract graph 4 with 43 nodes
+extract graph 5 with 43 nodes
+extract graph 6 with 43 nodes
+extract graph 7 with 43 nodes
+extract graph 8 with 43 nodes
+extract graph 9 with 43 nodes
+Injection time: 0 5.892644 .Length: 2952
+Injection time: 0 1.355833 .Length: 1389
+Injection time: 0 0.375753 .Length: 303
+Injection time: 0 4.82413 .Length: 6094
+Injection time: 0 1.984014 .Length: 3136
+Comparing learnt 1 of size 67 with eval 2 of size 43
+Done
+http://www.prnewswire.com Time Static 0 709.219225
+goelayu   2992 30.2 14.2 2313512 1132012 pts/14 Sl  21:51   8:14 node mitm-proxy.js
+Launching site http://www.miamiherald.com
+(node:3018) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Timer fired before page could be loaded { TimeoutError: Navigation timeout of 100000 ms exceeded
+    at Promise.then (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/LifecycleWatcher.js:106:111) name: 'TimeoutError' }
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+rm: cannot remove '/tmp/webarchive/*': No such file or directory
+goelayu   2992 28.5  9.5 1976684 761008 pts/14 Sl   21:51   8:15 node mitm-proxy.js
+Launching site http://www.mercurynews.com
+(node:4767) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 1.40177 .Length: 49
+Injection time: 0 47.916971 .Length: 8251
+Injection time: 0 48.427502 .Length: 17375
+Injection time: 0 22.932636 .Length: 15946
+Injection time: 0 158.05742 .Length: 89476
+Injection time: 0 301.749421 .Length: 145533
+Injection time: 0 2.63022 .Length: 2178
+Injection time: 0 189.429695 .Length: 128729
+Injection time: 0 2.12801 .Length: 3647
+Injection time: 0 2.250185 .Length: 1426
+Injection time: 0 14.046977 .Length: 14229
+Injection time: 0 121.8352 .Length: 103954
+Injection time: 0 0.075162 .Length: 72
+Injection time: 0 46.928301 .Length: 68771
+Injection time: 0 0.104359 .Length: 87
+Injection time: 0 152.910928 .Length: 177837
+Injection time: 0 813.895542 .Length: 645873
+Injection time: 0 170.836894 .Length: 57669
+Injection time: 0 4.830651 .Length: 2750
+Injection time: 0 46.927249 .Length: 42543
+Site loaded
+extracting handlers
+http://www.mercurynews.com Time EVT 0 176.364224
+extract graph 0 with 225 nodes
+extract graph 1 with 215 nodes
+extract graph 2 with 215 nodes
+extract graph 3 with 215 nodes
+extract graph 4 with 215 nodes
+extract graph 5 with 215 nodes
+extract graph 6 with 215 nodes
+extract graph 7 with 215 nodes
+extract graph 8 with 215 nodes
+extract graph 9 with 215 nodes
+Comparing learnt 1 of size 225 with eval 2 of size 225
+Done
+http://www.mercurynews.com Time Static 1 28.469248
+goelayu   2992 28.7 12.4 2168816 987716 pts/14 Sl   21:51   8:21 node mitm-proxy.js
+Launching site http://www.metoffice.gov.uk
+(node:4935) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 1.41752 .Length: 3733
+Injection time: 0 18.839019 .Length: 4962
+Injection time: 0 33.556586 .Length: 8052
+Injection time: 0 41.831817 .Length: 11289
+Injection time: 0 63.326567 .Length: 42136
+Injection time: 0 43.534709 .Length: 17493
+Injection time: 0 2.671701 .Length: 5607
+Injection time: 0 4.141221 .Length: 4021
+Injection time: 0 388.74955 .Length: 295129
+Injection time: 0 18.236798 .Length: 27622
+Injection time: 0 10.806553 .Length: 9883
+Site loaded
+extracting handlers
+http://www.metoffice.gov.uk Time EVT 0 123.954542
+extract graph 0 with 59 nodes
+extract graph 1 with 58 nodes
+extract graph 2 with 58 nodes
+extract graph 3 with 58 nodes
+extract graph 4 with 58 nodes
+extract graph 5 with 57 nodes
+extract graph 6 with 58 nodes
+extract graph 7 with 55 nodes
+extract graph 8 with 58 nodes
+extract graph 9 with 58 nodes
+Injection time: 0 0.517661 .Length: 916
+Injection time: 0 0.619759 .Length: 915
+Injection time: 0 4.378508 .Length: 845
+Injection time: 0 1.152183 .Length: 769
+Injection time: 0 6.266221 .Length: 7289
+Injection time: 0 6.283567 .Length: 6353
+Injection time: 0 0.414124 .Length: 724
+Injection time: 0 0.720428 .Length: 1571
+Injection time: 0 6.455361 .Length: 7382
+Injection time: 0 205.380878 .Length: 141941
+Injection time: 0 6.692574 .Length: 4498
+Injection time: 0 4.50759 .Length: 7069
+Injection time: 0 2.908824 .Length: 5559
+Comparing learnt 1 of size 77 with eval 2 of size 63
+Comparing learnt 2 of size 81 with eval 4 of size 63
+Done
+http://www.metoffice.gov.uk Time Static 0 821.982179
+goelayu   2992 28.7 14.4 2327372 1146900 pts/14 Sl  21:51   8:22 node mitm-proxy.js
+Launching site http://www.zougla.gr
+(node:5106) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 143.102426 .Length: 97163
+Injection time: 0 1.299749 .Length: 980
+Injection time: 0 35.715278 .Length: 23063
+Injection time: 0 68.270575 .Length: 115593
+Injection time: 0 35.514266 .Length: 40327
+Injection time: 0 94.624807 .Length: 102802
+Injection time: 0 202.14335 .Length: 164296
+Injection time: 0 22.467 .Length: 12322
+Injection time: 0 383.254371 .Length: 240427
+Injection time: 0 15.574029 .Length: 11960
+Injection time: 0 31.401893 .Length: 27192
+Injection time: 0 2.287968 .Length: 2884
+Injection time: 0 17.063889 .Length: 15650
+Injection time: 0 356.015281 .Length: 361291
+Injection time: 0 5.813715 .Length: 3590
+Injection time: 0 154.762751 .Length: 122769
+Injection time: 0 296.817379 .Length: 295379
+Injection time: 1 75.398016 .Length: 858259
+proxy error: { Error: read ECONNRESET
+    at TLSWrap.onread (net.js:659:25) errno: 'ECONNRESET', code: 'ECONNRESET', syscall: 'read' }
+proxy error: { Error: read ECONNRESET
+    at TLSWrap.onread (net.js:659:25) errno: 'ECONNRESET', code: 'ECONNRESET', syscall: 'read' }
+Injection time: 0 26.122347 .Length: 19589
+Injection time: 0 33.539574 .Length: 32013
+Injection time: 0 0.687275 .Length: 2483
+Injection time: 1 445.272592 .Length: 1034823
+Injection time: 0 1.682164 .Length: 1058
+Injection time: 0 8.316343 .Length: 5753
+Site loaded
+extracting handlers
+http://www.zougla.gr Time EVT 4 395.588742
+extract graph 0 with 248 nodes
+extract graph 1 with 253 nodes
+extract graph 2 with 252 nodes
+extract graph 3 with 252 nodes
+extract graph 4 with 253 nodes
+extract graph 5 with 252 nodes
+extract graph 6 with 251 nodes
+extract graph 7 with 250 nodes
+extract graph 8 with 253 nodes
+extract graph 9 with 249 nodes
+Comparing learnt 1 of size 379 with eval 2 of size 259
+Comparing learnt 2 of size 390 with eval 4 of size 259
+Done
+http://www.zougla.gr Time Static 1 905.197817
+goelayu   2992 29.0 14.6 2372852 1165420 pts/14 Sl  21:51   8:32 node mitm-proxy.js
+Launching site http://www.seattletimes.com
+(node:5532) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Timer fired before page could be loaded { TimeoutError: Navigation timeout of 100000 ms exceeded
+    at Promise.then (/home/goelayu/research/WebPeformance/node_modules/puppeteer/lib/cjs/puppeteer/common/LifecycleWatcher.js:106:111) name: 'TimeoutError' }
+Site loaded
+extracting handlers
+error while launchig Error: Protocol error (Runtime.evaluate): Target closed.
+rm: cannot remove '/tmp/webarchive/*': No such file or directory
+goelayu   2992 27.5  9.7 1985664 778124 pts/14 Sl   21:51   8:34 node mitm-proxy.js
+Launching site http://www.france24.com
+(node:7123) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 61.777825 .Length: 44855
+Injection time: 0 1.220122 .Length: 149385
+Injection time: 0 685.614662 .Length: 368303
+Injection time: 0 116.848609 .Length: 73364
+Injection time: 0 376.253716 .Length: 373884
+Injection time: 0 394.746032 .Length: 256308
+Site loaded
+extracting handlers
+http://www.france24.com Time EVT 6 425.120299
+extract graph 0 with 157 nodes
+extract graph 1 with 168 nodes
+extract graph 2 with 168 nodes
+extract graph 3 with 168 nodes
+extract graph 4 with 168 nodes
+extract graph 5 with 168 nodes
+extract graph 6 with 168 nodes
+extract graph 7 with 168 nodes
+extract graph 8 with 166 nodes
+extract graph 9 with 166 nodes
+Comparing learnt 1 of size 239 with eval 2 of size 177
+Comparing learnt 2 of size 261 with eval 4 of size 177
+Done
+http://www.france24.com Time Static 1 646.686067
+goelayu   2992 27.5 12.2 2146536 975540 pts/14 Sl   21:51   8:38 node mitm-proxy.js
+Launching site http://www.theage.com.au
+(node:8458) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 22.382218 .Length: 5667
+Injection time: 0 4.600563 .Length: 3515
+Injection time: 0 409.884587 .Length: 497360
+Injection time: 0 420.845625 .Length: 348589
+Injection time: 0 904.116061 .Length: 569320
+Injection time: 0 795.06732 .Length: 1096055
+Injection time: 0 14.944185 .Length: 11830
+Injection time: 0 507.165669 .Length: 404261
+Site loaded
+extracting handlers
+http://www.theage.com.au Time EVT 0 57.879459
+extract graph 0 with 54 nodes
+extract graph 1 with 71 nodes
+extract graph 2 with 71 nodes
+extract graph 3 with 71 nodes
+extract graph 4 with 71 nodes
+extract graph 5 with 71 nodes
+extract graph 6 with 71 nodes
+extract graph 7 with 71 nodes
+extract graph 8 with 71 nodes
+extract graph 9 with 71 nodes
+Comparing learnt 1 of size 141 with eval 2 of size 71
+Comparing learnt 2 of size 158 with eval 4 of size 71
+Done
+http://www.theage.com.au Time Static 3 874.057053
+goelayu   2992 27.7 13.3 2232988 1065180 pts/14 Sl  21:51   8:45 node mitm-proxy.js
+Launching site http://www.azcentral.com
+(node:8720) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 66.964542 .Length: 55964
+Injection time: 0 0.286586 .Length: 191
+Injection time: 0 103.381397 .Length: 77790
+Injection time: 0 168.560005 .Length: 128198
+Site loaded
+extracting handlers
+http://www.azcentral.com Time EVT 0 16.320308
+extract graph 0 with 12 nodes
+extract graph 1 with 12 nodes
+extract graph 2 with 12 nodes
+extract graph 3 with 12 nodes
+extract graph 4 with 12 nodes
+extract graph 5 with 12 nodes
+extract graph 6 with 12 nodes
+extract graph 7 with 12 nodes
+extract graph 8 with 12 nodes
+extract graph 9 with 12 nodes
+Comparing learnt 1 of size 12 with eval 2 of size 12
+Done
+http://www.azcentral.com Time Static 0 253.134351
+goelayu   2992 27.7 13.5 2242588 1075472 pts/14 Sl  21:51   8:45 node mitm-proxy.js
+Launching site http://www.dnaindia.com
+(node:8815) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 2.265115 .Length: 2974
+Injection time: 0 9.480126 .Length: 6748
+Injection time: 0 29.889885 .Length: 14019
+Injection time: 0 1.409927 .Length: 1190
+Injection time: 0 303.573052 .Length: 240427
+Injection time: 0 1.105758 .Length: 1293
+Injection time: 0 4.671773 .Length: 14544
+Injection time: 0 2.19437 .Length: 2692
+Injection time: 0 170.788226 .Length: 97163
+Injection time: 0 33.594931 .Length: 10063
+Injection time: 0 157.503588 .Length: 93867
+Injection time: 0 5.184828 .Length: 5429
+Injection time: 0 50.677264 .Length: 50975
+Injection time: 0 35.717579 .Length: 51166
+Injection time: 0 2.543797 .Length: 1899
+Injection time: 0 24.388443 .Length: 19307
+Injection time: 0 189.939337 .Length: 801630
+Injection time: 0 5.772571 .Length: 19988
+Injection time: 0 30.669414 .Length: 112673
+Injection time: 0 49.456915 .Length: 235495
+Injection time: 0 7.125549 .Length: 15653
+Injection time: 0 4.057857 .Length: 4068
+Injection time: 0 10.468947 .Length: 14400
+Injection time: 0 5.513502 .Length: 7066
+Injection time: 0 10.352997 .Length: 18841
+Injection time: 0 114.247985 .Length: 195352
+Injection time: 0 373.49765 .Length: 545736
+Injection time: 0 26.657468 .Length: 9492
+Injection time: 0 3.077781 .Length: 3380
+Injection time: 0 47.106226 .Length: 15726
+Injection time: 0 93.614481 .Length: 73471
+Injection time: 0 0.629101 .Length: 1825
+Injection time: 0 189.59432 .Length: 185384
+Injection time: 0 0.549253 .Length: 93
+Injection time: 0 31.568986 .Length: 9495
+Site loaded
+extracting handlers
+http://www.dnaindia.com Time EVT 0 480.19185
+extract graph 0 with 258 nodes
+extract graph 1 with 193 nodes
+extract graph 2 with 180 nodes
+extract graph 3 with 167 nodes
+extract graph 4 with 178 nodes
+extract graph 5 with 175 nodes
+extract graph 6 with 178 nodes
+extract graph 7 with 229 nodes
+extract graph 8 with 178 nodes
+extract graph 9 with 180 nodes
+Comparing learnt 1 of size 314 with eval 2 of size 259
+Comparing learnt 2 of size 315 with eval 4 of size 259
+Done
+http://www.dnaindia.com Time Static 0 941.159006
+goelayu   2992 27.8 15.9 2430432 1264828 pts/14 Sl  21:51   8:50 node mitm-proxy.js
+Launching site http://www.metafilter.com
+(node:10179) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 55.562049 .Length: 16544
+Injection time: 0 24.915489 .Length: 25582
+Injection time: 0 176.568117 .Length: 147203
+Site loaded
+extracting handlers
+http://www.metafilter.com Time EVT 0 85.607609
+extract graph 0 with 75 nodes
+extract graph 1 with 75 nodes
+extract graph 2 with 75 nodes
+extract graph 3 with 75 nodes
+extract graph 4 with 75 nodes
+extract graph 5 with 75 nodes
+extract graph 6 with 75 nodes
+extract graph 7 with 75 nodes
+extract graph 8 with 75 nodes
+extract graph 9 with 75 nodes
+Comparing learnt 1 of size 88 with eval 2 of size 75
+Done
+http://www.metafilter.com Time Static 0 476.271681
+goelayu   2992 27.8 13.3 2225628 1060732 pts/14 Sl  21:51   8:51 node mitm-proxy.js
+Launching site http://www.philly.com
+(node:10330) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 66.569588 .Length: 23124
+Injection time: 0 48.811794 .Length: 17845
+Injection time: 0 13.924614 .Length: 9494
+Injection time: 0 308.379877 .Length: 266282
+Injection time: 0 9.754477 .Length: 33316
+Injection time: 2 11.982993 .Length: 1754093
+Site loaded
+extracting handlers
+http://www.philly.com Time EVT 0 151.676143
+extract graph 0 with 73 nodes
+extract graph 1 with 73 nodes
+extract graph 2 with 73 nodes
+extract graph 3 with 73 nodes
+extract graph 4 with 73 nodes
+extract graph 5 with 73 nodes
+extract graph 6 with 73 nodes
+extract graph 7 with 73 nodes
+extract graph 8 with 73 nodes
+extract graph 9 with 73 nodes
+Injection time: 1 129.612098 .Length: 835904
+Comparing learnt 1 of size 161 with eval 2 of size 73
+Done
+http://www.philly.com Time Static 4 133.513901
+goelayu   2992 28.0 15.1 2365752 1206424 pts/14 Sl  21:51   8:58 node mitm-proxy.js
+Launching site http://www.globaltimes.cn
+(node:10490) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 60.97942 .Length: 37045
+Injection time: 0 0.503121 .Length: 177
+Injection time: 0 115.321562 .Length: 93107
+Injection time: 0 6.466782 .Length: 37339
+Injection time: 0 8.332201 .Length: 5758
+Injection time: 0 1.647346 .Length: 1417
+Site loaded
+extracting handlers
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 27.9 15.3 2376696 1217776 pts/14 Sl  21:51   8:59 node mitm-proxy.js
+Launching site http://www.topix.com
+(node:10787) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 5.979632 .Length: 1383
+Injection time: 0 240.385053 .Length: 176971
+Injection time: 0 632.116738 .Length: 823920
+Injection time: 1 500.271771 .Length: 1222729
+Injection time: 0 4.97779 .Length: 3224
+Injection time: 0 257.422367 .Length: 215667
+Site loaded
+extracting handlers
+http://www.topix.com Time EVT 0 24.797514
+extract graph 0 with 61 nodes
+extract graph 1 with 61 nodes
+extract graph 2 with 61 nodes
+extract graph 3 with 61 nodes
+extract graph 4 with 61 nodes
+extract graph 5 with 61 nodes
+extract graph 6 with 61 nodes
+extract graph 7 with 61 nodes
+extract graph 8 with 61 nodes
+extract graph 9 with 61 nodes
+Comparing learnt 1 of size 84 with eval 2 of size 61
+Done
+http://www.topix.com Time Static 5 680.98987
+goelayu   2992 28.1 16.4 2465012 1309112 pts/14 Sl  21:51   9:05 node mitm-proxy.js
+Launching site http://www.fark.com
+(node:11024) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 3.020604 .Length: 980
+Injection time: 0 343.454897 .Length: 289582
+Injection time: 0 1.393136 .Length: 3224
+Injection time: 0 0.310883 .Length: 546
+Injection time: 0 4.923204 .Length: 2891
+Injection time: 0 367.62938 .Length: 215963
+Injection time: 0 182.117862 .Length: 122769
+Injection time: 0 110.880467 .Length: 577263
+Site loaded
+extracting handlers
+Injection time: 0 944.41342 .Length: 514691
+Injection time: 0 449.408109 .Length: 298660
+Injection time: 0 415.124369 .Length: 298660
+Injection time: 0 429.176898 .Length: 298660
+Injection time: 0 441.046616 .Length: 298660
+Injection time: 0 16.36232 .Length: 6083
+Injection time: 0 389.749895 .Length: 298660
+Injection time: 0 9.160313 .Length: 6083
+Injection time: 0 29.893477 .Length: 29578
+Injection time: 0 193.173314 .Length: 157047
+Injection time: 0 403.944333 .Length: 298660
+Injection time: 0 33.402114 .Length: 29578
+Injection time: 0 195.943205 .Length: 157047
+Injection time: 0 634.370843 .Length: 298660
+Injection time: 0 5.654673 .Length: 6083
+Injection time: 0 196.624598 .Length: 157047
+Injection time: 0 5.270857 .Length: 6083
+Injection time: 0 403.281149 .Length: 298660
+Injection time: 0 204.389404 .Length: 157047
+Injection time: 0 5.175623 .Length: 6083
+Injection time: 0 411.785263 .Length: 298660
+Injection time: 0 209.069499 .Length: 157047
+Injection time: 0 4.931732 .Length: 6083
+Injection time: 0 649.219872 .Length: 298660
+Injection time: 0 200.211395 .Length: 157047
+Site navigation did not time out. Force KILL.
+error while launchig Error: Protocol error (Runtime.callFunctionOn): Target closed.
+goelayu   2992 28.8 14.9 2303448 1186544 pts/14 Rl  21:51   9:26 node mitm-proxy.js
+Launching site http://www.startribune.com
+Injection time: 0 398.353769 .Length: 298660
+proxy error: { Error: write EPIPE
+    at WriteWrap.afterWrite [as oncomplete] (net.js:835:14) errno: 'EPIPE', code: 'EPIPE', syscall: 'write' }
+Injection time: 0 26.088991 .Length: 29578
+(node:11395) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 64.904892 .Length: 38541
+Injection time: 0 141.242798 .Length: 101122
+Injection time: 0 270.794198 .Length: 240027
+Injection time: 0 82.103563 .Length: 73817
+Injection time: 0 12.181744 .Length: 5037
+Injection time: 0 130.240059 .Length: 95992
+Injection time: 0 201.468514 .Length: 37608
+Injection time: 0 439.847294 .Length: 387089
+Injection time: 0 101.581285 .Length: 70638
+Injection time: 0 9.763324 .Length: 9034
+Injection time: 0 48.267404 .Length: 24336
+Injection time: 0 6.047242 .Length: 2701
+Injection time: 0 78.571462 .Length: 68041
+Injection time: 0 3.232873 .Length: 626
+Injection time: 0 5.820048 .Length: 8096
+Injection time: 0 28.973206 .Length: 21237
+Injection time: 0 135.48446 .Length: 95992
+Injection time: 0 8.609846 .Length: 11434
+Injection time: 0 29.702528 .Length: 25442
+Injection time: 0 148.263697 .Length: 108895
+Injection time: 0 2.298489 .Length: 2437
+Injection time: 0 129.740989 .Length: 89476
+Injection time: 0 629.757773 .Length: 269300
+Injection time: 0 0.857709 .Length: 823
+Injection time: 0 62.261526 .Length: 58525
+Injection time: 0 223.462064 .Length: 278800
+Injection time: 0 381.329888 .Length: 314642
+Injection time: 0 10.320368 .Length: 9034
+Injection time: 0 21.367905 .Length: 40354
+Injection time: 0 51.102217 .Length: 27528
+Injection time: 0 178.014191 .Length: 153595
+Injection time: 0 10.493226 .Length: 19849
+Injection time: 0 20.794792 .Length: 13533
+Site loaded
+extracting handlers
+Injection time: 0 170.824693 .Length: 95992
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+goelayu   2992 29.1 17.5 2514452 1397020 pts/14 Rl  21:51   9:35 node mitm-proxy.js
+Launching site http://www.lexisnexis.com
+(node:11633) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+Injection time: 0 180.591234 .Length: 108895
+global time out value 15000 100000
+Injection time: 0 8.924853 .Length: 7075
+Injection time: 0 154.109333 .Length: 157785
+Injection time: 0 132.639044 .Length: 93867
+Injection time: 0 2.641892 .Length: 5208
+Injection time: 0 18.452406 .Length: 44027
+Injection time: 0 0.746649 .Length: 199
+Site loaded
+extracting handlers
+http://www.lexisnexis.com Time EVT 0 12.580976
+extract graph 0 with 0 nodes
+extract graph 1 with 0 nodes
+extract graph 2 with 0 nodes
+extract graph 3 with 0 nodes
+extract graph 4 with 0 nodes
+extract graph 5 with 0 nodes
+extract graph 6 with 0 nodes
+extract graph 7 with 0 nodes
+extract graph 8 with 0 nodes
+extract graph 9 with 0 nodes
+Done
+http://www.lexisnexis.com Time Static 0 0.46349
+goelayu   2992 29.1 14.9 2306660 1190956 pts/14 Sl  21:51   9:36 node mitm-proxy.js
+Launching site http://www.oregonlive.com
+(node:11807) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 0.068376 .Length: 72
+Injection time: 0 323.524245 .Length: 323298
+Injection time: 1 648.98746 .Length: 1444111
+Injection time: 0 12.361207 .Length: 25293
+Injection time: 0 735.758617 .Length: 353710
+Site loaded
+extracting handlers
+http://www.oregonlive.com Time EVT 0 38.7528
+extract graph 0 with 52 nodes
+extract graph 1 with 52 nodes
+extract graph 2 with 52 nodes
+extract graph 3 with 52 nodes
+extract graph 4 with 52 nodes
+extract graph 5 with 52 nodes
+extract graph 6 with 52 nodes
+extract graph 7 with 52 nodes
+extract graph 8 with 52 nodes
+extract graph 9 with 52 nodes
+Injection time: 0 0.162213 .Length: 409
+Comparing learnt 1 of size 90 with eval 2 of size 52
+Done
+http://www.oregonlive.com Time Static 4 761.653697
+goelayu   2992 29.3 17.2 2486440 1371728 pts/14 Sl  21:51   9:42 node mitm-proxy.js
+Launching site http://www.livemint.com
+(node:12071) ExperimentalWarning: The fs.promises API is experimental
+returning custom filter
+global time out value 15000 100000
+Injection time: 0 0.380243 .Length: 213
+Injection time: 0 3.214962 .Length: 4263
+Injection time: 0 1.275698 .Length: 3621
+Injection time: 0 5.544628 .Length: 2760
+Injection time: 0 10.135456 .Length: 6875
+Injection time: 0 12.877905 .Length: 24082
+Injection time: 0 3.259804 .Length: 55421
+Injection time: 0 4.498292 .Length: 1504
+Injection time: 0 6.686324 .Length: 106866
+Injection time: 0 26.899101 .Length: 35741
+Injection time: 0 47.090725 .Length: 16938
+Site loaded
+extracting handlers
+Injection time: 0 5.9179 .Length: 2123
+Injection time: 0 10.752161 .Length: 3509
+Injection time: 0 13.638847 .Length: 7470
+Injection time: 0 21.815197 .Length: 2866
+error while launchig Error: Execution context was destroyed, most likely because of a navigation.
+Killing proxy
+Injection time: 0 18.17938 .Length: 5089
+kill: (12145): No such process
