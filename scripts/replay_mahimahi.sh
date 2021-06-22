@@ -14,14 +14,18 @@ echo machine is $machine
 _dir=`shuf -i 9600-9900 -n 1`
 CUSTOMCHROMEDIR=/vault-home/goelayu/CHROMEDIR/${_dir}
 
-mmwebreplay=/home/goelayu/research/mahimahi/build/bin/mm-webreplay
-mmnoop=/home/goelayu/research/mahimahi/build/bin/mm-noop
-mmwebrecord=/home/goelayu/research/mahimahi/build/bin/mm-webrecord
-if [[ $machine == 'wolverines' || $machine == 'lions' || $machine == 'redwings' || $machine == 'pistons' ]]; then
-	echo 'Running on wolverines'
-	mmwebreplay=mm-webreplay
-	mmwebrecord=mm-webrecord
-fi
+# mm binaries in /usr/local/bin are ones which inject code while crawling, and no smart match while replay
+
+# mmwebreplay=/home/goelayu/research/mahimahi/build/bin/mm-webreplay #best match
+# mmnoop=/home/goelayu/research/mahimahi/build/bin/mm-noop
+mmwebrecord=/home/goelayu/research/mahimahi/build/bin/mm-webrecord #no dyn patches
+# mmwebrecord=/usr/local/bin/mm-webrecord #inject dyn patches
+# mmwebreplay=/usr/local/bin/mm-webreplay #exact match
+# if [[ $machine == 'wolverines' || $machine == 'lions' || $machine == 'redwings' || $machine == 'pistons' ]]; then
+# 	echo 'Running on wolverines'
+# 	mmwebreplay=mm-webreplay
+# 	mmwebrecord=mm-webrecord
+# fi
 
 
 # mmwebreplay=/vault-home/goelayu/tools/mahimahi/src/frontend/mm-webreplay
@@ -91,8 +95,8 @@ replay(){
 	#avoid 9600 range because a certain kworker runs on port 9645
 	port=`shuf -i 9600-9900 -n 1`
 	echo "Running on port" $port
-	echo "$cmd node chrome-launcher.js -u $2 -l -o $3 -n --timeout 60000 --screenshot $DATAFLAGS"
-    $cmd node chrome-launcher.js -u $2 -l -o $3 -n --timeout 80000 $DATAFLAGS
+	echo "$cmd node chrome-launcher.js -u $2 -l -o $3 -n $DATAFLAGS"
+    time $cmd node  chrome-launcher.js -u $2 -l -o $3 -n  $DATAFLAGS
 	replay_pid=$!
 	echo "Done waiting"
 }
