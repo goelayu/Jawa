@@ -45,7 +45,7 @@ var archive_listeners = (function listAllEventListeners() {
   
 var verbose_listeners = (function listAllEventListeners() {
     let listeners = [], pl = processListeners;
-    const allElements = document.querySelectorAll('*');
+    var allElements = document.querySelectorAll('*');
     const types = [];
   
     for (let i = 0; i < allElements.length; i++) {
@@ -55,6 +55,9 @@ var verbose_listeners = (function listAllEventListeners() {
       (listeners.push([currentElement, eventListeners]))
   
     }
+    var eventListeners = getEventListeners(document);
+    Object.keys(eventListeners).length != 0 &&
+    (listeners.push([document, eventListeners]))
     return listeners;
   })();
 
@@ -77,7 +80,7 @@ var all_handlers = ["abort", "blur", "change", "click", "close", "contextmenu", 
     "mouseover", "mouseup", "reset", "resize", "scroll", "select", "submit" ];
 
 var IGNORE_ELEMENTS = ['SCRIPT', 'IFRAME', 'BODY','LINK','IMG'
-    ,'INPUT','FORM','A','HTML']
+    ,'INPUT','FORM','HTML']
 
 function getEventId(el, evt){
     //construct event id from element and event information
@@ -121,6 +124,8 @@ function triggerEvents(elems){
             var [elem, handlers] = _e;
             handlers.forEach((h)=>{
                 _triggerEvent(elem, h);
+                if (h == 'click')
+                    _triggerEvent(elem, h);
             })
         } catch (e) {
             /**no op */
@@ -133,8 +138,9 @@ function getCandidateElements(listeners){
     var elems = []; // each entry is a two-tupe [1st,2nd] where 1st is element, and 2nd is list of events
     listeners.forEach((l)=>{
         var [el, handler] = l;
-        if (el && el.href && el.href != "") return;
         if (IGNORE_ELEMENTS.filter(e=>el.nodeName == e).length == 0){
+            if (el && el.href && el.href != "" && !el.href.endsWith("#")) return;
+        
             var e = [el, []];
             Object.keys(handler).forEach((h)=>{
                 if (all_handlers.indexOf(h)>=0)
