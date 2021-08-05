@@ -53,6 +53,29 @@ var getStallTime = function(data){
     }
 }
 
+var isValidUrl = function(n){
+    // const VALID_MIMES = ["image", "document", "script", "stylesheet"];
+    const VALID_MIMES = ["image", "html", "script", "css","json",""];
+    return n.request.method == "GET" &&
+        n.url.indexOf('data')!=0 && 
+        VALID_MIMES.some(e=>n.type.toLowerCase().indexOf(e)>=0 ) && 
+        n.type.indexOf('gif')<0;
+
+}
+
+var getNetErrors = function(data){
+    var net = netParser.parseNetworkLogs(data);
+    var count = 0;
+    for (var n of net){
+        if (!isValidUrl(n)) continue;
+        if (!n.response) continue;
+        if (n.response && n.response.status > 400){
+            count++;
+        }
+    }
+    console.log(count);
+}
+
 var getNetSize = function(data){
     var net = netParser.parseNetworkLogs(data);
     var total = 0;
@@ -134,15 +157,32 @@ var getSizePerType = function(data){
     for (var n of net){
         if (!n.type || !n.size
             /*|| !isCriticalReq(n)*/) continue;
-
-        if (!(n.type in type2size))
-            type2size[n.type] = 0;
-        type2size[n.type] += n.size;
+        var type;
+        // var mainTypes = ['Image', 'Script','Document', 'Stylesheet'];
+        const mainTypes = ["image", "html", "script", "css","json",""];
+        for (var t of mainTypes){
+            if (n.type.indexOf(t)>=0){
+                type = t;
+                break;
+            }
+        }
+        if (mainTypes.indexOf(type)<0)
+            type = 'Other';
+        if (!(type in type2size))
+            type2size[type] = 0;
+        type2size[type] += n.size;
     };
     var totalSize = Object.values(type2size).reduce((acc,cur)=>{return acc + cur;},0);
-    Object.keys(type2size).forEach((t)=>{
-        (t == 'Script') && console.log(`${t} ${type2size[t]/totalSize}`);
-    });
+    // Object.keys(type2size).forEach((t)=>{
+    //     (t == 'Script') && console.log(`${type2size[t]/totalSize},${t}`);
+    // });
+    // console.log(type2size)
+    if (totalSize < 1000){
+        //hack, usually a page should contain more than 1000 bytes
+        return;
+    }
+    console.log(type2size)
+    console.log(type2size.script/totalSize)
     return type2size;
 }
 
@@ -329,4 +369,6 @@ switch (program.type){
     case 'ss': estimateSnapshotSize(program.input); break;
     case 'res': getResOnPage(program.input);break;
     case 'fil': filler(program.input);break;
+    case 'sum': console.log(Object.values(JSON.parse(fs.readFileSync(program.input,'utf-8'))).reduce((acc,cur)=>{return acc+cur},0)); break;
+    case 'error' : getNetErrors(parse(program.input));
 }
