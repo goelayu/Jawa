@@ -3,11 +3,12 @@
  * of CDP (as used inside chrome-remote-interface)
  */
 
- const puppeteer = require('puppeteer'),
+ const puppeteer = require('puppeteer-extra'),
+    
     program = require('commander'),
     fs = require('fs'),
     chromeFns = require('./chrome-ctx-scripts/fns');
-    // AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
+    AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 const { createDeflate } = require('zlib');
 
 program
@@ -27,12 +28,18 @@ program
     .option('--coverage', 'get the js coverage information')
     .option('--load-iter [value]', 'page loading iteration count')
     .option('--chrome-dir [value]', 'path to the chrome user directory, only useful if loadIter is present')
+    .option('--filter', 'filters all the archive-irrelevant files')
+    .option('--dimension', 'set customd chrome dimensions')
     .option('--wait', 'waits before exiting chrome')
     .parse(process.argv);
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const SERIALIZESTYLES=`${__dirname}/chrome-ctx-scripts/serializeWithStyle.js`
 const DISTILLDOM=`${__dirname}/../dom-distill/lib/domdistiller.js`
 const HANDLERS=`${__dirname}/chrome-ctx-scripts/fetch-listeners.js`
+
+var intercepts = fs.readFileSync('../program_analysis/runtime/dynamic-api-intercepts.js','utf-8');
 
 async function launch(){
     const options = {
@@ -40,9 +47,17 @@ async function launch(){
         headless: program.testing ? false : true,
         defaultViewport: null,
         args : [ '--ignore-certificate-errors'/*, '--blink-settings=scriptEnabled=false'*/, '--auto-open-devtools-for-tabs', '--disable-web-security',
-        '--disable-features=IsolateOrigins,site-per-process,CrossSiteDocumentBlockingAlways,CrossSiteDocumentBlockingIfIsolating'],
+        '--disable-features=IsolateOrigins,site-per-process,CrossSiteDocumentBlockingAlways,CrossSiteDocumentBlockingIfIsolating',
+        '--no-sandbox',
+        '--disable-setuid-sandbox'],
         // '--no-first-run'],
         // ignoreDefaultArgs: true,
+    }
+    
+    if (program.dimension){
+        console.log('custom dimensions')
+        // options.args.push(` --window-size=700,1000`);
+        // options.args.push(' --lang=es-ES');
     }
     
     var outDir = program.output;
@@ -50,11 +65,47 @@ async function launch(){
     if (program.loadIter){
         options.userDataDir = program.chromeDir;
     }
-    // puppeteer.use(AdblockerPlugin({blockTrackers: true}))
+    program.filter && puppeteer.use(AdblockerPlugin({blockTrackers: true, useCache: false}))
     const browser = await puppeteer.launch(options);
     let page = await browser.newPage();
     var nLogs = [], cLogs = [], jProfile;
     var cdp = await page.target().createCDPSession();
+
+    if (program.dimension){
+        console.log('setting custom dimensions')
+        // await page.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4182.0 Safari/537.36");
+        //   console.log(await browser.userAgent());
+        // await page.setViewport({ width: 1261, height: 3816 })
+        await page.evaluateOnNewDocument((intercepts) => {
+            // Object.defineProperty(navigator, "language", {
+            //     get: function() {
+            //         return "en-US";
+            //     }
+            // });
+            // Object.defineProperty(navigator, "languages", {
+            //     get: function() {
+            //         return ["en-US"];
+            //     }
+            // });
+            eval(intercepts);
+        }, intercepts);
+    } else {
+        await page.evaluateOnNewDocument(() => {
+            Date=function(r){function n(n,t,a,u,i,f,o){var c;switch(arguments.length){case 0:case 1:c=new r(e);break;default:a=a||1,u=u||0,i=i||0,f=f||0,o=o||0,c=new r(e)}return c}var e=1619575609705;return n.parse=r.parse,n.UTC=r.UTC,n.toString=r.toString,n.prototype=r.prototype,n.now=function(){return e},n}(Date),Math.exp=function(){function r(r){var n=new ArrayBuffer(8);return new Float64Array(n)[0]=r,0|new Uint32Array(n)[1]}function n(r){var n=new ArrayBuffer(8);return new Float64Array(n)[0]=r,new Uint32Array(n)[0]}function e(r,n){var e=new ArrayBuffer(8);return new Uint32Array(e)[1]=r,new Uint32Array(e)[0]=n,new Float64Array(e)[0]}var t=[.5,-.5],a=[.6931471803691238,-.6931471803691238],u=[1.9082149292705877e-10,-1.9082149292705877e-10];return function(i){var f,o=0,c=0,w=0,y=r(i),v=y>>31&1;if((y&=2147483647)>=1082535490){if(y>=2146435072)return isNaN(i)?i:0==v?i:0;if(i>709.782712893384)return 1/0;if(i<-745.1332191019411)return 0}if(y>1071001154){if(y<1072734898){if(1==i)return Math.E;c=i-a[v],w=u[v],o=1-v-v}else o=1.4426950408889634*i+t[v]|0,f=o,c=i-f*a[0],w=f*u[0];i=c-w}else{if(y<1043333120)return 1+i;o=0}f=i*i;var s=i-f*(.16666666666666602+f*(f*(6613756321437934e-20+f*(4.1381367970572385e-8*f-16533902205465252e-22))-.0027777777777015593));if(0==o)return 1-(i*s/(s-2)-i);var A=1-(w-i*s/(2-s)-c);return o>=-1021?A=e((o<<20)+r(A),n(A)):(A=e((o+1e3<<20)+r(A),n(A)),A*=9.332636185032189e-302)}}(),/*Math.random=function(){var r,n,e,t;return r=.8725217853207141,n=.520505596883595,e=.22893249243497849,t=1,function(){var a=2091639*r+2.3283064365386963e-10*t;return r=n,n=e,t=0|a,e=a-t}}()*/Math.random = function(){return 0.9322873996837797},Object.keys=function(r){return function(n){var e;return e=r(n),e.sort(),e}}(Object.keys);
+
+            Object.defineProperty(navigator, "language", {
+                get: function() {
+                    return "en-GB";
+                }
+            });
+            Object.defineProperty(navigator, "languages", {
+                get: function() {
+                    return ["en-GB"];
+                }
+            });
+
+        });
+    }
 
     if (program.loadIter){
         console.log(`Part of a series of page loads`)
@@ -63,6 +114,24 @@ async function launch(){
             agent = 'desktop'
         await emulateUserAgent(page, agent);
     }
+
+    // if (program.filter){
+    //     await page.setRequestInterception(true);
+    //     var customFilters  = getCustomFilters();
+    //     page.on('request', (request) => {
+    //         console.log(`request: ${request.url()}`)
+    //         try {
+    //             if (customFilters.some(e=>request.url().indexOf(e)>=0)){
+    //                 console.log(`Blocking: ${request.url()}`)
+    //                 request.abort();
+    //             }
+    //             else
+    //                 request.continue();
+    //         } catch (err){
+    //             //pass 
+    //         }
+    //     });
+    // }
 
     // console.log(`User agent is: ${await browser.userAgent()}`);
     await initCDP(cdp);
@@ -85,9 +154,10 @@ async function launch(){
     console.log('global time out value', gTimeoutValue, program.timeout);
     var globalTimer = globalTimeout(browser, cdp, gTimeoutValue);
     await page.goto(program.url,{
-        timeout: program.timeout,
+        timeout: program.timeout
     }).catch(err => {
         console.log('Timer fired before page could be loaded', err)
+        browser.close();
         clearTimeout(globalTimer);
         return;
     })
@@ -122,7 +192,7 @@ async function launch(){
         dump(prof.profile, `${outDir}/jsProfile`);
     }
 
-    // await extractPLT(page);
+    await extractPLT(page);
     if (program.screenshot)
         await page.screenshot({path: `${outDir}/screenshot.png`, fullPage: true});
 
@@ -130,7 +200,7 @@ async function launch(){
         let cstmEntries =  program.custom.split(',');
         for (var c of cstmEntries){
             switch (c) {
-                 case 'Handlers': await extractHandlers(page,cdp,50); break;
+                 case 'Handlers': await extractHandlers(page,cdp,10); break;
                  case 'DOM' : await extractDOM(page); break; 
                  case 'Distill' : await distillDOM(page); break;
                  case 'CG' : await chromeFns.getAllFns(page, program); break; 
@@ -175,6 +245,12 @@ async function autoScroll(page){
 
 var sleep = function(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+var getCustomFilters = function(){
+    var path = `${__dirname}/../filter-lists/archive-filter.txt`;
+    var _filters = fs.readFileSync(path, 'utf-8');
+    return _filters.split('\n').filter(e=>e!='');
 }
 
 var globalTimeout = function(browser,cdp, timeout){
@@ -284,6 +360,7 @@ var extractHandlers = async function(page,cdp, nTimes){
     //eval the handler script
     console.log('extracting handlers')
     var handlerCode = fs.readFileSync(HANDLERS, 'utf-8');
+    var cgStart = process.hrtime();
     await cdp.send('Runtime.evaluate',{expression:handlerCode, includeCommandLineAPI:true})
     var _handlers = await page.evaluateHandle(()=> archive_listeners);
     var handlers = await _handlers.jsonValue();
@@ -298,14 +375,17 @@ var extractHandlers = async function(page,cdp, nTimes){
         await page.evaluateHandle(()=> triggerEvents(_final_elems))
         await chromeFns.getCallGraph(page, program, i);
     } 
+    // var cgEnd = process.hrtime(cgStart);
+    // console.log(`${program.url} Time EVT ${cgEnd[0]} ${cgEnd[1]/(1000*1000)}`)
 }
 
 var extractDOM = async function(page){
-    var inlineStyles = fs.readFileSync(SERIALIZESTYLES, 'utf-8');
-    var evalStyles = await page.evaluateHandle((s) => eval(s),inlineStyles);
-    var domHandler = await page.evaluateHandle(() => document.documentElement.serializeWithStyles());
-    var domString = await domHandler.jsonValue();
-    dump(domString, `${program.output}/DOM`);
+    // var inlineStyles = fs.readFileSync(SERIALIZESTYLES, 'utf-8');
+    // var evalStyles = await page.evaluateHandle((s) => eval(s),inlineStyles);
+    // var domHandler = await page.evaluateHandle(() => document.documentElement.serializeWithStyles());
+    // var domString = await domHandler.jsonValue();
+    const html = await page.content();
+    dump(html, `${program.output}/DOM`);
 }
 
 var initConsoleHandlers = function(cdp, cLogs){
@@ -320,7 +400,8 @@ var extractPLT = async function(page){
     var _endTime = await page.evaluateHandle(timing => timing.loadEventEnd, _runtime);
     var startTime = await _startTime.jsonValue(), 
         endTime = await _endTime.jsonValue();
-    dump(endTime - startTime, `${program.output}/plt`);
+    // dump(endTime - startTime, `${program.output}/plt`);
+    console.log(`${program.url} Time PLT ${endTime - startTime}`)
 }
 
 var dump = function(data, file){
