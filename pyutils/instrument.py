@@ -42,7 +42,7 @@ wombat_location = '/w/goelayu/webArchive/data/wombat.js'
 # custom_files = mp_manager.list()
 
 def copy(source, destination):
-    subprocess.Popen("ln {} {}/".format(source, destination), shell=True)
+    subprocess.Popen("cp {} {}/".format(source, destination), shell=True)
 
 def read_filter():
     path='../filter-lists/archive-filter.txt'
@@ -205,11 +205,11 @@ def instrument(root, fileType,args,file_obj):
         return
 
     # skip non critical archive urls
-    ts = re.findall(r'\d+',origPath)
-    if len(ts) == 0 or len(ts[0]) != 14:
-        print "Skipping non critical files", fullurl
-        copy(os.path.join(root,file), args.output)
-        return
+    # ts = re.findall(r'\d+',origPath)
+    # if len(ts) == 0 or len(ts[0]) != 14:
+    #     print "Skipping non critical files", fullurl
+    #     copy(os.path.join(root,file), args.output)
+    #     return
 
     #remove timestamp from filename
     filename = re.sub('\/web\/\d{14}','',filename)
@@ -278,6 +278,9 @@ def instrument(root, fileType,args,file_obj):
         command = "node " + command
     _log_path = log_directory+"/" + filename + "/"
 
+    if args.allfns:
+        command += " --fns {}".format(args.allfns)
+    
     subprocess.call("mkdir -p {}".format(_log_path), shell=True)
 
     log_file=open(_log_path+"logs","w+")
@@ -523,6 +526,7 @@ if __name__ == "__main__":
     parser.add_argument('rewriter', help='type of instrumentation to perform', default="comments", choices=["comments","dynamic-cfg"])
     parser.add_argument('logDir', help='path to log output directory')
     parser.add_argument('--jsProfile', help='path to the js profile')
+    parser.add_argument('--allfns', help="allfns which need to be preserved")
     parser.add_argument('--cgInfo',help="path to the cg info")
     parser.add_argument('--debug',help="enable node debugging using -inspect flag")
     parser.add_argument('--filter',help="enable analytics filtering",action='store_true')
