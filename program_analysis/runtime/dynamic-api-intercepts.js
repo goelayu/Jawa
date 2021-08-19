@@ -11,14 +11,6 @@
             oldget = propDesc.get;
         if (propDesc && propDesc.set)
             oldset = propDesc.set;
-        else{
-            if (prop == 'cookie')
-                oldget =  document.cookie;
-            if (prop == 'lastModified')
-                oldget =  document.lastModified
-            if (prop == 'referrer')
-                oldget =  document.referrer;
-        }
 
         Object.defineProperty(api, prop,{
             get: function(){

@@ -30,11 +30,12 @@ function IsJsonString(str) {
 
 function initRewriter(){
     rewriter = program.fns ? 
-        require(`./rewriters/strip-fns`) : require(`./rewriters/dynamic-cfg`);
+        require(`./rewriters/strip-fns`) : 
+        program.rewriter == 'state' ? require(`./rewriters/state-static-analysis`) : require(`./rewriters/dynamic-cfg`);
 }
 
 function getTracerObj(){
-    return fs.readFileSync('./runtime/tracer.js','utf-8');
+    return program.rewriter == 'state' ? fs.readFileSync(`./runtime/state-tracer.js`) : fs.readFileSync('./runtime/tracer.js','utf-8');
 }
 
 function instrumentHTML(src, filename){
@@ -133,7 +134,7 @@ function instrumentHTML(src, filename){
 }
 
 function dumpMD(){
-    var dumpData = program.fns ? {} : rewriter.metadata.allFnIds;
+    var dumpData = program.fns || program.rewriter == 'state' ? {} : rewriter.metadata.allFnIds;
     // dumps the metadata information post instrumentation
     fs.writeFileSync(returnInfoFile, JSON.stringify(dumpData));
 }
