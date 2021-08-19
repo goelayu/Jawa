@@ -9,6 +9,7 @@
 
 program
     .option('-i, --input [input]','path to the input file')
+    .option('-a, --anotherin [anotherin]','path to the second input file')
     .option('-t, --type [type]','type of run')
     .option('--site-type [value]',' type of sites, live or archive')
     .option('-o, --output [output]','path to output file')
@@ -322,6 +323,44 @@ var ignoreUrl = function(n, net){
         
 }
 
+var matchNetwork = function(net1, net2){
+    /**
+     * returns the number of matching urls between two network logs
+     */
+     var ignoreUrl = function(n){
+        var type = n.type;
+        return n.request.method != "GET"
+            ||  n.url.indexOf('data') == 0
+            || !n.type
+            || !n.size;
+            
+    }
+    var isBestMatch = function(u1, u2){
+        u1 = u1.split('?')[0],
+            u2 = u2.split('?')[0];
+        
+        if (u1 == u2) return true;
+        return false;
+    }
+
+    net1 = netParser.parseNetworkLogs(parse(net1)),
+        net2 = netParser.parseNetworkLogs(parse(net2));
+    var total = match = 0;
+    for (var n1 of net1){
+        if (ignoreUrl(n1)) continue;
+        total++;
+        for (var n2 of net2){
+            if (ignoreUrl(n2)) continue;
+
+            if (isBestMatch(n1.url, n2.url)){
+                match++;
+                break;
+            }
+        }
+    }
+    console.log(total, match)
+}
+
 var getResOnPage = function(data){
     var net = netParser.parseNetworkLogs(parse(data)),
         total = 0, size=0;
@@ -371,4 +410,6 @@ switch (program.type){
     case 'fil': filler(program.input);break;
     case 'sum': console.log(Object.values(JSON.parse(fs.readFileSync(program.input,'utf-8'))).reduce((acc,cur)=>{return acc+cur},0)); break;
     case 'error' : getNetErrors(parse(program.input));
+    case 'matchNet' : matchNetwork(program.input,program.anotherin);
+
 }
