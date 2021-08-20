@@ -1163,10 +1163,10 @@ var traceFilter = function (content, options) {
                        __tracer.cacheInit("${options.filename}")
                    }
 				})();\n`;
-                var programEnd = `(function(){
+                var programEnd = `\n
                     if (__tracer && __tracer.exitFunction)
                         __tracer.exitFunction();
-                })();`
+                `
 				if (node.source().indexOf("__tracer") >=0)
 					update(node, options.prefix,tracerCheck,sourceNodes(node), programEnd)
 				else 

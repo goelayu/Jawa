@@ -1099,13 +1099,13 @@ function __declTracerObject__(window) {
                 if (logType.indexOf('closure')>=0)
                     logType = `${closureScope}_reads`;
                 var log = [logType, rootId, key, childLogStr,childId ];
-                customLocalStorage[nodeId].readKeys.add(logType);
+                // customLocalStorage[nodeId].readKeys.add(logType);
                 customLocalStorage[nodeId].push(log);
                 // customLocalStorage[nodeId][logType].push(log);
             } else { 
                 if (logType.indexOf('closure')>=0)
                     logType = `${closureScope}_writes`;
-                customLocalStorage[nodeId].writeKeys.add(logType);
+                // customLocalStorage[nodeId].writeKeys.add(logType);
                 var log = [logType, rootId, key, childLogStr ];
                 customLocalStorage[nodeId].push(log);
                 // customLocalStorage[nodeId][logType].push(log);
@@ -2114,7 +2114,7 @@ function __declTracerObject__(window) {
             }
 
             
-            shadowStack.push(cacheIndex);
+            // shadowStack.push(cacheIndex);
             _shadowStackHead = cacheIndex;
         }
         // window.performance.mark(cacheIndex);
@@ -2407,6 +2407,8 @@ function __declTracerObject__(window) {
         // var cacheIndexExp = nodeId + "_count" + invocationsIndName[nodeId];
         var cacheIndex = _shadowStackHead ? _shadowStackHead : null;
         if (!cacheIndex) return;
+        _shadowStackHead = null;
+        return;
         
         if (instrumentationPattern == "replay")
             return;
@@ -2873,17 +2875,17 @@ function __declTracerObject__(window) {
                             console.log("Error while trying to stringify path: " + e + e.stack);
                         }
                         if (sig) {
-                            if (sig[0].indexOf("reads")>=0){
-                                if (readsSeen.indexOf(sig[1])>=0)
-                                    prunedInds.push(ind);
-                                else readsSeen.push(sig[1]);
-                            }
+                            // if (sig[0].indexOf("reads")>=0){
+                            //     if (readsSeen.indexOf(sig[1])>=0)
+                            //         prunedInds.push(ind);
+                            //     else readsSeen.push(sig[1]);
+                            // }
                             // if (detectProperty(readVal)) processedSig[nodeId].isFunction = true;
                             processedSig[nodeId][ind] = sig;
                         }
                     })
-                    for (var i=prunedInds.length - 1;i>=0;i--)
-                        processedSig[nodeId].splice(prunedInds[i],1);
+                    // for (var i=prunedInds.length - 1;i>=0;i--)
+                    //     processedSig[nodeId].splice(prunedInds[i],1);
                 }
 
                 var processWrite = function(nodeId){
