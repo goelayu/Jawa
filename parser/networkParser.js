@@ -91,6 +91,7 @@ function parseNetworkLogs(netLog){
                 prevReq.timing = timing;          
                 netObject.protocol = payLoad.response.protocol;
                 netObject.response = payLoad.response;
+                payLoad.response.mimeType && (netObject.type = payLoad.response.mimeType)
                 break;
             case 'Network.dataReceived':
                 if (!(requestId in requestIdToObject))
@@ -103,6 +104,13 @@ function parseNetworkLogs(netLog){
                     continue;
                 var netObject = requestIdToObject[requestId];
                 netObject.size = payLoad.encodedDataLength;
+                break;
+            case 'Network.loadingFailed':
+                if (!(requestId in requestIdToObject))
+                    continue;
+                var netObject = requestIdToObject[requestId];
+                // console.log(payLoad)
+                (payLoad.blockedReason) && (netObject.isFiltered = true);
         }
 
     }
