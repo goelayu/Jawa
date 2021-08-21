@@ -12,6 +12,7 @@
 program
     .option('-l, --live [live]','path to the live network file')
     .option('-a, --archive [archive]', 'path to the archive network file')
+    .option('-f, --fetch', 'No fetch responses')
     .parse(process.argv);
 
 
@@ -63,7 +64,8 @@ var getURLs = function(netData, isArchive){
 }
 
 var _wastefulContent = async function(live, archive){
-    var fetched = stored = 0; // fetched are also stored 
+    var total = fetched = stored = 0; // fetched are also stored 
+    total = live.length;
     for (var l of live){
         console.log(`checking url: ${l}`);
         if (archive.indexOf(l)>=0){
@@ -71,6 +73,8 @@ var _wastefulContent = async function(live, archive){
             fetched++;
             continue;
         } else {
+            console.log(program.fetch)
+            if (program.fetch) continue;
             var IAUrl = `https://web.archive.org/web/20201109050505/${l}`
             try{
                 var r = await fetch(IAUrl);
@@ -82,7 +86,7 @@ var _wastefulContent = async function(live, archive){
             }
         }
     }
-    console.log(`fetched: ${fetched} stored: ${stored}`);
+    console.log(`total: ${total} fetched: ${fetched} stored: ${stored}`);
 }
 
 var wastefulContent = function(){
@@ -90,10 +94,13 @@ var wastefulContent = function(){
     var archiveNet = parse(program.archive);
 
     var liveURLs = getURLs(liveNet, false);
-    var archiveURLs = getURLs(archiveNet, true);
-    // console.log(JSON.stringify(archiveURLs));
+    var archiveURLs = getURLs(archiveNet, false);
+    console.log(JSON.stringify(archiveURLs));
     console.log(liveURLs.length, archiveURLs.length)
-    _wastefulContent(liveURLs, archiveURLs);
+    // var src = liveURLs.length > archiveURLs.length ? archiveURLs : liveURLs;
+    // var dst = src == archiveNet ? liveURLs : archiveURLs;
+    var src = liveURLs, dst = archiveURLs;
+    _wastefulContent(src, dst);
 }
 
 wastefulContent();

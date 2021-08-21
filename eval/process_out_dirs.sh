@@ -3,17 +3,18 @@
 # This script processes the final output
 # directory and generates storage and performance
 # results
+set -v
 
 script_dir='/vault-home/goelayu/webArchive/scripts'
 src_dir='/y/goelayu/webArchive/data/out_dirs/'
-raw_dir='/y/goelayu/webArchive/data/raw_dirs/'
-result_dir='/vault-home/goelayu/webArchive/results/SOSP21/'
+raw_dir='/x/goelayu/webArchive/data/raw_dirs/'
+result_dir='/vault-home/goelayu/webArchive/results/SOSP21/eval'
 while read site; do 
     echo Executing site $site: ${src_dir}/${site}.tar 
     # cp ${_src_dir}/${site}.tar ${src_dir}
     # echo Done moving tar, extracing
     start=`date +%s`
-    tar xf ${src_dir}/${site}.tar -C ${raw_dir}
+    # tar xf ${src_dir}/${site}.tar -C ${raw_dir}
     end=`date +%s`
     echo Done extracting tar in time: $((end-start))
     cd $script_dir

@@ -58,10 +58,11 @@ while read site; do
     end=`date +%s`
     runtime=$((end-start))
     echo 'done launching static analysis commands from in time: ', $runtime
-    # process_out_dir $site
+    process_out_dir $site
     cd /w/goelayu/webArchive/data/sites/
     # tar -zcf /vault-home/goelayu/webArchive/data/500k/out_tars/${site}.tar.gz ${site} && rm -r ${site} &
-    tar cf /y/goelayu/webArchive/data/out_dirs/${site}.tar ${site} && rm -r ${site}
+    # tar cf /y/goelayu/webArchive/data/out_dirs/${site}.tar ${site} && rm -r ${site}
+    mv ${site} /x/goelayu/webArchive/data/raw_dirs/
     # mv ${site}.tar /y/goelayu/webArchive/data/out_dirs/
     echo 'Site ' $site, ' finished...'
     endM=`date +%s`
