@@ -169,6 +169,7 @@ function instrument(src, options) {
 		tracer_name: '__tracer',
 		e2eTesting: false,
 	};
+	options.path = options.filename;
 	e2eTesting = options.e2eTesting;
 	options = mergeInto(options, defaultOptions);
 	var prefix = '', shebang = '', output, m;
@@ -1526,8 +1527,34 @@ var traceFilter = function (content, options) {
 						// });
 							
 					}
-			}
-			else if (node.type == "IfStatement") {
+			} else if (node.type == "ForStatement"){
+				if (node.test.type == "Identifier"){
+					var {readArray,local, argReads, antiLocal} = signature.handleReads(node.test);
+					var _functionId = util.getFunctionIdentifier(node,true);
+					if (_functionId) {
+						readArray.forEach(function(read){
+							var newRead = util.logReadsHelper(read,scope.checkAndReplaceAlias(read));
+							if (options.caching)
+								update(read, options.tracer_name, '.logRead(', JSON.stringify(functionId),',[', newRead, '],[', util.getAllIdentifiersFromMemberExpression(read),'])');
+							if (options.useProxy){
+								if (util.checkIfReservedWord(read)) return;
+								if (read.source() == "this") {
+									// update(read, "thisProxy");
+									return
+								}
+								if (read.source() == "window")
+									update(read, options.proxyName)
+								else
+									update(read, options.proxyName, '.', read.source());
+							}
+								
+						});
+						rewriteClosure(antiLocal,_functionId);
+							
+					} 
+					// scope.addGlobalReads(readArray);
+				}
+			} else if (node.type == "IfStatement") {
 					var {readArray,local, argReads, antiLocal} = signature.handleReads(node.test);
 					var _functionId = util.getFunctionIdentifier(node,true);
 					if (_functionId) {

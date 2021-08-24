@@ -233,6 +233,7 @@ function __declTracerObject__(window) {
             //For each invocation get all the scopes it touches
             functionToScopes[invocationId] && functionToScopes[invocationId].forEach((i_scope)=>{
                 var closureProxyHandler = invocationToClosureProxy[i_scope];
+                if (!closureProxyHandler) return;
                 var proxyPrivates = closureProxyHandler.accessToPrivates();
                 var sigProcessor = new SignatureProcessor(invocationSignature, proxyPrivates.ObjectTree, callGraph, `closure_${i_scope}`);
                 sigProcessor.process();
@@ -572,6 +573,7 @@ function __declTracerObject__(window) {
     window.__tracerEval = window.eval;
     window.__tracerParseInt = window.parseInt;
     window.__tracerParseFloat = window.parseFloat;
+    window.__WeakMap = window.WeakMap;
 
 
     /*
@@ -897,9 +899,9 @@ function __declTracerObject__(window) {
 
         var ObjectTree = {};
         var objectIdCounter = 1;
-        var methodToProxy = new WeakMap();
-        var proxyToMethod = new WeakMap();
-        var ObjectToId = new WeakMap();
+        var methodToProxy = new window.__WeakMap();
+        var proxyToMethod = new window.__WeakMap();
+        var ObjectToId = new window.__WeakMap();
         var idToObject = {};
         var objectToPath;
         var parentFunctionId = null;
