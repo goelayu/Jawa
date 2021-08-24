@@ -77,10 +77,13 @@ var _hasStateOverlap = function(fileState, allWrites){
 var hasStateOverlap = function(state, fil, unfil){
     var filteredWrites = getFilteredWrites(state, fil),
         overlap = false;
+    
+    var filNames = fil.map(e=>e.split('_count')[0]);
     outer: 
         for (var unfilFile of unfil){
             program.verbose && console.log(`comparing state of file ${unfilFile}`)
-            var fileState = state[unfilFile].map(e=>[e[0],e[1]]).filter(e=>e[0].indexOf('reads')>0);
+            var fileState = state[unfilFile].map(e=>[e[0],e[1]]).filter(e=>e[0].indexOf('reads')>0 
+                && !filNames.find(f=>e[0].indexOf(f)>=0));
             if (_hasStateOverlap(fileState, filteredWrites))
                 return true;
         // inner:
