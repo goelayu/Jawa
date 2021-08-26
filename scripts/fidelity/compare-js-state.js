@@ -97,7 +97,7 @@ var _hasStateOverlap = function(fileState, allWrites){
         for (var write of filWritesDict[ws]){
             var match;
             if (match = reads.find(e => write == e)){
-                program.verbose && console.log(match, ws)
+                console.log(match, ws)
                 return true;
             }
         }

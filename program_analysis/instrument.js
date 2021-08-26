@@ -16,7 +16,7 @@ program
 
 
 
-var rewriter = null, intercepts;
+var rewriter = null, intercepts, isSafeReadCheck = false;
 var returnInfoFile = program.input + ".info";
 
 function IsJsonString(str) {
@@ -29,9 +29,20 @@ function IsJsonString(str) {
 }
 
 function initRewriter(){
-    rewriter = program.fns ? 
-        require(`./rewriters/strip-fns`) : 
-        program.rewriter == 'state' ? require(`./rewriters/state-static-analysis`) : require(`./rewriters/dynamic-cfg`);
+
+    rewriter = (function(){
+        if (program.fns)
+         return require(`./rewriters/strip-fns`)
+        else if (program.rewriter == 'state')
+            return require(`./rewriters/state-static-analysis`)
+        else if (program.rewriter == 'dynamic-cfg')
+            return require(`./rewriters/dynamic-cfg`)
+        else {
+            isSafeReadCheck = true;
+            return require(`./analyzers/var-existence-check`);
+        }
+    })();
+
 }
 
 function getTracerObj(){
@@ -134,7 +145,13 @@ function instrumentHTML(src, filename){
 }
 
 function dumpMD(){
-    var dumpData = program.fns || program.rewriter == 'state' ? {} : rewriter.metadata.allFnIds;
+    var dumpData = (function(){
+        if (program.fns || program.rewriter == 'state')
+            return {}
+        else if (program.rewriter == 'dynamic-cfg')
+            return rewriter.metadata.allFnIds;
+        else return rewriter.metadata.isSafeRead;
+    })();
     // dumps the metadata information post instrumentation
     fs.writeFileSync(returnInfoFile, JSON.stringify(dumpData));
 }
@@ -192,6 +209,9 @@ function instrumentJavaScript(src, options, jsInHTML){
          options.fns = allfns.filter(e=>e.indexOf(options.filename)>=0);
 
     }
+
+    if (isSafeReadCheck)
+        options.target = program.rewriter;
     try {
         src = rewriter.instrument(src, options);
     } catch (e) {
