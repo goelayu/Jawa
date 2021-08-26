@@ -28,14 +28,25 @@ var getFilteredFiles = function(all, unfiltered){
     return ret;
 }
 
-var getFilteredWrites = function(state, fil){
-    var writeKeys = [];
-    Object.keys(state).forEach((file)=>{
-        if (fil.indexOf(file)<0) return;
-        var st = state[file];
+var getExecutedFiles = function(allFiles, endFile, filFiles){
+    var ret = [];
+    for (var f of allFiles){
+        if (f == endFile)
+            return ret;
+        if (filFiles.indexOf(f)>=0)
+            ret.push(f);
+    }
+}
+
+var getFilteredWrites = function(state, files){
+    var writeKeys = [],
+     fileNames = files.map(e=>e.split('_count')[0]);
+    Object.keys(state).forEach((f)=>{
+        if (files.indexOf(f)<0) return;
+        var st = state[f];
         writeKeys = writeKeys.concat(
             st
-            .filter(e=>e[0].indexOf('_writes')>0)
+            .filter(e=>e[0].indexOf('_writes')>0 && !fileNames.find(f=>e[0].indexOf(f)>=0))
             .map(e=>[e[0],e[1]])
         )
         // console.log(file, writeKeys)
@@ -44,48 +55,67 @@ var getFilteredWrites = function(state, fil){
     return writeKeys;
 }
 
+
+var unfilDict = {reads:{}, writes:{}};
 var _hasStateOverlap = function(fileState, allWrites){
-    var writesDict = {};
+    if (!allWrites.length) return false;
+    var filWritesDict = {};
     allWrites.forEach((w)=>{
         w[0] = w[0].split('_writes')[0];
-        if (!(w[0] in writesDict))
-            writesDict[w[0]] = [];
-        writesDict[w[0]].push(w[1]);
+        if (!(w[0] in filWritesDict))
+        filWritesDict[w[0]] = [];
+        filWritesDict[w[0]].push(w[1]);
     })
-    var readDict = {};
+    // re initialize the reads for the current state
+    unfilDict.reads = {};
     fileState.forEach((r)=>{
-        r[0] = r[0].split('_reads')[0];
-        if (!(r[0] in readDict))
-            readDict[r[0]] = [];
-        readDict[r[0]].push(r[1]);
+        var type = r[0].indexOf('_reads') > 0 ? 'reads' : 'writes';
+        if (type == 'reads') return;
+        r[0] = r[0].split(`_${type}`)[0];
+        if (!(r[0] in unfilDict[type]))
+            unfilDict[type][r[0]] = [];
+        unfilDict[type][r[0]].push(r[1]);
+    });
+    fileState.forEach((r)=>{
+        var type = r[0].indexOf('_reads') > 0 ? 'reads' : 'writes';
+        if (type == 'writes') return;
+        r[0] = r[0].split(`_${type}`)[0];
+
+        if (unfilDict.writes[r[0]] && unfilDict.writes[r[0]].indexOf(r[1])>=0)
+            return;
+            
+        if (!(r[0] in unfilDict[type]))
+            unfilDict[type][r[0]] = [];
+        unfilDict[type][r[0]].push(r[1]);
     });
 
+
     // compare states
-    for (var ws of Object.keys(writesDict)){
-        if (!(ws in readDict)) continue;
-        var reads = readDict[ws];
-        for (var write of writesDict[ws]){
+    for (var ws of Object.keys(filWritesDict)){
+        if (!(ws in unfilDict.reads)) continue;
+        var reads = unfilDict.reads[ws];
+        for (var write of filWritesDict[ws]){
             var match;
             if (match = reads.find(e => write == e)){
                 program.verbose && console.log(match, ws)
-                // return true;
+                return true;
             }
         }
     }
 }
 
 var hasStateOverlap = function(state, fil, unfil){
-    var filteredWrites = getFilteredWrites(state, fil),
-        overlap = false;
-    
+    var allFiles = Object.keys(state);
     var filNames = fil.map(e=>e.split('_count')[0]);
-    outer: 
-        for (var unfilFile of unfil){
-            program.verbose && console.log(`comparing state of file ${unfilFile}`)
-            var fileState = state[unfilFile].map(e=>[e[0],e[1]]).filter(e=>e[0].indexOf('reads')>0 
-                && !filNames.find(f=>e[0].indexOf(f)>=0));
-            if (_hasStateOverlap(fileState, filteredWrites))
-                return true;
+    for (var unfilFile of unfil){
+        if (!(unfilFile in state)) continue;
+        program.verbose && console.log(`comparing state of file ${unfilFile}`)
+        var fileState = state[unfilFile].map(e=>[e[0],e[1]])
+        // filter(e=>e[0].indexOf('global_reads')>=0 && !filNames.find(f=>e[0].indexOf(f)>=0) && e[0].indexOf('jquery')<0);
+        var executedFiles = getExecutedFiles(allFiles, unfilFile, fil);
+        var filteredWrites = getFilteredWrites(state, executedFiles)
+        if (_hasStateOverlap(fileState, filteredWrites))
+            return true;
         // inner:
         //     for (var write of filteredWrites){
         //         var match;
