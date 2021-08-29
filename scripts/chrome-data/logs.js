@@ -1,7 +1,8 @@
 var fs = require('fs')
 var util = require('util'),
 	strSim=require('string-similarity'),
-	program = require('commander');
+	program = require('commander'),
+	netParser = require(`../../parser/networkParser`);
 
 
 program
@@ -9,9 +10,13 @@ program
     .option("-o, --original [original]", "path to the original log file")
     .option("-t, --type [type]","type of analysis to run")
     .option("-v, --verbose", "verbose logs")
+	.option("-n, --network [network]", 'path to the network log (optional)')
     .parse(process.argv);
 
-
+var parse = function(f){
+	return JSON.parse(fs.readFileSync(f));
+}
+	
 var flag = program.type
 var verbose = false;
 var log1, log2;
@@ -149,13 +154,22 @@ function matchingExceptions(log1, log2){
 
 }
 
+var errorFromMain = function(log){
+	var net = netParser.parseNetworkLogs(parse(program.network));
+	return log.exceptionDetails &&
+		log.exceptionDetails.url == net[0].documentURL;
+}
+
 function calculateErrors(log){
 	var count=0;
+	var avoidErrors = ['404 NOT FOUND', '(in promise)']
 	log.forEach((l) => {
 		if (l.exceptionDetails && 
 			l.exceptionDetails.exception &&
 			l.exceptionDetails.exception.description && 
-			l.exceptionDetails.exception.description.indexOf('404 NOT FOUND')<0) {
+			l.exceptionDetails.exception.description.indexOf('404 NOT FOUND')<0 &&
+			l.exceptionDetails.text && l.exceptionDetails.text.indexOf('in promise')<0 &&
+			!errorFromMain(l)) {
 				if (program.verbose)
 					console.log(l.exceptionDetails.exception.description)
 				count++;
