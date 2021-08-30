@@ -188,7 +188,7 @@ def instrument(root, fileType,args,file_obj):
     iframe_script_path = "iframeJs2/"
     log_directory = args.logDir
 
-
+    subprocess.call("mkdir -p {}".format(log_directory), shell=True)
     TEMP_FILE = log_directory + '/' + str(os.getpid()) + str(random.randint(0, 100000))
 
     fullurl = "http://{}{}".format(get_mm_header(http_response,'host'),filename)
@@ -276,6 +276,7 @@ def instrument(root, fileType,args,file_obj):
         command = "node " + command
     _log_path = log_directory+"/" + filename + "/"
     
+    print 'making directory', _log_path
     subprocess.call("mkdir -p {}".format(_log_path), shell=True)
 
     log_file=open(_log_path+"logs","w+")
