@@ -35,7 +35,7 @@ DIR = os.path.dirname(os.path.abspath(__file__))
 analyzer_script = "{}/../program_analysis/instrument.js".format(DIR)
 # filter_list = "{}/../filter-lists/combined.txt".format(DIR)
 # filter_rules = None
-wombat_location = '/w/goelayu/webArchive/data/wombat.js'
+wombat_location = 'wombat.js'
 
 # mp_manager = mp.Manager()
 # analytic_files = mp_manager.list()
@@ -233,7 +233,7 @@ def instrument(root, fileType,args,file_obj):
     #             custom_files.append(filename) 
     
 
-    node_debugging_port = random.randint(9300,9900)
+    node_debugging_port = random.randint(9300,9600)
     # pid = os.fork()
 
     # if pid == 0:
@@ -280,7 +280,7 @@ def instrument(root, fileType,args,file_obj):
 
     if args.allfns:
         command += " --fns {}".format(args.allfns)
-    
+
     subprocess.call("mkdir -p {}".format(_log_path), shell=True)
 
     log_file=open(_log_path+"logs","w+")
@@ -523,11 +523,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help='path to input directory')
     parser.add_argument('output', help='path to output directory')
-    parser.add_argument('rewriter', help='type of instrumentation to perform', default="comments", choices=["comments","dynamic-cfg", "state"])
+    parser.add_argument('rewriter', help='type of instrumentation to perform', default="comments", choices=["comments","dynamic-cfg"])
     parser.add_argument('logDir', help='path to log output directory')
     parser.add_argument('--jsProfile', help='path to the js profile')
-    parser.add_argument('--allfns', help="allfns which need to be preserved")
     parser.add_argument('--cgInfo',help="path to the cg info")
+    parser.add_argument('--allfns', help="allfns which need to be preserved")
     parser.add_argument('--debug',help="enable node debugging using -inspect flag")
     parser.add_argument('--filter',help="enable analytics filtering",action='store_true')
     parser.add_argument('--profile',help="turn on profiling of code", action='store_true')

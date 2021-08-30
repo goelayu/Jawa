@@ -345,20 +345,22 @@ var matchNetwork = function(net1, net2){
 
     net1 = netParser.parseNetworkLogs(parse(net1)),
         net2 = netParser.parseNetworkLogs(parse(net2));
-    var total = match = 0;
-    for (var n1 of net1){
-        if (ignoreUrl(n1)) continue;
-        total++;
-        for (var n2 of net2){
-            if (ignoreUrl(n2)) continue;
+    // var total = match = 0;
+    // for (var n1 of net1){
+    //     if (ignoreUrl(n1)) continue;
+    //     total++;
+    //     for (var n2 of net2){
+    //         if (ignoreUrl(n2)) continue;
 
-            if (isBestMatch(n1.url, n2.url)){
-                match++;
-                break;
-            }
-        }
-    }
-    console.log(total, match)
+    //         if (isBestMatch(n1.url, n2.url)){
+    //             match++;
+    //             break;
+    //         }
+    //     }
+    // }
+    // console.log(total, match)
+    var sum = (total, cur) => {return total + cur.size}
+    console.log(net1.filter(e=>!ignoreUrl(e)).reduce(sum,0), net2.filter(e=>!ignoreUrl(e)).reduce(sum, 0));
 }
 
 var getResOnPage = function(data){

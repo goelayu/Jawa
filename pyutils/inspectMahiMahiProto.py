@@ -17,6 +17,8 @@ import json
 import unicodedata
 import hashlib
 
+from pyutils.mahimahi import Mahimahi
+
 
 def matchRtiWithMahimahi(rtiUrls, mahimahiUrls):
     unmatched = []
@@ -99,36 +101,42 @@ def getPlainText(msg):
 
     return orig_body
 
+def get_mm_header(mm_obj, key):
+    for header in mm_obj.request.header:
+        if header.key.lower() == key:
+            return header.value
+
+    return None
 def main(args):
 
-    mahimahiUrls = []
-    pairs = []
-    rtiUrls = {}
-    # extract js Urls
-    http_response_orig = http_record_pb2.RequestResponse()
-    http_response_mod = http_record_pb2.RequestResponse()
     count = 0
-    listOfJS = {}
     for root, folder, files in os.walk(args.original):
         url = root.split('/')[-1]
-        listOfJS[url] = []
-        count = count+1
+        cookie_len = 0
         for file in files:
-            # try:
-            f_orig = open(os.path.join(root,file), "rb")
-            # print f_orig.name
-            http_response_orig.ParseFromString(f_orig.read())
-            f_orig.close()
-
-            reqUrl = http_response_orig.request.first_line.split()[1]
-            # print reqUrl, http_response_orig.response
-            print reqUrl, http_response_orig.request.first_line, http_response_orig.response.first_line, file, 
+            try:
+                mm = Mahimahi(os.path.join(root,file))
+                type = mm.getHeader('content-type')
+                if 'javascript' not in type:
+                    continue
+                fullurl = "http://{}{}".format(mm.getRequestHeader('host'),mm.getUrl())
+                print mm.getUrl()
+                print mm.http_obj.response.first_line
+                print mm.http_obj.request.first_line
+                # if 'cookie' in fullurl:
+                #     cookie_len += len(mm._plainText)
+                # print reqUrl, http_response_orig.request.first_line, http_response_orig.response.first_line, file, host
+                # print fullurl, len(mm._plainText)
+            except Exception as e:
+                pass
+    # print cookie_len
             # removeHeader(http_response_orig.response.header, 'link')
             # createOutputProtoFile(http_response_orig, os.path.join(args.modified,file))
             # print http_response_orig.request.header
-            for h in http_response_orig.response.header:
-                if h.key.lower() == 'content-type':
-                    print h.value
+            # print http_response_orig.response.header
+            # for h in http_response_orig.response.header:
+            #     if h.key.lower() == 'content-type':
+            #         print h.value
                 # if reqUrl in args.url:
                 #     # body = getPlainText(http_response_orig)
                 #     print len(http_response_orig.response.body)

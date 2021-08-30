@@ -7,13 +7,11 @@
 # Excludes certain sites which didn't have the js byte distribution
 
 for c in $(seq 1 10); do 
-    ls /vault-home/goelayu/webArchive/results/NSDI22/motivation/scale | grep -v thetimes.co | \
-        grep -v economictimes.indiatimes | grep -v money.cnn | grep -v smh.com | \
-    while read i; do
+    ls /vault-home/goelayu/webArchive/results/NSDI22/motivation/scale -tr | grep add  | while read i; do
         len=`cat /vault-home/goelayu/webArchive/results/NSDI22/motivation/scale/$i | wc -l`;
         setsize=$((len/10));
         curhead=$((setsize*c));
-        cat /vault-home/goelayu/webArchive/results/NSDI22/motivation/scale/$i | awk '{print $2-prevj, ($2+$4+$6+$8 - prevt); prevj=$2; prevt=$2+$4+$6+$8}' \
+        cat /vault-home/goelayu/webArchive/results/NSDI22/motivation/scale/$i | sed '$d' | awk '{print $2-prevj, ($2+$4+$6+$8 - prevt); prevj=$2; prevt=$2+$4+$6+$8}' \
             | head -n $curhead | tail -n $setsize;
     done
-done |  awk '{js+=$1; other+=($2);print NR*10, js/other}'
+done |  awk '{js+=$1; other+=($2);print NR*1, js, other, js/other}'

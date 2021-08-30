@@ -97,8 +97,8 @@ def getTotalDiffSize(files):
 
 
 def getTotalSize(files):
-    for i in files:
-        logging.info('File {} with size {}'.format(i.getUrl(), len(i._plainText)))
+    # for i in files:
+    #     logging.info('File {} with size {}'.format(i.getUrl(), len(i._plainText)))
     sizes = [len(i._plainText) for i in files]
     # sizes = [len(i.getBody()) for i in files]
     return sum(sizes)
@@ -133,6 +133,8 @@ def dump_log(log_data):
         logging.info('computing total size for type: {} with # {}'.format(k, len(log_data['type_to_files_all'][k])))
         str = str + ',{} : {} '.format(k, _s(log_data['type_to_files_all'][k]))
         str = str + ',{}_dedup : {} '.format(k, _s(log_data['type_to_files_dedup'][k]))
+        if k == 'javascript':
+            str = str + ',{}_dedup : {} '.format('javascript_filter', _s(log_data['type_to_files_dedup']['javascript_filter']))
         # str = str + ',{}_diff : {} '.format(k, _d(log_data['type_to_files_dedup'][k]))
     logging.info(str)
 
@@ -140,7 +142,27 @@ def dump_file(file, data):
     with (open(file,'w')) as f:
         f.write(json.dumps(data))
 
-def compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all, valid_js):
+def strip_list(l):
+    r = []
+    for i in l:
+        r.append(i.strip())
+    return r
+
+def read_filter():
+    path='filter-lists/archive-filter.txt'
+    with open(path,'rb') as f:
+        filters = f.readlines()
+    return strip_list(filters)
+
+def is_filtered_url(url, filters):
+    for rule in filters:
+        if rule in url:
+            logging.info("url filtered {}".format(url))
+            return True
+    return False
+
+
+def compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all, valid_js, filters):
     all_files.extend(dst_objs)
     matches = []
     unmatches = []
@@ -151,14 +173,19 @@ def compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_t
         #     continue
         if type == 'javascript':
             # logging.info('comparing url {}'.format(file.getUrl()))
-            short_name = get_archive_filename(file.getUrl())
+            furl = file.getUrl()
+            filter_url = is_filtered_url(furl, filters)
+            short_name = get_archive_filename(furl)
             if short_name not in valid_js:
                 continue
+
         match = _compare(file, dedup_files)
         match and matches.append(file)
         if not match:
             unmatches.append(file)
             type_to_files_dedup[type].append(file)
+            if type == 'javascript' and not filter_url:
+                type_to_files_dedup['javascript_filter'].append(file)
         type_to_files_all[type].append(file)
     dedup_files.extend(unmatches) 
 
@@ -186,8 +213,10 @@ def get_valid_jsfiles(files, datadir,site_path):
 def compare(args):
     all_files = []
     dedup_files = []
-    type_to_files_dedup = {'javascript':[], 'html':[], 'image':[], 'css':[], None:[], 'font':[]}
+    type_to_files_dedup = {'javascript':[], 'html':[], 'image':[], 'css':[], None:[], 'font':[], 'javascript_filter':[]}
     type_to_files_all = {'javascript':[], 'html':[], 'image':[], 'css':[], None:[], 'font':[]}
+
+    filters = read_filter()
     if args.selected:
         dirs = open(args.directory).readlines()
         for d in dirs:
@@ -201,11 +230,11 @@ def compare(args):
             js_urls = get_valid_jsfiles(dst_objs, args.urldir,site_path)
 
             logging.info("Comparing {} with {} with url {}".format(len(dedup_files), len(dst_objs), d ))
-            compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all, js_urls)
+            compare_helper(all_files, dedup_files, dst_objs, type_to_files_dedup, type_to_files_all, js_urls, filters)
             dump_log({'all_files':all_files, 'dedup_files':dedup_files, 'type_to_files_dedup': type_to_files_dedup, 'type_to_files_all':type_to_files_all})
             
             #extract url path to append to output
-            dump_file('{}/{}/archive_urls'.format(args.urldir,site_path), js_urls)
+            # dump_file('{}/{}/archive_urls'.format(args.urldir,site_path), js_urls)
     else:
         for root, folder, files in os.walk(args.directory):
             if len(files) != 0:
