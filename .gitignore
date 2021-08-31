@@ -1,9 +1,12 @@
 *
+
 !dom-distill/
 !dom-distill/*/
 !program_analysis/
 !program_analysis/*/
 !program_analysis/**/
+program_analysis/node_modules/
+program_analysis/instOutput
 !scripts/
 !scripts/*/
 !parser/
@@ -14,7 +17,8 @@
 !filter-lists/
 !filter-lists/*
 !data/
-!data/plot/*
+!data/*
+!data/plots/*
 !eval
 !eval/*
 !*js
