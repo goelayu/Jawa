@@ -1,7 +1,7 @@
 analytics
 cdn.cookielaw.org
 jquery.cookie.js
-platform.twitter.com/widgets.js
+platform.twitter.com
 outbrain
 tinypass
 izooto.js
@@ -20,7 +20,7 @@ cdn.parsely.com
 cdn.onesignal.com
 imasdk.googleapis.com
 static.ads-twitter.com
-cdn.taboola.com
+taboola
 cdn.blueconic.com
 ats.rlcdn.com
 s.skimresources.com
@@ -28,3 +28,15 @@ assets.zephr.com
 www.googletagservices.com
 utag
 tags
+chartbeat
+gpt.js
+ssc.33across.com
+api.permutive.com
+sdk.privacy-center.org
+secure.quantserve.com
+s.ntv.io
+cdn.izooto.com
+script.crazyegg.com
+tiqcdn.com
+pushnotification
+assets.adobedtm.com

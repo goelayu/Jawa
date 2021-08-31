@@ -1,0 +1,42 @@
+# this file contains a description of each of the filter in the
+archive-filter list
+
+analytics
+cdn.cookielaw.org
+jquery.cookie.js
+platform.twitter.com/widgets.js
+outbrain
+tinypass
+izooto.js
+recaptcha
+ta-pagesocial-sdk.js
+js/search.js
+social-share
+social-sdk
+OneSignalPage
+amp-facebook
+amp-instagram
+boomerang#RUM
+linkedin.com/in.js
+news.google.com/swg
+cdn.parsely.com
+cdn.onesignal.com
+imasdk.googleapis.com
+static.ads-twitter.com
+cdn.taboola.com
+cdn.blueconic.com # behavior listening, analytics to better understand what the user is doing
+ats.rlcdn.com # tracker/cookie script
+s.skimresources.com #content monetization scripts
+assets.zephr.com #paywall
+www.googletagservices.com #tagging scripts
+chartbeat
+gtp.js
+ssc.33across.com/ ##monetization framework
+api.permutive.com # data management platform
+sdk.privacy-center.org
+secure.quantserve.com #quantcast 3rd party cookie
+s.ntv.io #native tracker
+script.crazyegg.com #heatmap
+tiqcdn.com #tag management 
+pushnotification
+assets.adobedtm.com #dynamic tag management
