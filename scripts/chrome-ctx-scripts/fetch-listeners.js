@@ -89,8 +89,10 @@ function getEventId(el, evt){
 
 function _triggerEvent(el, evt){
     var event = new Event(evt);
-    window.__tracer.setEventId(getEventId(el,evt));
+    // window.__tracer.setEventId(getEventId(el,evt));
+    window.__tracer.cacheInit(getEventId(el,evt ));
     el.dispatchEvent && el.dispatchEvent(event);
+    window.__tracer.exitFunction();
 }
 
 function shuffle(array) {
@@ -117,21 +119,21 @@ function triggerEvents(elems){
     shuffle(elems);
 
     // turn on the tracer logging
-    window.__tracer.setTracingMode(true);
-    window.__tracer.setCaptureMode('postload');
+    // window.__tracer.setTracingMode(true);
+    // window.__tracer.setCaptureMode('postload');
     elems.forEach((_e)=>{
         try {
             var [elem, handlers] = _e;
             handlers.forEach((h)=>{
                 _triggerEvent(elem, h);
-                if (h == 'click')
-                    _triggerEvent(elem, h);
+                // if (h == 'click')
+                //     _triggerEvent(elem, h);
             })
         } catch (e) {
             /**no op */
         }
     });
-    window.__tracer.setTracingMode(false);
+    // window.__tracer.setTracingMode(false);
 }
 
 function getCandidateElements(listeners){

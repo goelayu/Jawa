@@ -1160,16 +1160,16 @@ var traceFilter = function (content, options) {
 				   if (self.window != self){
 				   	__tracer = {isProxy:function(e){return e}, handleProtoAssignments: function(e){return e}}
 				   }
-                   if (__tracer && __tracer.cacheInit){
-                       __tracer.cacheInit("${options.filename}")
-                   }
+                //    if (__tracer && __tracer.cacheInit){
+                //        __tracer.cacheInit("${options.filename}")
+                //    }
 				})();\n`;
                 var programEnd = `\n
                     if (__tracer && __tracer.exitFunction)
                         __tracer.exitFunction();
                 `
 				if (node.source().indexOf("__tracer") >=0)
-					update(node, options.prefix,tracerCheck,sourceNodes(node), programEnd)
+					update(node, options.prefix,tracerCheck,sourceNodes(node))
 				else 
 					update(node, options.prefix,sourceNodes(node))
 			} 

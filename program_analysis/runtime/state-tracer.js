@@ -672,6 +672,38 @@ function __declTracerObject__(window) {
 
         customShims(window);
 
+        function getDomPath(el) {
+            try {
+                var stack = [];
+                while ( el.parentNode != null ) {
+                console.log(el.nodeName);
+                var sibCount = 0;
+                var sibIndex = 0;
+                for ( var i = 0; i < el.parentNode.childNodes.length; i++ ) {
+                    var sib = el.parentNode.childNodes[i];
+                    if ( sib.nodeName == el.nodeName ) {
+                    if ( sib === el ) {
+                        sibIndex = sibCount;
+                    }
+                    sibCount++;
+                    }
+                }
+                if ( el.__hasAttribute('id') && el.id != '' ) {
+                    stack.unshift(el.nodeName.toLowerCase() + '#' + el.id);
+                } else if ( sibCount > 1 ) {
+                    stack.unshift(el.nodeName.toLowerCase() + ':eq(' + sibIndex + ')');
+                } else {
+                    stack.unshift(el.nodeName.toLowerCase());
+                }
+                el = el.parentNode;
+                }
+            
+                return stack.slice(1).join('>'); // removes the html element
+            } catch (e){
+                return '#'
+            }
+          }
+
 
         /*Creates shim for every dom methods
         The purpose of the shim is to check for proxy argument types*/
@@ -698,54 +730,32 @@ function __declTracerObject__(window) {
                          if (typeof self[_class].prototype[classKey] == "function") {
                             var origMethod = self[_class].prototype[classKey];
                             if (classKey == "constructor") return;
-                            if (origMethod.name == "appendChild" || origMethod.name == "append" || origMethod.name == "createElement"){
-                               self[_class].prototype[classKey] = function(){
-                                    var thisObj = this;
-                                    for (var i=0;i<arguments.length;i++){
-                                        var arg = arguments[i];
-                                        if (arg && arg.__isProxy)
-                                            arguments[i] = arg.__target;
-                                    }
-                                    if (thisObj && thisObj.__isProxy)
-                                        thisObj = thisObj.__target;
-                                    var ret = origMethod.apply(thisObj,arguments);
-                                    // if ( (arguments[0].nodeName && arguments[0].nodeName.toLowerCase() == "iframe") || 
-                                    //         arguments[0].toLowerCase && arguments[0].toLowerCase() == "iframe" ){
-                                    //     if (ret.contentWindow) {
-                                    //         createShimForDOMMethods(ret.contentWindow);
-                                    //         customShims(ret.contentWindow);
-                                    //     }
-                                    //     else ret.addEventListener("load", function(){
-                                    //         createShimForDOMMethods(ret.contentWindow);
-                                    //         customShims(ret.contentWindow);
-                                    //     })
-                                    // }
-                                    return ret;
-                                }; 
-                                self[_class].prototype[classKey].__isShimmed__ = true
-                                self[_class].prototype[classKey].__orig__ = origMethod;
-                            } else {
-                                self[_class].prototype[classKey] = function(){
-                                    var thisObj = this;
-                                    for (var i=0;i<arguments.length;i++){
-                                        var arg = arguments[i];
-                                        if (arg && arg.__isProxy)
-                                            arguments[i] = arg.__target;
-                                    }
-                                    if (thisObj && thisObj.__isProxy)
-                                        thisObj = thisObj.__target;
-                                    if (arguments[0] && arguments[0].nodeName == "SCRIPT"){
-                                        // if (arguments[0].async == 1)
-                                        //     arguments[0].async = 0;
-                                    }
-                                    /*If regex testing, return the original method*/
-                                    if ( (origMethod.name == "test" || origMethod.name =="exec") && arguments[0] && arguments[0].__isShimmed__)
-                                        arguments[0] = arguments[0].__orig__;
-                                    return origMethod.apply(thisObj,arguments);
-                                };
-                                self[_class].prototype[classKey].__isShimmed__ = true
-                                self[_class].prototype[classKey].__orig__ = origMethod;
-                            }
+                            self[_class].prototype[classKey] = function(){
+                                var thisObj = this;
+                                for (var i=0;i<arguments.length;i++){
+                                    var arg = arguments[i];
+                                    if (arg && arg.__isProxy)
+                                        arguments[i] = arg.__target;
+                                }
+                                if (thisObj && thisObj.__isProxy)
+                                    thisObj = thisObj.__target;
+                                /*If regex testing, return the original method*/
+                                if ( (origMethod.name == "test" || origMethod.name =="exec") && arguments[0] && arguments[0].__isShimmed__)
+                                    arguments[0] = arguments[0].__orig__;
+
+                                // track DOM element and the corresponding class key
+                                if (_shadowStackHead){
+                                    var dompath = getDomPath(thisObj);
+                                    if (dompath.length > 1)
+                                        customLocalStorage[_shadowStackHead].DOMS.push([dompath, classKey, JSON.stringify(arguments)])
+                                }
+                                return origMethod.apply(thisObj,arguments);
+                            };
+                            self[_class].prototype[classKey].__isShimmed__ = true
+                            self[_class].prototype[classKey].__orig__ = origMethod;
+                            if (classKey == 'hasAttribute')
+                                self[_class].prototype['__hasAttribute'] = origMethod;
+                            
                          }
                     } catch (e){};
                 });
@@ -2102,6 +2112,7 @@ function __declTracerObject__(window) {
                 window.document.location.href : null;
             customLocalStorage[cacheIndex].readKeys = new Set();
             customLocalStorage[cacheIndex].writeKeys = new Set();
+            customLocalStorage[cacheIndex].DOMS = [];
             // customLocalStorage[cacheIndex].startTime = window.performance.now();
         } else {
             // if (!(cacheIndex in callGraph))
@@ -2960,6 +2971,9 @@ function __declTracerObject__(window) {
                         }
                         signature[nodeId] &&  signature[nodeId].IBF && processedSig[nodeId] && (
                             processedSig[nodeId].push(['IBF',signature[nodeId].IBF]));
+
+                        signature[nodeId] &&  signature[nodeId].DOMS && processedSig[nodeId] && (
+                            processedSig[nodeId].push(['DOMS',signature[nodeId].DOMS]));
 
                         // signature[nodeId] &&  signature[nodeId].ec && processedSig[nodeId] && (
                         //     processedSig[nodeId].push(['ec', signature[nodeId].ec]));
