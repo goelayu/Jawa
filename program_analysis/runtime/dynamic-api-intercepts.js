@@ -4,6 +4,8 @@
         return window.__dynAPI__;
     }
 
+    var mobileAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
+
     function interceptAPI(api, prop){
         var propDesc = Object.getOwnPropertyDescriptor(api, prop);
         var oldget, oldset;
@@ -15,6 +17,16 @@
         Object.defineProperty(api, prop,{
             get: function(){
                 window.__dynAPI__[prop]++;
+
+                if (prop == 'userAgent'){
+                    if (Math.random() < 0.5)
+                        return oldget.call(this);
+                    else return mobileAgent;
+                } else if (prop == 'innerWidth' || prop == 'innerHeight'){
+                    if (Math.random() < 0.5)
+                        return oldget.call(this);
+                    else return 375;
+                }
                 
                 if (oldget && oldget.call)
                     return oldget.call(this);
