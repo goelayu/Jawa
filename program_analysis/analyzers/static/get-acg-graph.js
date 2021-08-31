@@ -36,7 +36,7 @@ var extractContent = function(zipped){
     }
 }
 
-var execACGModule = function(filenames, srcDir){
+var execACGModule = function(filenames, srcDir,time){
     var baseCMD = `node --max-old-space-size=64512 ${STATICANALYSER} `;
     var cmdArgs = ' ';
     var tmpDir = `${srcDir}/__metadata__/static_temp`;
@@ -62,7 +62,10 @@ var execACGModule = function(filenames, srcDir){
     var cfgCMD = baseCMD + `--cg --fg ${cmdArgs} 2> ${srcDir}/__metadata__/cg 1>${srcDir}/__metadata__/fg`;
     //create cfg
     // program.verbose && console.log(`creating cfg: ${cfgCMD}`)
+    var staticStart = process.hrtime();
     var _cmdOut = spawnSync(cfgCMD, {shell:true} );
+    var staticEnd = process.hrtime(staticStart);
+    time.static = staticEnd;
     
     // program.verbose && console.log(_cmdOut.stderr.toString())
 }
@@ -97,18 +100,18 @@ var patchCFG = function(srcDir){
  */
 var getCallGraph = function(srcDir, dynamicGraph, runModule, time){
     var filenames = extractFileNames(dynamicGraph);
-    if (time)
-        var staticStart = process.hrtime();
-    if (runModule) execACGModule(filenames, srcDir);
-    if (time)
-        var staticEnd = process.hrtime(staticStart);
+    // if (time)
+    //     var staticStart = process.hrtime();
+    if (runModule) execACGModule(filenames, srcDir, time);
+    // if (time)
+    //     var staticEnd = process.hrtime(staticStart);
     // var allIds = getAllIds(srcDir);
     var completeGraph = patchCFG(srcDir)
     
     var graph = new Graph(completeGraph);
     // graph.buildGraph();
-    if (time)
-        time.static = staticEnd;
+    // if (time)
+    //     time.static = staticEnd;
     return graph;
 }
 

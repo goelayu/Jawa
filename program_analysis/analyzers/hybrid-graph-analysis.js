@@ -7,10 +7,12 @@ var fs = require('fs'),
     program = require('commander'),
     staticGraph = require('../analyzers/static/get-acg-graph'),
     CFA = require('../analyzers/static/control-flow-analysis');
+const { spawnSync } = require('child_process');
 
 program
     .option('-p, --performance [value]','path to performance directory')
     .option('-s, --source [value]','path to JS source directory')
+    .option('-u, --url [url]', 'url which is being processed')
     .option('-v, --verbose','enable verbose logging')
     .parse(process.argv);
 
@@ -128,8 +130,8 @@ var learnNodes = function(hybridGraph, dynamicGraph, completeGraph, filenames, f
     dynamicGraph.forEach(hybridGraph.add, hybridGraph);
 
     //extract static call graph for control flow functions
-    var cntrlFlowFns = getControlFlowFns(dynamicGraph, filenames, filepaths);
-    var staticCntrlFlowFns = sliceGraph(completeGraph, cntrlFlowFns);
+    // var cntrlFlowFns = getControlFlowFns(dynamicGraph, filenames, filepaths);
+    var staticCntrlFlowFns = sliceGraph(completeGraph, [...dynamicGraph]);
     staticCntrlFlowFns.forEach(hybridGraph.add, hybridGraph);
     return hybridGraph;
 }
@@ -163,7 +165,7 @@ var tuneGraph = function(hybridGraph, dynamicGraphs, completeGraph, filenames, f
      * Learning param - 5
      * Eval param - 10
      */
-    var learn = 5, eval = 10, evalLimit = dynamicGraphs.length;
+    var learn = 1, eval = 2, evalLimit = dynamicGraphs.length;
         learnGraph = graphUnions(dynamicGraphs, learn),
         evalGraph = graphUnions(dynamicGraphs, eval);
 
@@ -183,7 +185,7 @@ var tuneGraph = function(hybridGraph, dynamicGraphs, completeGraph, filenames, f
         }
         learnNodes(hybridGraph, learnGraph, completeGraph, filenames, filepaths);
 
-        if (eval > Math.min(evalLimit,90))
+        if (eval > Math.min(evalLimit,10))
             throw new Error(`Call graph didn't converge within the limit specified`);
     }
     program.verbose && console.log(`Comparing learnt ${learn} of size ${hybridGraph.size} with eval ${eval} of size ${evalGraph.size}`)
@@ -191,19 +193,21 @@ var tuneGraph = function(hybridGraph, dynamicGraphs, completeGraph, filenames, f
 
 var buildCallGraph = function(){
 
-    var _filterFiles = parse(`${program.source}/__metadata__/filtered`),
-        filterFiles = _filterFiles.tracker.concat(_filterFiles.custom);
+    // var _filterFiles = parse(`${program.source}/__metadata__/filtered`),
+    //     filterFiles = _filterFiles.tracker.concat(_filterFiles.custom);
     //get all the dynamic call graphs
-    var dynamicGraphs = loadDynamicGraphs(program.performance, filterFiles, 50);
+    var dynamicGraphs = loadDynamicGraphs(program.performance, [], 10);
     if (!dynamicGraphs.length){
         program.verbose && console.log('No dynamic call graphs obtained');
         fs.writeFileSync(`${program.performance}/hybridcg`,JSON.stringify([]));
+        console.log(`Time: ${program.url} 0 0 0`);
         return;
     }
 
     // get the complete call graph
     var time = {};
     var completeGraph = staticGraph.getCallGraph(program.source, dynamicGraphs[0], true, time);
+    console.log(`complete graph length: ${Object.keys(completeGraph.raw).length}`)
     var filePaths = staticGraph.contentFiles;
     var filenames = extractFileNames(dynamicGraphs[0]);
 
@@ -213,9 +217,14 @@ var buildCallGraph = function(){
     var tuneEnd = process.hrtime(tuneStart);
 
     var hybridBenchTime = tuneEnd[0] + time.static[0];
-    console.log(`Time: ${hybridBenchTime} ${tuneEnd[0]} ${time.static[0]}`)
+    console.log(`Time: ${program.url} ${hybridBenchTime} ${tuneEnd[0]*1000 + tuneEnd[1]/(1000*1000)} ${time.static[0]*1000 + time.static[1]/(1000*1000)}`)
     console.log(`Final call graph: ${hybridGraph.size} nodes`)
     fs.writeFileSync(`${program.performance}/hybridcg`,JSON.stringify([...hybridGraph]));
+
+    //delete temp files; cleanupa
+    var staticTempDir = `${program.source}/__metadata__/static_temp`;
+    fs.existsSync(staticTempDir) && spawnSync(`rm -r ${staticTempDir}`, {shell:true})
+
 }
 
 buildCallGraph();
