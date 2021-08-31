@@ -119,7 +119,8 @@ function wrap(content){
                 }
             }
         }).toString();
-
+        
+        var locationInit = `var location = window.__location__;\n`
         content = falafel(content,{
             locations: true,
             ranges:true
@@ -132,7 +133,7 @@ function wrap(content){
                 globalStart = true && (globalCodeRange.s = globalCodeRange.e = node)
             } else if (globalStart){
                 if (isGlobalCodeEnd(node)){
-                    update(globalCodeRange.s, `(function ${IIFE_NAME}(){ `,globalCodeRange.s.source());
+                    update(globalCodeRange.s, `(function ${IIFE_NAME}(){ `,locationInit, globalCodeRange.s.source());
                     update(globalCodeRange.e, globalCodeRange.e.source(), ' })();');
                     globalStart = false;
                 } else 

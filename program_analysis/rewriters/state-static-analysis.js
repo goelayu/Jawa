@@ -841,6 +841,10 @@ var traceFilter = function (content, options) {
 
 		// console.log(esprima.parse(content));
 		var instrumentedNodes = [];
+
+		//rewrite to remove all window.location occurances with location so that the overwritten location
+		//variable can be read instead
+		content = content.replace(/window.location/g, 'location');
 		m = fala({
 			source: content,
 			locations: true,
@@ -1160,16 +1164,19 @@ var traceFilter = function (content, options) {
 				   if (self.window != self){
 				   	__tracer = {isProxy:function(e){return e}, handleProtoAssignments: function(e){return e}}
 				   }
-                //    if (__tracer && __tracer.cacheInit){
-                //        __tracer.cacheInit("${options.filename}")
-                //    }
-				})();\n`;
+                   if (__tracer && __tracer.cacheInit){
+                       __tracer.cacheInit("${options.filename}")
+                   }
+				})();\n
+				{
+					let location = window.__location__;\n`;
                 var programEnd = `\n
                     if (__tracer && __tracer.exitFunction)
                         __tracer.exitFunction();
+				}
                 `
 				if (node.source().indexOf("__tracer") >=0)
-					update(node, options.prefix,tracerCheck,sourceNodes(node))
+					update(node, options.prefix,tracerCheck,sourceNodes(node), programEnd)
 				else 
 					update(node, options.prefix,sourceNodes(node))
 			} 
@@ -1528,7 +1535,7 @@ var traceFilter = function (content, options) {
 							
 					}
 			} else if (node.type == "ForStatement"){
-				if (node.test.type == "Identifier"){
+				if (node.test && node.test.type == "Identifier"){
 					var {readArray,local, argReads, antiLocal} = signature.handleReads(node.test);
 					var _functionId = util.getFunctionIdentifier(node,true);
 					if (_functionId) {

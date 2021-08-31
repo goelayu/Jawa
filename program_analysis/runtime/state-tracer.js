@@ -126,6 +126,7 @@ function __declTracerObject__(window) {
     var PMD = {};
     var runTimePurged = 0;
     var writeStateProcessed = new Map();
+    var evtTracking = false;
 
     /*
     For efficient recording, constraint the size of certain objects
@@ -653,18 +654,10 @@ function __declTracerObject__(window) {
                 return _defineProperty.apply(this, arguments);
             }
 
-            // var _toString = Object.prototype.toString;
-            // self.Object.prototype.toString = function(){
-            //     var thisObj = this;
-            //     for (var i=0;i<arguments.length;i++){
-            //         var arg = arguments[i];
-            //         if (arg && arg.__isProxy)
-            //             arguments[i] = arg.__target;
-            //     }
-            //     if (thisObj && thisObj.__isProxy)
-            //         thisObj = thisObj.__target;
-            //     return _toString.apply(thisObj,arguments);
-            // }
+            var _alert = window.aler;
+            window.alert = function(){
+                //convert the function to a no-op
+            }
 
 
             window.___ranCUSTOMSHIMS___ = true;
@@ -731,6 +724,7 @@ function __declTracerObject__(window) {
                             var origMethod = self[_class].prototype[classKey];
                             if (classKey == "constructor") return;
                             self[_class].prototype[classKey] = function(){
+                                if (evtTracking && classKey == 'submit') return; //make submit into a noop once evt tracking is initialized
                                 var thisObj = this;
                                 for (var i=0;i<arguments.length;i++){
                                     var arg = arguments[i];
@@ -744,7 +738,7 @@ function __declTracerObject__(window) {
                                     arguments[0] = arguments[0].__orig__;
 
                                 // track DOM element and the corresponding class key
-                                if (_shadowStackHead){
+                                if (_shadowStackHead && evtTracking){
                                     var dompath = getDomPath(thisObj);
                                     if (dompath.length > 1)
                                         customLocalStorage[_shadowStackHead].DOMS.push([dompath, classKey, JSON.stringify(arguments)])
@@ -1455,6 +1449,11 @@ function __declTracerObject__(window) {
         window.__tracerPROXY = window;
     }
 
+    window.__location__ = Object.assign({}, location);
+    window.__location__.assign = window.__location__.replace = window.__location__.reload = function(){
+
+    };
+
     this.getShadowStackHead = function(){
         return _shadowStackHead;
     }
@@ -2057,6 +2056,12 @@ function __declTracerObject__(window) {
 
     var exceedsInvocationLimit = function(nodeId){
         return nodeId.split("_count")[1] > INVOCATION_LIMIT;
+    }
+
+    this.clearCustomStorage = function(){
+        //  clearing custom storage for event handler analysis
+        customLocalStorage = [];
+        evtTracking = true;
     }
 
     this.cacheInit = function(nodeId, isRoot){
