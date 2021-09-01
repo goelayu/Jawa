@@ -11,6 +11,38 @@ var getElemId = function(elem){
     return id;
 }
 
+// var getElemId = function(el){
+//     try {
+//         var stack = [];
+//         while ( el.parentNode != null ) {
+//         console.log(el.nodeName);
+//         var sibCount = 0;
+//         var sibIndex = 0;
+//         for ( var i = 0; i < el.parentNode.childNodes.length; i++ ) {
+//             var sib = el.parentNode.childNodes[i];
+//             if ( sib.nodeName == el.nodeName ) {
+//             if ( sib === el ) {
+//                 sibIndex = sibCount;
+//             }
+//             sibCount++;
+//             }
+//         }
+//         if ( el.__hasAttribute('id') && el.id != '' ) {
+//             stack.unshift(el.nodeName.toLowerCase() + '#' + el.id);
+//         } else if ( sibCount > 1 ) {
+//             stack.unshift(el.nodeName.toLowerCase() + ':eq(' + sibIndex + ')');
+//         } else {
+//             stack.unshift(el.nodeName.toLowerCase());
+//         }
+//         el = el.parentNode;
+//         }
+    
+//         return stack.slice(1).join('>'); // removes the html element
+//     } catch (e){
+//         return '#'
+//     }
+// }
+
 /**
  * Takes in the listeners and returns only the source of each handler
  * @param { response from getEventListeners} listeners 
@@ -39,6 +71,9 @@ var archive_listeners = (function listAllEventListeners() {
       (listeners.push([elemId, __l]))
   
     }
+    var eventListeners = getEventListeners(document);
+    Object.keys(eventListeners).length != 0 && (elemId = getElemId(document)) && (__l = pl(eventListeners)) &&
+    (listeners.push([elemId, __l]))
     console.log('returning the following', listeners)
     return listeners;
   })();
