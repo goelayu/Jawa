@@ -528,6 +528,31 @@ var customMergeDeep = function (signature1, signature2) {
     }
 }
 
+var fnContainsBranch = function(src, falafel){
+    var removeInnerFunctions = function(src){
+        return falafel(src, function(node){
+            if ((node.type == 'FunctionDeclaration' || node.type == 'FunctionExpression') && node.parent.type != 'Program'){
+                node.body.update('{}');
+            }
+        }).toString();
+    }
+    src = removeInnerFunctions(src);
+    console.log(src);
+    var branches = ["IfStatement","SwitchExpression","ConditionalExpression"];
+    var astNodes = [], res = [];
+    falafel(src, function(node){
+        astNodes.push(node);
+    });
+    for (var n of astNodes){
+        var br = branches.find(e=>n.type == e);
+        if (br){
+            res.push(br);
+        } 
+    }
+    return res;
+
+}
+
 
 var zip= rows=>rows[0].map((_,c)=>rows.map(row=>row[c]));
 
@@ -559,5 +584,6 @@ module.exports = {
     isArgOfCE:isArgOfCE,
     isChildOfNode: isChildOfNode,
     nodeContainsCall: nodeContainsCall,
-    rewriteLogicalExprToIf: rewriteLogicalExprToIf
+    rewriteLogicalExprToIf: rewriteLogicalExprToIf,
+    fnContainsBranch:fnContainsBranch
 }

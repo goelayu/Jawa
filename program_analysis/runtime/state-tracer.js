@@ -127,6 +127,7 @@ function __declTracerObject__(window) {
     var runTimePurged = 0;
     var writeStateProcessed = new Map();
     var evtTracking = false;
+    var currFnPointer = [];
 
     /*
     For efficient recording, constraint the size of certain objects
@@ -997,43 +998,6 @@ function __declTracerObject__(window) {
                 if (value && value.__isProxy)
                     value = value.__target;
             }
-
-            // if (logType.indexOf("argument")>=0 || logType.indexOf("this")>=0 || logType.indexOf("closure")>=0)
-            //     nodeId = parentFunctionId;
-
-            //This check implies that the function where the proxy is being accessed
-            // is different from where it was created
-            // therefore, add the log in both function signatures
-            var currentObjectTree = null;
-            var remoteLogType = "";
-            // if (_shadowStackHead != nodeId) {
-            //     // console.error("shadow stack head doesn't point to proxy creating head");
-            //     //Check how in the current function, it is being accessed: as closure,argument, or this
-            //     if ( invocationToArgProxy[_shadowStackHead] ){
-            //         var remotePrivates = invocationToArgProxy[_shadowStackHead].accessToPrivates();
-            //         if (remotePrivates.hasObjectId(target)) {
-            //             currentObjectTree = remotePrivates.getObjectId;
-            //             var remoteRootId = currentObjectTree(target);
-            //             remoteLogType += "argument_" + logType.split('_')[1];
-            //         }
-            //     } 
-            //     if (!currentObjectTree && invocationToClosureProxy[_shadowStackHead]) {
-            //         var remotePrivates = invocationToClosureProxy[_shadowStackHead].accessToPrivates();
-            //         if (remotePrivates.hasObjectId(target)) {
-            //             currentObjectTree = remotePrivates.getObjectId;
-            //             var remoteRootId = currentObjectTree(target);
-            //             remoteLogType += "closure_" + logType.split('_')[1];
-            //         }
-            //     }
-            //     if (!currentObjectTree && invocationToThisProxy[_shadowStackHead]){
-            //         var remotePrivates = invocationToThisProxy[_shadowStackHead].accessToPrivates();
-            //         if (remotePrivates.hasObjectId(target)) {
-            //             currentObjectTree = remotePrivates.getObjectId;
-            //             var remoteRootId = currentObjectTree(target);
-            //             remoteLogType += "this_" + logType.split('_')[1];
-            //         }
-            //     }
-            // }
             
             var childId, childLogStr;
             if ((value instanceof Object) || (typeof value == "object" && value != null) || typeof value == "function") {
@@ -1104,7 +1068,7 @@ function __declTracerObject__(window) {
             if (logType.indexOf("reads")>=0) {
                 if (logType.indexOf('closure')>=0)
                     logType = `${closureScope}_reads`;
-                var log = [logType, rootId, key, childLogStr,childId ];
+                var log = [logType, rootId, key, childLogStr,currFnPointer[currFnPointer.length -1] ];
                 // customLocalStorage[nodeId].readKeys.add(logType);
                 customLocalStorage[nodeId].push(log);
                 // customLocalStorage[nodeId][logType].push(log);
@@ -1112,7 +1076,7 @@ function __declTracerObject__(window) {
                 if (logType.indexOf('closure')>=0)
                     logType = `${closureScope}_writes`;
                 // customLocalStorage[nodeId].writeKeys.add(logType);
-                var log = [logType, rootId, key, childLogStr ];
+                var log = [logType, rootId, key, childLogStr,currFnPointer[currFnPointer.length -1]  ];
                 customLocalStorage[nodeId].push(log);
                 // customLocalStorage[nodeId][logType].push(log);
                 // if (customLocalStorage[nodeId].filter(e=>e[0].indexOf("reads")>=0 && e[3] === rootId).length)
@@ -2064,6 +2028,14 @@ function __declTracerObject__(window) {
         evtTracking = true;
     }
 
+    this.markCurrFn = function(fn){
+        currFnPointer.push(fn);
+    }
+
+    this.unmarkCurrFn = function(){
+        currFnPointer.pop();
+    }
+
     this.cacheInit = function(nodeId, isRoot){
         if (invocationsIndName[nodeId] != null)
             invocationsIndName[nodeId]++;
@@ -2879,6 +2851,7 @@ function __declTracerObject__(window) {
                             //     val = omniStringifier.stringify(val, state, 2);
                             sig[1] = path;
                             sig[2] = val;
+                            sig[3] = entry[4];
 
                             //Special case while reading window
                             if (entry[4] === 0 && !isWrite) {

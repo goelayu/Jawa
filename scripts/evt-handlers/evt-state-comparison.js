@@ -4,6 +4,12 @@
  * heap and DOM state
  */
 
+/**
+ * Rules when state overlap doesn't matter
+ * 1) If the events are paired events, i.e, they always trigger together
+ * 2) q
+ */
+
 const { RSA_X931_PADDING, RSA_SSLV23_PADDING } = require('constants');
 var fs = require('fs'),
     program = require('commander');
@@ -60,8 +66,8 @@ var _parseState = function(state){
         if (st[0].indexOf('closure_')>=0) pState.closure.push(st);
 
     });
-    pState.global = pRW(pState.global);
-    pState.closure = pRW(pState.closure);
+    // pState.global = pRW(pState.global);
+    // pState.closure = pRW(pState.closure);
     return pState;
 }
 
@@ -147,8 +153,16 @@ var compareState = function(state){
     var elems = Object.keys(state);
     var eventToHandler = parseHandlers();
     for (var _e1 = 0; _e1 < elems.length-1; _e1++){
+        var e1 = elems[_e1];
+        if (e1.indexOf('#document_')>=0) continue;
+        if (overlapHeap(state[e1], state[e1])){
+            console.log(e1, e1)
+            console.log(`Heap overlap`)
+            return true;
+        }
         for (var _e2 = _e1+1; _e2 < elems.length;_e2++){
-            var e1 = elems[_e1], e2 = elems[_e2];
+            var e2 = elems[_e2];
+            if (e2.indexOf('#document_')>=0) continue;
             if (isPairedEvent(e1,e2)) continue;
             var e1key = e1.split("_count")[0], e2key = e2.split("_count")[0];
             if (eventToHandler[e1key] == eventToHandler[e2key]) {

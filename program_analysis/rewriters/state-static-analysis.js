@@ -32,7 +32,7 @@ var staticInfo = {};
 staticInfo.rtiDebugInfo = {totalNodes:[], matchedNodes:[], ALLUrls : [], matchedUrls: []};
 staticInfo.uncacheableFunctions = uncacheableFunctions;
 
-
+var metadata = {};
 var IIFE_NAME="__HORCRUX__";
 
 // console.error = function(){
@@ -461,9 +461,13 @@ var traceFilter = function (content, options) {
 						});
 						closureObjStr += '};\n'
 					});
+
+					// track current function
+					var _currFnId = util.getFunctionIdentifier(fId,true),
+						currFnId = makeId('function', options.path, _currFnId);
 					
 					update(fId.body, closureObjStr, closureDecl, src);
-                    update(fId.body, '{', fId.body.source(), '}');
+                    update(fId.body, `{\ntry{__tracer.markCurrFn('${currFnId}');\n`, fId.body.source(), '} finally {__tracer.unmarkCurrFn();}}');
 					return 1;
 				}
 
@@ -1932,7 +1936,9 @@ var traceFilter = function (content, options) {
 				}
 
 				rewriteClosure.insertClosureProxy(node, node.body.source());
-
+				var branchTest = util.fnContainsBranch(`function a(){${ASTSourceMap.get(node.body)}}`, falafel)
+				metadata[index] = branchTest;
+				console.log(metadata)
 				// update(node.body, '{ \ntry {\n',options.tracer_name,'.cacheInit(', JSON.stringify(index),',arguments, new.target',',',JSON.stringify(enableRecord),');\n',
 				// 	node.body.source());
 
@@ -1983,5 +1989,6 @@ module.exports = {
 	instrument: instrument,
 	instrumentationPrefix: instrumentationPrefix,
 	staticInfo: staticInfo,
-	makeId:makeId
+	makeId:makeId,
+	metadata:metadata
 };

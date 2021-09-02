@@ -71,9 +71,9 @@ var archive_listeners = (function listAllEventListeners() {
       (listeners.push([elemId, __l]))
   
     }
-    var eventListeners = getEventListeners(document);
-    Object.keys(eventListeners).length != 0 && (elemId = getElemId(document)) && (__l = pl(eventListeners)) &&
-    (listeners.push([elemId, __l]))
+    // var eventListeners = getEventListeners(document);
+    // Object.keys(eventListeners).length != 0 && (elemId = getElemId(document)) && (__l = pl(eventListeners)) &&
+    // (listeners.push([elemId, __l]))
     console.log('returning the following', listeners)
     return listeners;
   })();
@@ -90,9 +90,9 @@ var verbose_listeners = (function listAllEventListeners() {
       (listeners.push([currentElement, eventListeners]))
   
     }
-    var eventListeners = getEventListeners(document);
-    Object.keys(eventListeners).length != 0 &&
-    (listeners.push([document, eventListeners]))
+    // var eventListeners = getEventListeners(document);
+    // Object.keys(eventListeners).length != 0 &&
+    // (listeners.push([document, eventListeners]))
     return listeners;
   })();
 
