@@ -558,7 +558,7 @@ var fnContainsBranch = function(src, falafel){
         if (br){
             if ((n.consequent && containsCallExpression(n.consequent.source())) ||
                 (n.alternate && containsCallExpression(n.alternate.source())))
-                res.push(br);
+                res.push([br,n.source()]);
         } 
     }
     return res;

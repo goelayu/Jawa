@@ -188,7 +188,7 @@ def instrument(root, fileType,args,file_obj):
     iframe_script_path = "iframeJs2/"
     log_directory = args.logDir
 
-
+    subprocess.call("mkdir -p {}".format(log_directory), shell=True)
     TEMP_FILE = log_directory + '/' + str(os.getpid()) + str(random.randint(0, 100000))
 
     fullurl = "http://{}{}".format(get_mm_header(http_response,'host'),filename)
@@ -286,11 +286,15 @@ def instrument(root, fileType,args,file_obj):
     log_file=open(_log_path+"logs","w+")
     error_file=open(_log_path+"errors","w")
     src_file = open(_log_path+'/'+filename,'w')
+    content_file_full = open(_log_path+'/content_full','w')
     id_file = open(_log_path+'ids','w')
     content_file = open(_log_path+'content','w')
 
     content_file.write(orig_content)
     content_file.close()
+
+    content_file_full.write(content)
+    content_file_full.close()
 
     src_file_data = {'type':fileType}
 

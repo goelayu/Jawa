@@ -10,16 +10,36 @@
  * 2) q
  */
 
-const { RSA_X931_PADDING, RSA_SSLV23_PADDING } = require('constants');
 var fs = require('fs'),
     program = require('commander');
 
 program
     .option('-s, --state [state]', 'path to the state access')
     .option('-h, --handlers [handlers]', ' path to the list of handlers')
+    .option('-i, --ids [ids]','list of files containing the static analysis information')
     .parse(process.argv);
 
+var fnToBranches = {};
+var getBranchedFunctions = function(){
+    var files = fs.readFileSync(program.ids, 'utf-8').split('\n').filter(e=>e!="");
+    files.forEach((f)=>{
+        var content;
+        try {
+            var content = JSON.parse(fs.readFileSync(f, 'utf-8'));
+        } catch (e){
+            content = {};
+        }
+        Object.keys(content).forEach((fn)=>{
+            fnToBranches[fn] = content[fn]
+        })
+    })
+    return fnToBranches;
+}
 
+var isBranchedFn = function(fnToBranches, fn){
+    // console.log(fnToBranches[fn])
+    return fn in fnToBranches && fnToBranches[fn].length > 0;
+}
 var parseHandlers = function(){
     var handlers = JSON.parse(fs.readFileSync(program.handlers));
     var eventToHandler = {};
@@ -59,7 +79,7 @@ var _parseState = function(state){
     var pState = {DOMS:[], global:[], closure:[]},
         pRW = pruneReadsAfterWrites;
     state.forEach((st)=>{
-        if (st[0].indexOf('jquery')>=0) return;
+        if (st[0].indexOf('jquery')>=0 || (st[1].indexOf && st[1].indexOf('guid')>=0)) return;
         if (typeof st[1] != "string" || st[1].indexOf('undefined')>=0) return;
         if (st[0].indexOf('DOMS')==0) pState.DOMS = st[1].filter(e=>e[1].indexOf('dispatch')<0);
         if (st[0].indexOf('global_')>=0) pState.global.push(st)
@@ -79,10 +99,9 @@ var parseState = function(state){
     return fState;
 }
 
-var isRWConflict = function(type1, type2){
-    if ((type1.indexOf('_read')>=0 && type2.indexOf('_write')>=0) ||
-        (type2.indexOf('_read')>=0 && type1.indexOf('_write')>=0))
-        return true;
+var isRWConflict = function(s1, s2){
+    if (s1[0].indexOf('_read')>=0 && s2[0].indexOf('_write')>=0) return s1;
+    if (s1[0].indexOf('_read')>=0 && s2[0].indexOf('_write')>=0) return s2;
 
     return false;
 }
@@ -107,7 +126,9 @@ var overlapHeap = function(h1, h2){
     //compare global    
     for (var g1 of h1.global){
         for (var g2 of h2.global){
-            if (g1[1] == g2[1] && isRWConflict(g1[0], g2[0])){
+            var conflict;
+            if (g1[1] == g2[1] && (conflict = isRWConflict(g1, g2))){
+                if (!isBranchedFn(fnToBranches,conflict[3])) continue;
                 console.log(g1, g2)
                 return true;
             }
@@ -118,7 +139,9 @@ var overlapHeap = function(h1, h2){
         var cs1 = getClosureScope(c1[0]);
         for (var c2 of h2.closure){
             var cs2 = getClosureScope(c2[0]);
-            if (c1[1] == c2[1] && cs1 == cs2 && isRWConflict(c1[0], c2[0])){
+            var conflict;
+            if (c1[1] == c2[1] && cs1 == cs2 && (conflict = isRWConflict(c1, c2)) ){
+                if (!isBranchedFn(fnToBranches,conflict[3])) continue;
                 console.log(c1, c2)
                 return true;
             }
@@ -185,6 +208,7 @@ var compareState = function(state){
 }
 
 var main = function(){
+    getBranchedFunctions();
     var state = parseState(JSON.parse(fs.readFileSync(program.state, 'utf-8')));
     console.log(compareState(state));
 }
