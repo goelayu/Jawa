@@ -539,7 +539,7 @@ var fnContainsBranch = function(src, falafel){
     var containsCallExpression = function(src){
         try {
             var hasCallExpression = false;
-            return falafel(`function a(){${src}}`, function(node){
+            falafel(`function a(){${src}}`, function(node){
                 if (node.type == 'CallExpression') hasCallExpression = true;
             });
             return hasCallExpression;
