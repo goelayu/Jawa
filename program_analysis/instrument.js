@@ -146,12 +146,15 @@ function instrumentHTML(src, filename){
 
 function dumpMD(){
     var dumpData = (function(){
-        if (program.fns || program.rewriter == 'state')
+        if (program.fns)
             return {}
+        else if (program.rewriter == 'state')
+            return rewriter.metadata;
         else if (program.rewriter == 'dynamic-cfg')
             return rewriter.metadata.allFnIds;
         else return rewriter.metadata.isSafeRead;
     })();
+    console.log(`dumpData is ${JSON.stringify(dumpData)}`)
     // dumps the metadata information post instrumentation
     fs.writeFileSync(returnInfoFile, JSON.stringify(dumpData));
 }

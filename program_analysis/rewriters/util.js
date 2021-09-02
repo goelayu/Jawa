@@ -536,9 +536,19 @@ var fnContainsBranch = function(src, falafel){
             }
         }).toString();
     }
+    var containsCallExpression = function(src){
+        try {
+            var hasCallExpression = false;
+            return falafel(`function a(){${src}}`, function(node){
+                if (node.type == 'CallExpression') hasCallExpression = true;
+            });
+            return hasCallExpression;
+        } catch (e){
+            return false;
+            }
+    }
     src = removeInnerFunctions(src);
-    console.log(src);
-    var branches = ["IfStatement","SwitchExpression","ConditionalExpression"];
+    var branches = ["IfStatement","ConditionalExpression"];
     var astNodes = [], res = [];
     falafel(src, function(node){
         astNodes.push(node);
@@ -546,7 +556,9 @@ var fnContainsBranch = function(src, falafel){
     for (var n of astNodes){
         var br = branches.find(e=>n.type == e);
         if (br){
-            res.push(br);
+            if ((n.consequent && containsCallExpression(n.consequent.source())) ||
+                (n.alternate && containsCallExpression(n.alternate.source())))
+                res.push(br);
         } 
     }
     return res;
