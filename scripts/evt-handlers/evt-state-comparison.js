@@ -21,6 +21,10 @@ program
 
 var fnToBranches = {};
 var getBranchedFunctions = function(){
+    var filterTokens = [
+        'test(', 'concat(', 'clearTimeout(', 'appendChild', 'getComputedChild','push(', 'hasClass(',
+        'attr(', '.replace(', 'Math.','.filter('
+    ]
     var files = fs.readFileSync(program.ids, 'utf-8').split('\n').filter(e=>e!="");
     files.forEach((f)=>{
         var content;
@@ -30,7 +34,7 @@ var getBranchedFunctions = function(){
             content = {};
         }
         Object.keys(content).forEach((fn)=>{
-            fnToBranches[fn] = content[fn]
+            fnToBranches[fn] = content[fn].filter(e=>!filterTokens.find(t=>e[1].indexOf(t)>=0));
         })
     })
     return fnToBranches;
@@ -38,7 +42,10 @@ var getBranchedFunctions = function(){
 
 var isBranchedFn = function(fnToBranches, fn){
     // console.log(fnToBranches[fn])
-    return fn in fnToBranches && fnToBranches[fn].length > 0;
+    if (fn in fnToBranches && fnToBranches[fn].length > 0){
+        console.log(fnToBranches[fn])
+        return true;
+    }
 }
 var parseHandlers = function(){
     var handlers = JSON.parse(fs.readFileSync(program.handlers));

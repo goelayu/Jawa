@@ -90,7 +90,7 @@ var main = function(){
     for (var elem of Object.keys(callStack)){
         if (elem.indexOf('onmouse')<0) continue;
         var grepRes;
-        // console.log(elem)
+        console.log(elem)
         if (grepRes = grepCallStack(callStack[elem], fileStore))
             console.log(grepRes)
     }
