@@ -23,7 +23,8 @@ var fnToBranches = {};
 var getBranchedFunctions = function(){
     var filterTokens = [
         'test(', 'concat(', 'clearTimeout(', 'appendChild', 'getComputedChild','push(', 'hasClass(',
-        'attr(', '.replace(', 'Math.','.filter('
+        'attr(', '.replace(', 'Math.','.filter(', 'banner','dataLayer', 'removeClass', 'doneResult',
+        '.each(','.dispatchExecution'
     ]
     var files = fs.readFileSync(program.ids, 'utf-8').split('\n').filter(e=>e!="");
     files.forEach((f)=>{

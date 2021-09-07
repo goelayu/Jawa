@@ -73,48 +73,25 @@ function instrumentHTML(src, filename){
     var lastScriptEnd = 0;
     var match, newline = /\n/ig;
 
+    // var asyncMatch, asyncLocs = [], nLoc = 0;
+
+    // while (asyncMatch = scriptBeginRegexp.exec(src)){
+    //     if (asyncMatch[0].indexOf("async")>=0){
+    //         asyncLocs.push(asyncMatch);
+    //     }
+    // }
+
+    // //Commenting as simply replacing async with defer gives runtime errors
+    // asyncLocs.forEach((asyn)=>{
+    //     var _initLen = src.length;
+    //     src = src.slice(0,asyn.index-nLoc) + asyn[0].replace(/async/,'') +
+    //          src.slice(asyn.index-nLoc + asyn[0].length,src.length);
+    //     var _finalLen = src.length;
+    //     nLoc += _initLen -  _finalLen;
+    // })
+
     var inHtmlScripts = "";
 
-
-    // while (match = scriptBeginRegexp.exec(src)) {
-    //     var scriptOffset = 0;
-    //     var scriptBegin = match.index + match[0].length;
-    //     if (scriptBegin < lastScriptEnd) {
-    //         continue;
-    //     }
-
-    //     /*
-    //     The slicing takes care of whether there is. a new line
-    //     immediately after the <Script> tag or not, because 
-    //     it will account for the correct offset
-    //     */
-    //     var _prevScript = src.slice(0,scriptBegin+1);
-    //     while(nMatch = newline.exec(_prevScript))
-    //         scriptOffset++;
-    //     var endMatch = scriptEndRegexp.exec(src.slice(scriptBegin));
-    //     if (endMatch) {
-    //         var scriptEnd = scriptBegin + endMatch.index;
-    //         scriptLocs.push({ start: scriptBegin, end: scriptEnd , offset: scriptOffset});
-    //         lastScriptEnd = scriptEnd;
-    //     }
-    // }
-
-    // // process the scripts in reverse order
-    // for (var i = scriptLocs.length - 1; i >= 0; i--) {
-    //     var loc = scriptLocs[i];
-    //     var script = src.slice(loc.start, loc.end);
-    //     inHtmlScripts += script;
-    //     var path = filename + "-script-" + i;
-    //     //Add the script offset to be sent to the instrumentation script
-    //     // options.scriptOffset = loc;
-    //     var offset = src.slice(0,loc.start).length;
-    //     var prefix = src.slice(0, loc.start).replace(/[^\n]/g, " "); // padding it out so line numbers make sense
-    //     // console.log("Instrumenting " + JSON.stringify(loc));
-    //     // src = src.slice(0, loc.start) + instrumentJavaScript(prefix + script, options, true) + src.slice(loc.end);
-    //     // console.log("And the final src is :" + src)
-    //     src = src.slice(0, loc.start) + instrumentJavaScript(script, {filename:path, offset:offset}, true) + src.slice(loc.end);
-    // }
-    //insert the tracer object at top of the html
     var doctypeMatch = /<!DOCTYPE[^>[]*(\[[^]]*\])?>/i.exec(src);
     var headIndx = src.indexOf('<head>');
 

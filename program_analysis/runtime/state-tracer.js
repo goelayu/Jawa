@@ -726,6 +726,11 @@ function __declTracerObject__(window) {
                             if (classKey == "constructor") return;
                             self[_class].prototype[classKey] = function(){
                                 if (evtTracking && classKey == 'submit') return; //make submit into a noop once evt tracking is initialized
+
+                                //make scripts synchronous
+                                // if (arguments[0] && arguments[0].nodeName == 'SCRIPT'
+                                //     && arguments[0].async)
+                                //     arguments[0].async = false;
                                 var thisObj = this;
                                 for (var i=0;i<arguments.length;i++){
                                     var arg = arguments[i];

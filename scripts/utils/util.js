@@ -5,6 +5,7 @@
  const fs = require('fs'),
     program = require('commander'),
     netParser = require('parser/networkParser');
+    // fuzz = require('fuzzball');
 
 
 program
@@ -336,31 +337,54 @@ var matchNetwork = function(net1, net2){
             
     }
     var isBestMatch = function(u1, u2){
-        u1 = u1.split('?')[0],
-            u2 = u2.split('?')[0];
+        // u1 = u1.split('?')[0],
+        //     u2 = u2.split('?')[0];
         
         if (u1 == u2) return true;
         return false;
     }
 
+    var fuzzMatch = function(src, options){
+        var bestMatch, bestScore = 0;
+        options.forEach((target)=>{
+            var score;
+            if ((score = fuzz.ratio(src, target)) > bestScore){
+                bestScore = score;
+                bestMatch = target; 
+            }
+        })
+        console.log(bestScore)
+        return bestScore > 95 ? bestMatch : null;
+    }
+
     net1 = netParser.parseNetworkLogs(parse(net1)),
         net2 = netParser.parseNetworkLogs(parse(net2));
-    // var total = match = 0;
-    // for (var n1 of net1){
-    //     if (ignoreUrl(n1)) continue;
-    //     total++;
-    //     for (var n2 of net2){
-    //         if (ignoreUrl(n2)) continue;
+    var total = match = 0;
+    for (var n1 of net1){
+        if (ignoreUrl(n1)) continue;
+        total += n1.size/1000;
+        var foundIdentical = false;
+        for (var n2 of net2){
+            if (ignoreUrl(n2)) continue;
 
-    //         if (isBestMatch(n1.url, n2.url)){
-    //             match++;
-    //             break;
-    //         }
-    //     }
-    // }
-    // console.log(total, match)
-    var sum = (total, cur) => {return total + cur.size}
-    console.log(net1.filter(e=>!ignoreUrl(e)).reduce(sum,0), net2.filter(e=>!ignoreUrl(e)).reduce(sum, 0));
+            if (isBestMatch(n1.url, n2.url)){
+                foundIdentical = true;
+                // console.log(n1.url, n2.url)
+                match += n1.size/1000;
+                break;
+            }
+        }
+        if (foundIdentical) continue;
+        var bestMatch = fuzzMatch(n1.url, net2.filter(e=>!ignoreUrl(e)).map(e=>e.url));
+        if (bestMatch){
+            if (bestMatch != n1.url) console.log(bestMatch, n1.url)
+            match += n1.size/1000;
+        }
+        // console.log(n1.url, bestMatch);
+    }
+    console.log(total, match)
+    // var sum = (total, cur) => {return total + cur.size}
+    // console.log(net1.filter(e=>!ignoreUrl(e)).reduce(sum,0), net2.filter(e=>!ignoreUrl(e)).reduce(sum, 0));
 }
 
 var getResOnPage = function(data){
