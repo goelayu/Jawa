@@ -5,7 +5,7 @@
  const fs = require('fs'),
     program = require('commander'),
     netParser = require('parser/networkParser');
-    // fuzz = require('fuzzball');
+    fuzz = require('fuzzball');
 
 
 program
@@ -183,7 +183,7 @@ var getSizePerType = function(data){
         //hack, usually a page should contain more than 1000 bytes
         return;
     }
-    console.log(type2size)
+    // console.log(type2size)
     console.log(type2size.script/totalSize)
     return type2size;
 }
@@ -353,33 +353,50 @@ var matchNetwork = function(net1, net2){
                 bestMatch = target; 
             }
         })
-        console.log(bestScore)
-        return bestScore > 95 ? bestMatch : null;
+        // console.log(bestScore, bestMatch)
+        // return bestScore > 95 ? bestMatch : null;
+        return bestMatch;
     }
 
     net1 = netParser.parseNetworkLogs(parse(net1)),
         net2 = netParser.parseNetworkLogs(parse(net2));
-    var total = match = 0;
+    var total = match = 0,bestMatchCache = [],
+        filtern2 = net2.filter(e=>!ignoreUrl(e)).map(e=>e.url);
+    if (!filtern2.length){
+        console.log(total, match);
+        return;
+    }
     for (var n1 of net1){
         if (ignoreUrl(n1)) continue;
         total += n1.size/1000;
+        // total++
         var foundIdentical = false;
-        for (var n2 of net2){
-            if (ignoreUrl(n2)) continue;
-
-            if (isBestMatch(n1.url, n2.url)){
-                foundIdentical = true;
-                // console.log(n1.url, n2.url)
-                match += n1.size/1000;
-                break;
-            }
-        }
-        if (foundIdentical) continue;
-        var bestMatch = fuzzMatch(n1.url, net2.filter(e=>!ignoreUrl(e)).map(e=>e.url));
-        if (bestMatch){
-            if (bestMatch != n1.url) console.log(bestMatch, n1.url)
+            
+        // console.log(n1.url)
+        // for (var n2 of net2){
+        //     if (ignoreUrl(n2)) continue;
+        //     console.log('comparing with ', n2.url)
+        //     if (isBestMatch(n1.url, n2.url)){
+        //         foundIdentical = true;
+        //         // console.log(n1.url, n2.url)
+        //         match += n1.size/1000;
+        //         break;
+        //     }
+        // }
+        // if (foundIdentical) continue;
+        var bestMatch = fuzzMatch(n1.url, filtern2);
+        // console.log(bestMatch)
+        if (bestMatchCache.indexOf(bestMatch)>=0){
+            // console.log(n1.url, bestMatch)
             match += n1.size/1000;
         }
+        else bestMatchCache.push(bestMatch)
+        // if (bestMatch){
+        //     if (bestMatch != n1.url) console.log(bestMatch, n1.url)
+        //     match += n1.size/1000;
+        // } else {
+        //     console.log(`no match for ${n1.url}`)
+        // }
         // console.log(n1.url, bestMatch);
     }
     console.log(total, match)
@@ -421,6 +438,156 @@ var getResOnPage = function(data){
     console.log(size);
 }
 
+var ignoreUrl = function(n){
+    var type = n.type;
+    return n.request.method != "GET"
+        ||  n.url.indexOf('data') == 0
+        || !n.type
+        || !n.size
+        || n.response.status != 200
+        || n.size < 1000;
+        
+}
+
+var allInitiatedFiltered = function(n){
+    var allurls = new Set;
+    var mem = [];
+    var url = n.url;
+    var _inits = function(url){
+        if (mem.indexOf(url)>=0) return;
+        mem.push(url)
+        if (initDict[url]){
+            initDict[url].forEach((u)=>{
+                // console.log(n.url, n.type)
+                allurls.add(u);
+                _inits(u);
+            });
+        }
+    }
+    _inits(url)
+    return allurls;
+}
+
+var getFilteredUrls = function(data){
+    var net = netParser.parseNetworkLogs(parse(data));
+    var urls = new Set;
+    for (var n of net){
+        if (n.isFiltered){
+            // console.log(n.url)
+            gfiltered++;
+            if (n.initiator.type == 'script') gfilteredFromScripts++
+            else filteredURLs.push(n.url);
+            urls.add(n.url)
+            // console.log(n.url, n.type)
+            if (initDict[n.url]){
+                var allurls = [...allInitiatedFiltered(n)]
+                allurls.forEach(urls.add, urls);
+                // count += initDict[n.url].length
+            }
+        }
+    }
+    return urls;
+}
+
+var isInitiatedBy = function(src, target){
+    if (target.initiator && target.initiator.type == 'script'){
+        for (var cs of target.initiator.stack.callFrames){
+            if (cs.url == src || 
+                cs.url.split('?')[0] == src.split('?')[0])
+                return true;
+        }
+    };
+    return false;
+}
+
+
+// // ABPFilterParser.parse(someOtherListOfFilters, parsedFilterData);
+
+// function filter(){
+//     // console.log(`domain is ${program.domain}`)
+//     var urls = getURLs(program.network)
+//     var count = 0;
+//     urls.forEach((u)=>{
+//         if (ABPFilterParser.matches(parsedFilterData,u, {
+//             domain: program.domain
+//         } )) {
+//             // console.log(`filtering ${u}`)
+//             count++;
+//         }
+//     });
+//     console.log(count);
+// }
+
+// filter();
+
+// if (ABPFilterParser.matches(parsedFilterData, urlToCheck, {
+//       domain: currentPageDomain,
+//       elementTypeMaskMap: ABPFilterParser.elementTypes.SCRIPT,
+//     })) {
+//   console.log('You should block this URL!');
+// } else {
+//   console.log('You should NOT block this URL!');
+// }
+
+var initiatedRequests = function(allNet, filterNet){
+
+    let ABPFilterParser = require('abp-filter-parser');
+
+let easyListTxt = fs.readFileSync('/vault-home/goelayu/webArchive/filter-lists/final.txt', 'utf-8');
+let parsedFilterData = {};
+
+ABPFilterParser.parse(easyListTxt, parsedFilterData);
+    allNet = netParser.parseNetworkLogs(parse(allNet)),
+        filterNet = netParser.parseNetworkLogs(parse(filterNet));
+    
+    var resInitiated = {};
+    var unfilteredScripts = filterNet.filter(e=>!ignoreUrl(e) && e.type.toLowerCase().indexOf('script')>=0);
+    unfilteredScripts.forEach((sc)=>{
+        resInitiated[sc.url] = {all:[], filtered:[]}; //track res initiated during original and filtered run
+    })
+    // console.log(unfilteredScripts.map(e=>[e.url, e.type]))
+    var filteredUrls = [], filterDomains = new Set;
+    for (var f of filterNet){
+        if (f.isFiltered){
+            // console.log(f.url)
+            filteredUrls.push(f.url.split('?')[0]);
+            continue;
+        }
+        if (ignoreUrl(f)) continue;
+        if (!f.initiator || f.initiator.type != "script") continue;
+        var stack = f.initiator.stack.callFrames,
+            src = stack[stack.length - 1].url;
+        
+        // console.log(src)
+        var domain = f.url.split('/')[2];
+        filterDomains.add(domain);
+        resInitiated[src] && resInitiated[src].filtered.push(f.url);
+    }
+    filterDomains = [...filterDomains];
+    var domain = allNet[0].documentURL;
+    for (var a of allNet){
+        if (ignoreUrl(a)) continue;
+        if (a.url.indexOf('amazon')>=0 || a.url.indexOf('beacon')>=0 || a.url.indexOf('ntv')>=0) continue;
+        if (filteredUrls.indexOf(a.url.split('?')[0])>=0) continue;
+        if (filteredUrls.filter(e=>isInitiatedBy(e, a)).length){
+            filteredUrls.push(a.url);
+            continue;
+        }
+        if (ABPFilterParser.matches(parsedFilterData,a.url, {
+            domain: domain
+        } )) continue;
+        if (!a.initiator || a.initiator.type != "script") continue;
+        if (!filterDomains.find(e=>a.url.indexOf(e)>=0)) continue;
+        var stack = a.initiator.stack.callFrames,
+            src = stack[stack.length - 1].url;
+        resInitiated[src] && resInitiated[src].all.push(a.url);
+    };
+    var allInit = Object.values(resInitiated).reduce((acc, cur)=>{return cur.all.length + acc;},0),
+        filInit = Object.values(resInitiated).reduce((acc, cur)=>{return cur.filtered.length + acc;},0);
+    console.log(resInitiated)
+    console.log(allInit, filInit);
+}
+
 switch (program.type){
     case "prune": pruneDB(parse(program.input)); break
     case "netSize": getNetSize(parse(program.input)); break;
@@ -435,7 +602,8 @@ switch (program.type){
     case 'res': getResOnPage(program.input);break;
     case 'fil': filler(program.input);break;
     case 'sum': console.log(Object.values(JSON.parse(fs.readFileSync(program.input,'utf-8'))).reduce((acc,cur)=>{return acc+cur},0)); break;
-    case 'error' : getNetErrors(parse(program.input));
-    case 'matchNet' : matchNetwork(program.input,program.anotherin);
+    case 'error' : getNetErrors(parse(program.input)); break;
+    case 'matchNet' : matchNetwork(program.input,program.anotherin); break;
+    case 'initiator': initiatedRequests(program.input, program.anotherin); break;
 
 }
