@@ -2,7 +2,8 @@
  * This module contains utility functions
  */
 
- const fs = require('fs'),
+ const { ENETUNREACH } = require('constants');
+const fs = require('fs'),
     program = require('commander'),
     netParser = require('parser/networkParser');
     fuzz = require('fuzzball');
@@ -154,6 +155,8 @@ var getServerThinkTime = function(n){
 }
 
 var getSizePerType = function(data){
+    // identify 302 not found 
+    var JSERRORCOUNT = 426697 //426698(2000) 
     var net = netParser.parseNetworkLogs(parse(data));
     var type2size = {};
     for (var n of net){
@@ -184,7 +187,7 @@ var getSizePerType = function(data){
         return;
     }
     // console.log(type2size)
-    console.log(type2size.script/totalSize)
+    type2size.script != JSERRORCOUNT && console.log(type2size.script/totalSize)
     return type2size;
 }
 
@@ -337,8 +340,8 @@ var matchNetwork = function(net1, net2){
             
     }
     var isBestMatch = function(u1, u2){
-        // u1 = u1.split('?')[0],
-        //     u2 = u2.split('?')[0];
+        u1 = u1.split('?')[0],
+            u2 = u2.split('?')[0];
         
         if (u1 == u2) return true;
         return false;
@@ -363,7 +366,7 @@ var matchNetwork = function(net1, net2){
     var total = match = 0,bestMatchCache = [],
         filtern2 = net2.filter(e=>!ignoreUrl(e)).map(e=>e.url);
     if (!filtern2.length){
-        console.log(total, match);
+        // console.log(total, match);
         return;
     }
     for (var n1 of net1){
@@ -373,24 +376,24 @@ var matchNetwork = function(net1, net2){
         var foundIdentical = false;
             
         // console.log(n1.url)
-        // for (var n2 of net2){
-        //     if (ignoreUrl(n2)) continue;
-        //     console.log('comparing with ', n2.url)
-        //     if (isBestMatch(n1.url, n2.url)){
-        //         foundIdentical = true;
-        //         // console.log(n1.url, n2.url)
-        //         match += n1.size/1000;
-        //         break;
-        //     }
-        // }
-        // if (foundIdentical) continue;
-        var bestMatch = fuzzMatch(n1.url, filtern2);
-        // console.log(bestMatch)
-        if (bestMatchCache.indexOf(bestMatch)>=0){
-            // console.log(n1.url, bestMatch)
-            match += n1.size/1000;
+        for (var n2 of net2){
+            if (ignoreUrl(n2)) continue;
+            // console.log('comparing with ', n2.url)
+            if (isBestMatch(n1.url, n2.url)){
+                foundIdentical = true;
+                // console.log(n1.url, n2.url)
+                match += n1.size/1000;
+                break;
+            }
         }
-        else bestMatchCache.push(bestMatch)
+        // if (foundIdentical) continue;
+        // var bestMatch = fuzzMatch(n1.url, filtern2);
+        // // console.log(bestMatch)
+        // if (bestMatchCache.indexOf(bestMatch)>=0){
+        //     // console.log(n1.url, bestMatch)
+        //     match += n1.size/1000;
+        // }
+        // else bestMatchCache.push(bestMatch)
         // if (bestMatch){
         //     if (bestMatch != n1.url) console.log(bestMatch, n1.url)
         //     match += n1.size/1000;
@@ -588,6 +591,59 @@ ABPFilterParser.parse(easyListTxt, parsedFilterData);
     console.log(allInit, filInit);
 }
 
+var total = 0;
+var _combineCoverage = function(cvgArr){
+    // for (const entry of jsCoverage) {
+
+    //     if (entry.url.indexOf('.js') > 0) {
+    //         fileUrls.push(entry.url);
+    //         totalBytes += entry.text.length;
+    //         let singleUsedBytes = 0
+    //         for (const range of entry.ranges) {
+    //             usedBytes += range.end - range.start - 1;
+    //             singleUsedBytes += range.end - range.start - 1;
+    //         }
+    //     }
+    // }
+    var urlToRanges = []// for the same URL across multiple runs store the list of ranges
+    var sameRange = function(r1, r2){
+        if (!r1 || !r2) return false;
+        return r1.start == r2.start && r1.end == r2.end;
+    }
+    cvgArr.forEach((coverage)=>{
+        for (var entry of coverage){
+            if (entry.url.indexOf('.js')>0){
+                if (!(entry.url in urlToRanges)){
+                    urlToRanges[entry.url] = entry.ranges;
+                    total += entry.text.length;
+                    continue;
+                }
+                for (var range of entry.ranges){
+                    if (!urlToRanges[entry.url].find(e=>sameRange(range,e)))
+                        urlToRanges[entry.url].push(range)
+                }
+                // if (cvgArr.length == 1)
+                //     total += entry.text.length;
+            }
+        }
+    });
+    var totalBytes = 0;
+    Object.keys(urlToRanges).forEach((url)=>{
+        for (var range of urlToRanges[url]){
+            totalBytes += range.end - range.start - 1;
+        }
+    })
+    return totalBytes;
+}
+
+var combineCoverage = function(first, second){
+    first = parse(first);
+    second = parse(second);
+    var f = _combineCoverage([first]);
+    var union = _combineCoverage([first, second]);
+    console.log(f, union, total)
+}
+
 switch (program.type){
     case "prune": pruneDB(parse(program.input)); break
     case "netSize": getNetSize(parse(program.input)); break;
@@ -605,5 +661,6 @@ switch (program.type){
     case 'error' : getNetErrors(parse(program.input)); break;
     case 'matchNet' : matchNetwork(program.input,program.anotherin); break;
     case 'initiator': initiatedRequests(program.input, program.anotherin); break;
+    case 'coverage' : combineCoverage(program.input, program.anotherin); break;
 
 }

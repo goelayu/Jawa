@@ -51,7 +51,7 @@ var getFilteredWrites = function(state, files){
         )
         // console.log(file, writeKeys)
     });
-    program.verbose && console.log(`${writeKeys.length} writes made by filtered files`)
+    // program.verbose && console.log(`${writeKeys.length} writes made by filtered files`)
     return writeKeys;
 }
 
@@ -109,7 +109,7 @@ var hasStateOverlap = function(state, fil, unfil){
     var filNames = fil.map(e=>e.split('_count')[0]);
     for (var unfilFile of unfil){
         if (!(unfilFile in state)) continue;
-        program.verbose && console.log(`comparing state of file ${unfilFile}`)
+        // program.verbose && console.log(`comparing state of file ${unfilFile}`)
         var fileState = state[unfilFile].map(e=>[e[0],e[1]])
         // filter(e=>e[0].indexOf('global_reads')>=0 && !filNames.find(f=>e[0].indexOf(f)>=0) && e[0].indexOf('jquery')<0);
         var executedFiles = getExecutedFiles(allFiles, unfilFile, fil);

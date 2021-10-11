@@ -121,6 +121,25 @@ var mergeFns = function(src, dst){
     return [...res];
 }
 
+var mergeValsArr = function(dict){
+    /**
+     * Takes a dictionary where values are arrays
+     * and merges them together in a single array
+     */
+
+    var arr = [];
+    Object.values(dict).forEach((val)=>{
+        arr = arr.concat(val);
+    });
+    //add the keys as well since they are the root of the call gaphs
+    arr = arr.concat(Object.keys(dict).map(e=>e.split(';;;;')[1]));
+    return arr;
+}
+
+var unique = function(arr){
+    return [...new Set(arr)];
+}
+
 var getFileKey = function(f){
     var hInd = f.indexOf('-hash-');
     return f.slice(0,hInd);
@@ -293,14 +312,23 @@ var dedupAnalysis = function(){
         var srcDir = `${program.dir}/${path}`;
         // get all functions
         try {
-            var _execFns = parse(`${program.performance}/${path}/allFns`), _evtCG,
+            var _execFns = parse(`${program.performance}/${path}/allFns`), _evtCG, evtCG,
             execFns = [...new Set(_execFns.preload.concat(_execFns.postload))];
-
-        
-            _evtCG = parse(`${program.performance}/${path}/hybridcg`)
-            program.verbose && console.log(`Adding evt graph: ${_evtCG.length}`);
-            execFns = [...new Set(execFns.concat(_evtCG))]
+            
+            program.verbose && console.log(path);
+            // _evtCG = parse(`${program.performance}/${path}/hybridcg`)
+            try {
+                _evtCG = parse(`${program.performance}/${path}/cg0`)
+                evtCG = unique(mergeValsArr(_evtCG));
+                // if (!_evtCG.length)
+                //     _evtCG = [];
+                program.verbose && console.log(`Adding evt graph: ${evtCG.length}`);
+            } catch {
+                evtCG = [];
+            }
+            execFns = [...new Set(execFns.concat(evtCG))]
         } catch (e) {
+            // console.log(e)
             execFns = [];
             //pass nothing can be done, no event handler graph
         }
@@ -310,6 +338,7 @@ var dedupAnalysis = function(){
             try {
                 var _filterFiles = parse(`${srcDir}/__metadata__/filtered`),
                 filterFiles = _filterFiles.tracker.concat(_filterFiles.custom);
+                // filterFiles = _filterFiles.custom;
             } catch (e){
                 filterFiles = [];
             }

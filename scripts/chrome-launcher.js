@@ -3,13 +3,12 @@
  * of CDP (as used inside chrome-remote-interface)
  */
 
- const puppeteer = require('puppeteer-extra'),
-    
+ var puppeteerOg = require('puppeteer'),
+    puppeteer = require('puppeteer'),
     program = require('commander'),
     fs = require('fs'),
     chromeFns = require('./chrome-ctx-scripts/fns');
     AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
-const { createDeflate } = require('zlib');
 
 program
     .option('-o, --output [output]','path to the output directory')
@@ -65,13 +64,18 @@ async function launch(){
     if (program.loadIter){
         options.userDataDir = program.chromeDir;
     }
-    program.filter && puppeteer.use(AdblockerPlugin({blockTrackers: true, useCache: false}))
+    if (program.filter){
+        puppeteer = require('puppeteer-extra');
+        puppeteer.use(AdblockerPlugin({blockTrackers: true, useCache: false}))
+    }
+    
     const browser = await puppeteer.launch(options);
     let page = await browser.newPage();
     var nLogs = [], cLogs = [], jProfile;
     var cdp = await page.target().createCDPSession();
 
     if (program.dimension){
+        await emulateUserAgent(page, 'iPhone 6');
         console.log('setting custom dimensions')
         // await page.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4182.0 Safari/537.36");
         //   console.log(await browser.userAgent());
@@ -87,25 +91,33 @@ async function launch(){
             //         return ["en-US"];
             //     }
             // });
+            Date=function(r){function n(n,t,a,u,i,f,o){var c;switch(arguments.length){case 0:case 1:c=new r(e);break;default:a=a||1,u=u||0,i=i||0,f=f||0,o=o||0,c=new r(e)}return c}var e=1619575609705;return n.parse=r.parse,n.UTC=r.UTC,n.toString=r.toString,n.prototype=r.prototype,n.now=function(){return e},n}(Date),Math.exp=function(){function r(r){var n=new ArrayBuffer(8);return new Float64Array(n)[0]=r,0|new Uint32Array(n)[1]}function n(r){var n=new ArrayBuffer(8);return new Float64Array(n)[0]=r,new Uint32Array(n)[0]}function e(r,n){var e=new ArrayBuffer(8);return new Uint32Array(e)[1]=r,new Uint32Array(e)[0]=n,new Float64Array(e)[0]}var t=[.5,-.5],a=[.6931471803691238,-.6931471803691238],u=[1.9082149292705877e-10,-1.9082149292705877e-10];return function(i){var f,o=0,c=0,w=0,y=r(i),v=y>>31&1;if((y&=2147483647)>=1082535490){if(y>=2146435072)return isNaN(i)?i:0==v?i:0;if(i>709.782712893384)return 1/0;if(i<-745.1332191019411)return 0}if(y>1071001154){if(y<1072734898){if(1==i)return Math.E;c=i-a[v],w=u[v],o=1-v-v}else o=1.4426950408889634*i+t[v]|0,f=o,c=i-f*a[0],w=f*u[0];i=c-w}else{if(y<1043333120)return 1+i;o=0}f=i*i;var s=i-f*(.16666666666666602+f*(f*(6613756321437934e-20+f*(4.1381367970572385e-8*f-16533902205465252e-22))-.0027777777777015593));if(0==o)return 1-(i*s/(s-2)-i);var A=1-(w-i*s/(2-s)-c);return o>=-1021?A=e((o<<20)+r(A),n(A)):(A=e((o+1e3<<20)+r(A),n(A)),A*=9.332636185032189e-302)}}(),/*Math.random=function(){var r,n,e,t;return r=.8725217853207141,n=.520505596883595,e=.22893249243497849,t=1,function(){var a=2091639*r+2.3283064365386963e-10*t;return r=n,n=e,t=0|a,e=a-t}}()*/Math.random = function(){return 0.9322873996837797},Object.keys=function(r){return function(n){var e;return e=r(n),e.sort(),e}}(Object.keys);
+
+            var oldRandom = Math.random;
+            Math.random = function(){
+                oldRandom.apply(this, arguments);
+            }
             eval(intercepts);
         }, intercepts);
     } else {
-        await page.evaluateOnNewDocument(() => {
-            Date=function(r){function n(n,t,a,u,i,f,o){var c;switch(arguments.length){case 0:case 1:c=new r(e);break;default:a=a||1,u=u||0,i=i||0,f=f||0,o=o||0,c=new r(e)}return c}var e=1619575609705;return n.parse=r.parse,n.UTC=r.UTC,n.toString=r.toString,n.prototype=r.prototype,n.now=function(){return e},n}(Date),Math.exp=function(){function r(r){var n=new ArrayBuffer(8);return new Float64Array(n)[0]=r,0|new Uint32Array(n)[1]}function n(r){var n=new ArrayBuffer(8);return new Float64Array(n)[0]=r,new Uint32Array(n)[0]}function e(r,n){var e=new ArrayBuffer(8);return new Uint32Array(e)[1]=r,new Uint32Array(e)[0]=n,new Float64Array(e)[0]}var t=[.5,-.5],a=[.6931471803691238,-.6931471803691238],u=[1.9082149292705877e-10,-1.9082149292705877e-10];return function(i){var f,o=0,c=0,w=0,y=r(i),v=y>>31&1;if((y&=2147483647)>=1082535490){if(y>=2146435072)return isNaN(i)?i:0==v?i:0;if(i>709.782712893384)return 1/0;if(i<-745.1332191019411)return 0}if(y>1071001154){if(y<1072734898){if(1==i)return Math.E;c=i-a[v],w=u[v],o=1-v-v}else o=1.4426950408889634*i+t[v]|0,f=o,c=i-f*a[0],w=f*u[0];i=c-w}else{if(y<1043333120)return 1+i;o=0}f=i*i;var s=i-f*(.16666666666666602+f*(f*(6613756321437934e-20+f*(4.1381367970572385e-8*f-16533902205465252e-22))-.0027777777777015593));if(0==o)return 1-(i*s/(s-2)-i);var A=1-(w-i*s/(2-s)-c);return o>=-1021?A=e((o<<20)+r(A),n(A)):(A=e((o+1e3<<20)+r(A),n(A)),A*=9.332636185032189e-302)}}(),/*Math.random=function(){var r,n,e,t;return r=.8725217853207141,n=.520505596883595,e=.22893249243497849,t=1,function(){var a=2091639*r+2.3283064365386963e-10*t;return r=n,n=e,t=0|a,e=a-t}}()*/Math.random = function(){return 0.9322873996837797},Object.keys=function(r){return function(n){var e;return e=r(n),e.sort(),e}}(Object.keys);
+        // await page.evaluateOnNewDocument(() => {
+        //     Date=function(r){function n(n,t,a,u,i,f,o){var c;switch(arguments.length){case 0:case 1:c=new r(e);break;default:a=a||1,u=u||0,i=i||0,f=f||0,o=o||0,c=new r(e)}return c}var e=1619575609705;return n.parse=r.parse,n.UTC=r.UTC,n.toString=r.toString,n.prototype=r.prototype,n.now=function(){return e},n}(Date),Math.exp=function(){function r(r){var n=new ArrayBuffer(8);return new Float64Array(n)[0]=r,0|new Uint32Array(n)[1]}function n(r){var n=new ArrayBuffer(8);return new Float64Array(n)[0]=r,new Uint32Array(n)[0]}function e(r,n){var e=new ArrayBuffer(8);return new Uint32Array(e)[1]=r,new Uint32Array(e)[0]=n,new Float64Array(e)[0]}var t=[.5,-.5],a=[.6931471803691238,-.6931471803691238],u=[1.9082149292705877e-10,-1.9082149292705877e-10];return function(i){var f,o=0,c=0,w=0,y=r(i),v=y>>31&1;if((y&=2147483647)>=1082535490){if(y>=2146435072)return isNaN(i)?i:0==v?i:0;if(i>709.782712893384)return 1/0;if(i<-745.1332191019411)return 0}if(y>1071001154){if(y<1072734898){if(1==i)return Math.E;c=i-a[v],w=u[v],o=1-v-v}else o=1.4426950408889634*i+t[v]|0,f=o,c=i-f*a[0],w=f*u[0];i=c-w}else{if(y<1043333120)return 1+i;o=0}f=i*i;var s=i-f*(.16666666666666602+f*(f*(6613756321437934e-20+f*(4.1381367970572385e-8*f-16533902205465252e-22))-.0027777777777015593));if(0==o)return 1-(i*s/(s-2)-i);var A=1-(w-i*s/(2-s)-c);return o>=-1021?A=e((o<<20)+r(A),n(A)):(A=e((o+1e3<<20)+r(A),n(A)),A*=9.332636185032189e-302)}}(),/*Math.random=function(){var r,n,e,t;return r=.8725217853207141,n=.520505596883595,e=.22893249243497849,t=1,function(){var a=2091639*r+2.3283064365386963e-10*t;return r=n,n=e,t=0|a,e=a-t}}()*/Math.random = function(){return 0.9322873996837797},Object.keys=function(r){return function(n){var e;return e=r(n),e.sort(),e}}(Object.keys);
 
-            Object.defineProperty(navigator, "language", {
-                get: function() {
-                    return "en-GB";
-                }
-            });
-            Object.defineProperty(navigator, "languages", {
-                get: function() {
-                    return ["en-GB"];
-                }
-            });
+        //     Object.defineProperty(navigator, "language", {
+        //         get: function() {
+        //             return "en-GB";
+        //         }
+        //     });
+        //     Object.defineProperty(navigator, "languages", {
+        //         get: function() {
+        //             return ["en-GB"];
+        //         }
+        //     });
 
-        });
+        // });
     }
+
+    // await emulateUserAgent(page, 'iPhone 6');
 
     if (program.loadIter){
         console.log(`Part of a series of page loads`)
@@ -175,7 +187,7 @@ async function launch(){
         //turn on logging
         // await page.evaluateHandle(()=> window.__tracer.setTracingMode(true));
         // await page.evaluateHandle(()=> window.__tracer.setCaptureMode('postload'));
-        // await sleep(5000)
+        await sleep(5000)
     }
 
 
@@ -200,11 +212,12 @@ async function launch(){
         let cstmEntries =  program.custom.split(',');
         for (var c of cstmEntries){
             switch (c) {
-                 case 'Handlers': await extractHandlers(page,cdp,10); break;
+                 case 'Handlers': await extractHandlers(page,cdp,1); break;
                  case 'DOM' : await extractDOM(page); break; 
                  case 'Distill' : await distillDOM(page); break;
                  case 'CG' : await chromeFns.getAllFns(page, program); break; 
                  case 'dynAPI': await getDynCount(page); break;
+                 case 'state' : await getJSState(page); break;
             }
         }
     }
@@ -272,7 +285,7 @@ var emulateUserAgent = async function(page, agent){
     /**
      * If agent value not provided, randomly chooses an agent from the list; 
      */
-    var devices = puppeteer.devices;
+    var devices = puppeteerOg.devices;
     if (!agent){
         var deviceNames = Object.keys(devices);
         // deviceNames.push('desktop');
@@ -323,6 +336,15 @@ var getDynCount = async function(page){
     dump(dyn, `${program.output}/dynAPI`)
 }
 
+var getJSState = async function(page){
+    await page.evaluateHandle(() => window.__tracer.processFinalSignature());
+    var _state = await page.evaluateHandle( () => window.__tracer.getProcessedSignature()),
+        state = await _state.jsonValue();
+    console.log(`dumping state: ${Object.keys(state).length}`)
+    dump(state, `${program.output}/jsstate`);
+
+}
+
 var getMhtml = async function(cdp){
     var { data } = await cdp.send('Page.captureSnapshot', { format: 'mhtml' });
     dump(data, `${program.output}/mhtml`);
@@ -364,7 +386,7 @@ var extractHandlers = async function(page,cdp, nTimes){
     await cdp.send('Runtime.evaluate',{expression:handlerCode, includeCommandLineAPI:true})
     var _handlers = await page.evaluateHandle(()=> archive_listeners);
     var handlers = await _handlers.jsonValue();
-    var _fhandlers = await page.evaluateHandle(()=> _final_elems.map(e=>e[0].nodeName));
+    var _fhandlers = await page.evaluateHandle(()=> _final_elems.map(e=>[e[0].nodeName,JSON.stringify(e[1])]));
     var fhandlers = await _fhandlers.jsonValue();
     dump(handlers, `${program.output}/handlers`);
     dump(fhandlers, `${program.output}/handlersFinal`);
@@ -410,6 +432,6 @@ var dump = function(data, file){
 
 launch()
     .catch(err =>{
-        console.log(`error while launchig ${err}`);
+        console.log(`error while launching ${err}`);
         process.exit();
     });

@@ -170,9 +170,9 @@ var parseResponse = async function(res){
     res.on('end',async ()=>{
         var procRes = JSON.parse(rawData);
         program.debug && console.log(`Data retrieved: ${procRes} `)
-        var finalRes = procRes.sort((a,b)=>{return a[1] - b[1]}).slice(0,500);
+        // var finalRes = procRes.sort((a,b)=>{return a[1] - b[1]}).slice(0,500);
         console.log(procRes.length);
-        // return;
+        return;
         for (var entry of finalRes){
             if (!Number.isInteger(Number.parseInt(entry[1])))
                 continue;
@@ -189,8 +189,8 @@ var parseResponse = async function(res){
 
 
 async function crawlWayBack(url){
-    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&from=202011&to=202011&output=json&matchType=prefix&filter=mimetype:text/html&filter=statuscode:200`;
-    console.log(apiEndPoint);
+    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&from=202011&to=202011&output=json&matchType=prefix&filter=mimetype:text/html&filter=statuscode:200&limit=7000`;
+    // console.log(apiEndPoint);
     http.get(apiEndPoint, parseResponse);
     // await parseResponse(res);
     // .on('error',(e)=>{

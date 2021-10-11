@@ -19,13 +19,13 @@
                 window.__dynAPI__[prop]++;
 
                 if (prop == 'userAgent'){
-                    if (Math.random() < 0.5)
-                        return oldget.call(this);
-                    else return mobileAgent;
+                    // if (Math.random() < 0.5)
+                    return oldget.call(this);
+                    // else return mobileAgent;
                 } else if (prop == 'innerWidth' || prop == 'innerHeight'){
-                    if (Math.random() < 0.5)
-                        return oldget.call(this);
-                    else return 375;
+                    // if (Math.random() < 0.5)
+                    return oldget.call(this);
+                    // else return 375;
                 }
                 
                 if (oldget && oldget.call)
@@ -83,5 +83,5 @@
             interceptAPI(window,prop);
         else interceptAPI(window[api].prototype,prop);
         window.__dynAPI__[prop]=0;
-    })
+    });
 })();

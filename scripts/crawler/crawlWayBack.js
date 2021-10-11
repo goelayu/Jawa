@@ -190,7 +190,8 @@ var parseResponse = async function(res){
         var procRes = JSON.parse(rawData);
         program.debug && console.log(`Data retrieved: ${procRes} `)
         var procRes_ok = procRes.items.filter(e=>e[1]==200);
-        var nEntries = randomizer(procRes_ok, 1);
+        // var nEntries = randomizer(procRes_ok, 1);
+        console.log(procRes_ok.length);
         for (var entry of nEntries){
             // if (!Number.isInteger(Number.parseInt(entry[1])))
             //     continue;
