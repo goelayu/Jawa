@@ -78,7 +78,7 @@ async function launch(){
         await page.screenshot({path: `${outDir}/screenshot.png`, fullPage: true});
 
     // if (program.custom)
-    await extractDOM(page);
+    // await extractDOM(page);
     
     if (program.mhtml)
         await getMhtml(cdp);

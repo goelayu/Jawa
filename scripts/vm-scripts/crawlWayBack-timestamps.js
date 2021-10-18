@@ -172,17 +172,6 @@ var randomizer = function(arr, n){
 	    return result;
 }
 
-var readSnapshots = function(){
-    var snapshots = [];
-    var dataDir=`/data/md`;
-    var sites = fs.readdirSync(dataDir);
-    sites.forEach((s)=>{
-        var _snapshots = JSON.parse(fs.readFileSync(`${dataDir}/${s}`, 'utf-8'));
-        snapshots = snapshots.concat(_snapshots.slice(1,).map(e=>[s, e[0],e[1]]))
-    });
-    return randomizer(snapshots, snapshots.length);
-}
-
 var parseResponse = async function(res){
     // console.log(res);
     var {statusCode} = res;
@@ -196,9 +185,11 @@ var parseResponse = async function(res){
     res.on('end',async ()=>{
         var procRes = JSON.parse(rawData);
         program.debug && console.log(`Data retrieved: ${procRes} `)
-        var finalRes = randomizer(procRes,3000);
+        var finalRes = randomizer(procRes,7000);
         console.log(procRes.length);
-        // return;
+        var tsUrls = procRes.map(e=>[e[1], e[2]]);
+        fs.writeFileSync(`${program.output}/${program.url}`, JSON.stringify(tsUrls));
+        return;
         for (var entry of finalRes){
             if (!Number.isInteger(Number.parseInt(entry[1])))
                 continue;
@@ -215,7 +206,7 @@ var parseResponse = async function(res){
 
 
 async function crawlWayBack(url){
-    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&from=202011&to=202011&output=json&matchType=prefix&filter=mimetype:text/html&filter=statuscode:200`;
+    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&from=202011&to=202011&output=json&matchType=prefix&filter=mimetype:text/html&filter=statuscode:200&limit=7000`;
     console.log(apiEndPoint);
     http.get(apiEndPoint, parseResponse);
     // await parseResponse(res);
@@ -225,20 +216,17 @@ async function crawlWayBack(url){
 }
 
 async function main(){
-    // if (!program.skip)
-    //     crawlWayBack(program.url);
-    // else {
+    if (!program.skip)
+        crawlWayBack(program.url);
+    else {
         /*Directly load the site in chrome*/
-        var snapshots = readSnapshots();
-        console.log(`Launching ${snapshots.length} crawls`)
-        for (var sn of snapshots){
-            var [site, ts, url] = sn;
-            var wayBackUrl = `https://web.archive.org/web/${ts}/${url}`;
-            console.log(ts,url)
-            program.url = site;
-            await loadChrome(wayBackUrl,ts, url)
-        };
-    // }
+        var wayBackUrl = `https://web.archive.org/web/${program.url}`;
+        var delim = program.url.indexOf('https')>=0 ? '/https://' : '/http://'
+        var [ts,_url] = program.url.split(delim);
+        console.log(ts,_url)
+        // program.url = `http${_url}`;
+        loadChrome(wayBackUrl,ts, _url)
+    }
 };
 
 main();
