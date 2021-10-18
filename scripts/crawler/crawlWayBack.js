@@ -189,12 +189,15 @@ var parseResponse = async function(res){
     res.on('end',async ()=>{
         var procRes = JSON.parse(rawData);
         program.debug && console.log(`Data retrieved: ${procRes} `)
-        var procRes_ok = procRes.items.filter(e=>e[1]==200);
-        // var nEntries = randomizer(procRes_ok, 1);
-        console.log(procRes_ok.length);
+        // var procRes_ok = procRes.items.filter(e=>e[1]==200);
+        var nEntries = randomizer(procRes, 10);
+        // console.log(procRes_ok.length);
+        // return;
         for (var entry of nEntries){
-            // if (!Number.isInteger(Number.parseInt(entry[1])))
-            //     continue;
+            if (!Number.isInteger(Number.parseInt(entry[1])))
+                continue;
+            console.log(`https://web.archive.org/web/${entry[1]}/${entry[2]}`)
+            continue;
             var ts = `202011${fillTS(entry[0], 8)}`
             // var ts = (''+entry[0]).length == 9 ? `0${entry[0]}` : entry[0];
             var waybackurl = `https://web.archive.org/web/${ts}/${program.url}`;
@@ -211,9 +214,10 @@ var parseResponse = async function(res){
 
 
 async function crawlWayBack(url){
-    var apiEndPoint = `${CC_API}?url=${url}&${process.env.QUERY}`
+    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&from=202109&to=202109&output=json&matchType=prefix&filter=mimetype:text/html&filter=statuscode:200&limit=1000&collapse=urlkey`;
+    // var apiEndPoint = `${CC_API}?url=${url}&${process.env.QUERY}`
     // var apiEndPoint = `${WAYBACK_CDX}?url=${url}&${process.env.QUERY}`;
-    console.log(apiEndPoint);
+    // console.log(apiEndPoint);
     http.get(apiEndPoint, parseResponse);
     // await parseResponse(res);
     // .on('error',(e)=>{

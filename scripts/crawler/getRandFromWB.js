@@ -15,6 +15,8 @@ const CHROME_LOADER=`${__dirname}/chrome-launcher.js`;
 
 program
     .option('-o, --output [output]','path to the output file')
+    .option('-s, --start [start]','start range' )
+    .option('-e, --end [end]','end range')
     .parse(process.argv);
 
 var parseAlexa = function(){
@@ -30,9 +32,10 @@ var parseAlexa = function(){
 const ALEXA1M = parseAlexa();
 
 var getWBCount = async function(url){
-    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&from=202011&to=202011&output=json&matchType=prefix&filter=mimetype:text/html&filter=statuscode:200&limit=7000`;
-    var response = await fetch(apiEndPoint);
     try { 
+        var apiEndPoint = `${WAYBACK_CDX}?url=${url}&from=202011&to=202011&output=json&matchType=prefix&filter=mimetype:text/html&filter=statuscode:200&limit=7000`;
+        var response = await fetch(apiEndPoint);
+        // console.log(apiEndPoint)
         var json = await response.json();
     } catch (e) {
         var json = [];
@@ -46,9 +49,9 @@ var randFromRange = function(min, max){
 
 var buildCorpusForRange = async function(min, max){
     var sites = [], 
-        ranks = [];
-
-    while (sites.length < 100){
+        ranks = [],
+        found = false;
+    while (!found){
         var rank = randFromRange(min,max);
         if (ranks.indexOf(rank)>=0) continue;
         
@@ -60,8 +63,9 @@ var buildCorpusForRange = async function(min, max){
         console.log(url)
         sites.push(url);
         ranks.push(rank)
+        return url;
     }
-    return sites;
+    return null;
     
 }
 
@@ -82,4 +86,4 @@ var buildCorpus = async function(){
 
 }
 
-buildCorpus();
+buildCorpusForRange(program.start, program.end);
