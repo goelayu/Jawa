@@ -1,5 +1,4 @@
 *
-
 !dom-distill/
 !dom-distill/*/
 !program_analysis/
@@ -9,6 +8,7 @@ program_analysis/node_modules/
 program_analysis/instOutput
 !scripts/
 !scripts/*/
+!scripts/**/
 !parser/
 !pyutils/
 !tests/
@@ -17,7 +17,6 @@ program_analysis/instOutput
 !filter-lists/
 !filter-lists/*
 !data/
-!data/*
 !data/plots/*
 !eval
 !eval/*
@@ -25,6 +24,9 @@ program_analysis/instOutput
 !*py
 !*sh
 !*md
-
+!crawler/
+!js-formats/
+!quick_scripts/
+!vm-scripts/
 pyutils/inspectMahimahiProto.py
 
