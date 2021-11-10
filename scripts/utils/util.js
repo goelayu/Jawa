@@ -6,7 +6,8 @@
 const fs = require('fs'),
     program = require('commander'),
     netParser = require('parser/networkParser');
-    fuzz = require('fuzzball');
+const { url } = require('inspector');
+    // fuzz = require('fuzzball');
 
 
 program
@@ -161,7 +162,7 @@ var getSizePerType = function(data){
     var type2size = {};
     for (var n of net){
         if (!n.type || !n.size
-            /*|| !isCriticalReq(n)*/) continue;
+            || !isCriticalReq(n)) continue;
         var type;
         // var mainTypes = ['Image', 'Script','Document', 'Stylesheet'];
         const mainTypes = ["image", "html", "script", "css","json",""];
@@ -171,24 +172,27 @@ var getSizePerType = function(data){
                 break;
             }
         }
+        if (type != 'script') continue
+        console.log(n.url);
+        continue;
         if (mainTypes.indexOf(type)<0)
             type = 'Other';
         if (!(type in type2size))
             type2size[type] = 0;
         type2size[type] += n.size;
     };
-    var totalSize = Object.values(type2size).reduce((acc,cur)=>{return acc + cur;},0);
-    // Object.keys(type2size).forEach((t)=>{
-    //     (t == 'Script') && console.log(`${type2size[t]/totalSize},${t}`);
-    // });
-    // console.log(type2size)
-    if (totalSize < 1000){
-        //hack, usually a page should contain more than 1000 bytes
-        return;
-    }
-    // console.log(type2size)
-    type2size.script != JSERRORCOUNT && console.log(type2size.script/totalSize)
-    return type2size;
+    // var totalSize = Object.values(type2size).reduce((acc,cur)=>{return acc + cur;},0);
+    // // Object.keys(type2size).forEach((t)=>{
+    // //     (t == 'Script') && console.log(`${type2size[t]/totalSize},${t}`);
+    // // });
+    // // console.log(type2size)
+    // if (totalSize < 1000){
+    //     //hack, usually a page should contain more than 1000 bytes
+    //     return;
+    // }
+    // // console.log(type2size)
+    // type2size.script != JSERRORCOUNT && console.log(type2size.script,totalSize)
+    // return type2size;
 }
 
 var getNumPerType = function(data){
@@ -592,46 +596,41 @@ ABPFilterParser.parse(easyListTxt, parsedFilterData);
 }
 
 var total = 0;
-var _combineCoverage = function(cvgArr){
-    // for (const entry of jsCoverage) {
-
-    //     if (entry.url.indexOf('.js') > 0) {
-    //         fileUrls.push(entry.url);
-    //         totalBytes += entry.text.length;
-    //         let singleUsedBytes = 0
-    //         for (const range of entry.ranges) {
-    //             usedBytes += range.end - range.start - 1;
-    //             singleUsedBytes += range.end - range.start - 1;
-    //         }
-    //     }
-    // }
-    var urlToRanges = []// for the same URL across multiple runs store the list of ranges
+var _combineCoverage = function(cvgArr, urlCoverage, urlToRanges){
+    // var urlToRanges = []// for the same URL across multiple runs store the list of ranges
     var sameRange = function(r1, r2){
         if (!r1 || !r2) return false;
         return r1.start == r2.start && r1.end == r2.end;
     }
     cvgArr.forEach((coverage)=>{
         for (var entry of coverage){
-            if (entry.url.indexOf('.js')>0){
-                if (!(entry.url in urlToRanges)){
-                    urlToRanges[entry.url] = entry.ranges;
+            if (entry.url.indexOf('.js')>0 && entry.url.indexOf('chromewebdata')<0){
+                var urlKey = entry.url.split('?')[0];
+                if (!(urlKey in urlToRanges)){
+                    if (cvgArr.length == 2) continue; //if taking union, don't account for new urls. 
+                    urlToRanges[urlKey] = entry.ranges;
                     total += entry.text.length;
+                    if (urlKey.indexOf('gtm')>=0) fs.writeFileSync('t', entry.text);
                     continue;
                 }
                 for (var range of entry.ranges){
-                    if (!urlToRanges[entry.url].find(e=>sameRange(range,e)))
-                        urlToRanges[entry.url].push(range)
+                    if (!urlToRanges[urlKey].find(e=>sameRange(range,e)))
+                        console.log(entry.url, range);
+                        urlToRanges[urlKey].push(range)
                 }
                 // if (cvgArr.length == 1)
                 //     total += entry.text.length;
             }
         }
     });
-    var totalBytes = 0;
+    var totalBytes = 0,
+        run = cvgArr.length == 1 ? 'first' : 'union';
     Object.keys(urlToRanges).forEach((url)=>{
+        var _totalBytes = totalBytes;
         for (var range of urlToRanges[url]){
             totalBytes += range.end - range.start - 1;
         }
+        urlCoverage[run][url] = totalBytes - _totalBytes;
     })
     return totalBytes;
 }
@@ -639,9 +638,20 @@ var _combineCoverage = function(cvgArr){
 var combineCoverage = function(first, second){
     first = parse(first);
     second = parse(second);
-    var f = _combineCoverage([first]);
-    var union = _combineCoverage([first, second]);
+    var urlCoverage = {first:{}, union:{}}, urlToRanges = [];
+    var f = _combineCoverage([first], urlCoverage, urlToRanges);
+    console.log(urlCoverage)
+    var union = _combineCoverage([second], urlCoverage,urlToRanges);
     console.log(f, union, total)
+    console.log(urlCoverage)
+}
+
+var instCoverage = function(first, second){
+    first = parse(first);
+    second = parse(second);
+    var difference = first.preload.filter(x => !second.preload.includes(x));
+    console.log(first.preload.length, difference.length)
+
 }
 
 switch (program.type){
@@ -662,5 +672,6 @@ switch (program.type){
     case 'matchNet' : matchNetwork(program.input,program.anotherin); break;
     case 'initiator': initiatedRequests(program.input, program.anotherin); break;
     case 'coverage' : combineCoverage(program.input, program.anotherin); break;
+    case 'Icoverage' : instCoverage(program.input, program.anotherin); break;
 
 }
