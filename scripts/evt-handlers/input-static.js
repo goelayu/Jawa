@@ -64,7 +64,7 @@ var initializeFileData = function(files){
             //     content = zlib.gunzipSync(content).toString();
             parseJS(fileStore, content, file);
         } catch (e){
-            console.log(e)
+            // console.log(e)
         }
     })
     return fileStore;
@@ -76,8 +76,10 @@ var grepCallStack = function(cs,fileStore){
     for (var fn of cs){
         var fnSrc = fileStore[fn];
         // console.log(fnSrc)
-        if (fnSrc && (found = tokens.find(e=>fnSrc.indexOf(e)>=0)))
+        if (fnSrc && (found = tokens.find(e=>fnSrc.indexOf(e)>=0))){
+            console.log(fnSrc);
             break;
+        }
     }
     return found;
 
@@ -90,7 +92,7 @@ var main = function(){
     for (var elem of Object.keys(callStack)){
         if (elem.indexOf('onmouse')<0) continue;
         var grepRes;
-        console.log(elem)
+        // console.log(elem)
         if (grepRes = grepCallStack(callStack[elem], fileStore))
             console.log(grepRes)
     }
