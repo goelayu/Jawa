@@ -121,7 +121,6 @@ function main(){
         html:{size:0, hashes:[],total:0},
         js:{size:0, hashes:{},total:0},
     };
-
     var pageMD = {}
     pages.forEach((page,idx)=>{
         if (page == '') return;
@@ -136,13 +135,13 @@ function main(){
         }
         dedupMime(mimeData, jsData, store, srcDir, page, pageMD );
         // var perc = Number.parseInt(idx*100/pages.length);
-        // program.verbose && perc%10 == 0 && console.log(`${perc}% Done...`)
+        program.verbose && console.log(`js ${store.js.size} image ${store.image.size} css ${store.css.size} html  ${store.html.size}`)
 
     })
     console.log(`js ${store.js.size} image ${store.image.size} css ${store.css.size} html  ${store.html.size}`)
     console.log(`js ${store.js.total} image ${store.image.total} css ${store.css.total} html ${store.html.total}`)
 
-    fs.writeFileSync(program.output, JSON.stringify(pageMD));
+    program.output && fs.writeFileSync(program.output, JSON.stringify(pageMD));
 }
 main();
 

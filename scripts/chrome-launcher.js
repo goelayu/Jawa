@@ -75,12 +75,35 @@ async function launch(){
     var cdp = await page.target().createCDPSession();
 
     if (program.dimension){
-        await emulateUserAgent(page, 'iPhone 6');
+        // await emulateUserAgent(page, 'iPhone 6');
         console.log('setting custom dimensions')
         // await page.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4182.0 Safari/537.36");
         //   console.log(await browser.userAgent());
         // await page.setViewport({ width: 1261, height: 3816 })
         await page.evaluateOnNewDocument((intercepts) => {
+            var origSetTimeout = window.setTimeout;
+            window.setTimeout = function(){
+                // if (arguments.length > 1 && !isNaN(Number.parseFloat(arguments[1]))){
+                //     arguments[1] = 0;
+                // }
+                // return origSetTimeout.apply(this, arguments);
+            }
+            window.setInterval = function(){
+                
+            }
+
+            window.requestAnimationFrame = function(){
+
+            }
+
+            window.setImmediate = function(){
+                
+            }
+
+            var observers = ['MutationObserver', 'ResizeObserver','IntersectionObserver','PerformanceObserver'];
+            observers.forEach((o)=>{
+                window[o] = function(){};
+            })
             // Object.defineProperty(navigator, "language", {
             //     get: function() {
             //         return "en-US";
@@ -93,11 +116,11 @@ async function launch(){
             // });
             Date=function(r){function n(n,t,a,u,i,f,o){var c;switch(arguments.length){case 0:case 1:c=new r(e);break;default:a=a||1,u=u||0,i=i||0,f=f||0,o=o||0,c=new r(e)}return c}var e=1619575609705;return n.parse=r.parse,n.UTC=r.UTC,n.toString=r.toString,n.prototype=r.prototype,n.now=function(){return e},n}(Date),Math.exp=function(){function r(r){var n=new ArrayBuffer(8);return new Float64Array(n)[0]=r,0|new Uint32Array(n)[1]}function n(r){var n=new ArrayBuffer(8);return new Float64Array(n)[0]=r,new Uint32Array(n)[0]}function e(r,n){var e=new ArrayBuffer(8);return new Uint32Array(e)[1]=r,new Uint32Array(e)[0]=n,new Float64Array(e)[0]}var t=[.5,-.5],a=[.6931471803691238,-.6931471803691238],u=[1.9082149292705877e-10,-1.9082149292705877e-10];return function(i){var f,o=0,c=0,w=0,y=r(i),v=y>>31&1;if((y&=2147483647)>=1082535490){if(y>=2146435072)return isNaN(i)?i:0==v?i:0;if(i>709.782712893384)return 1/0;if(i<-745.1332191019411)return 0}if(y>1071001154){if(y<1072734898){if(1==i)return Math.E;c=i-a[v],w=u[v],o=1-v-v}else o=1.4426950408889634*i+t[v]|0,f=o,c=i-f*a[0],w=f*u[0];i=c-w}else{if(y<1043333120)return 1+i;o=0}f=i*i;var s=i-f*(.16666666666666602+f*(f*(6613756321437934e-20+f*(4.1381367970572385e-8*f-16533902205465252e-22))-.0027777777777015593));if(0==o)return 1-(i*s/(s-2)-i);var A=1-(w-i*s/(2-s)-c);return o>=-1021?A=e((o<<20)+r(A),n(A)):(A=e((o+1e3<<20)+r(A),n(A)),A*=9.332636185032189e-302)}}(),/*Math.random=function(){var r,n,e,t;return r=.8725217853207141,n=.520505596883595,e=.22893249243497849,t=1,function(){var a=2091639*r+2.3283064365386963e-10*t;return r=n,n=e,t=0|a,e=a-t}}()*/Math.random = function(){return 0.9322873996837797},Object.keys=function(r){return function(n){var e;return e=r(n),e.sort(),e}}(Object.keys);
 
-            var oldRandom = Math.random;
-            Math.random = function(){
-                oldRandom.apply(this, arguments);
-            }
-            eval(intercepts);
+            // var oldRandom = Math.random;
+            // Math.random = function(){
+            //     oldRandom.apply(this, arguments);
+            // }
+            // eval(intercepts);
         }, intercepts);
     } else {
         // await page.evaluateOnNewDocument(() => {
@@ -158,8 +181,8 @@ async function launch(){
         await cdp.send('Profiler.start');
     }
 
-    if (program.coverage)
-        await page.coverage.startJSCoverage();
+    // if (program.coverage)
+    //     await page.coverage.startJSCoverage();
 
     //Set global timeout to force kill the browser
     var gTimeoutValue = program.testing ? Number.parseInt(program.timeout)*100 : Number.parseInt(program.timeout) + 20000;
@@ -176,6 +199,18 @@ async function launch(){
 
     console.log('Site loaded');
 
+    if (program.coverage)
+        await page.coverage.startJSCoverage();
+    
+    // await page.reload();
+    // console.log('page reloaded')
+
+    // page.evaluate(() => {
+    //     debugger;
+    //   });
+
+    console.log('page paused')
+
     if (program.coverage){
         await getCoverage(page, 'preload');
     //     await page.coverage.startJSCoverage();
@@ -187,7 +222,7 @@ async function launch(){
         //turn on logging
         // await page.evaluateHandle(()=> window.__tracer.setTracingMode(true));
         // await page.evaluateHandle(()=> window.__tracer.setCaptureMode('postload'));
-        await sleep(5000)
+        await sleep(2000)
     }
 
 
@@ -218,6 +253,7 @@ async function launch(){
                  case 'CG' : await chromeFns.getAllFns(page, program); break; 
                  case 'dynAPI': await getDynCount(page); break;
                  case 'state' : await getJSState(page); break;
+                 case 'heap' : await getHeapObject(page,'getCustomCache'); break;
             }
         }
     }
@@ -334,6 +370,12 @@ var getDynCount = async function(page){
     var _dyn = await page.evaluateHandle(() => window.__getDynAPI());
     var dyn = await _dyn.jsonValue();
     dump(dyn, `${program.output}/dynAPI`)
+}
+
+var getHeapObject = async function(page, obj){
+    var _dyn = await page.evaluateHandle((obj) => __tracer[obj](), obj);
+    var dyn = await _dyn.jsonValue();
+    dump(dyn, `${program.output}/heapObj`)
 }
 
 var getJSState = async function(page){
