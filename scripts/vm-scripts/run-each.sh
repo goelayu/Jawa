@@ -13,17 +13,17 @@ while read i; do
 #         tmux send-keys "bash init-crawler.sh <(printf '$site1\n')" 'C-m'
 # HERE
     echo $i" "
-    # top=$((count*7))
-    # sites=`cat $FILE | head -n $top | tail -n 7`;
+    top=$((count*7))
+    sites=`cat $FILE | head -n $top | tail -n 7`;
     # ssh -n -o StrictHostKeyChecking=no $addr "bash /home/goelayu/webArchive/scripts/mount-disk.sh"
     # echo $sites
-    # scp crawlWayBack.dedup.js $addr:/home/goelayu/webArchive/scripts/
-    # ssh -o StrictHostKeyChecking=no $addr "cd /data; tar zcf - record" > /vault-home/goelayu/webArchive/data/storage-mix-large/500k-snapshot/$crawler/record.tar.gz &
-    scp $addr:/data/logs ../../data/storage-mix-large/500k-snapshot/$crawler
-#     ssh -o StrictHostKeyChecking=no $addr /bin/bash << HERE
-#     find /data/performance/ -iname plt | wc -l
-# HERE
-    # count=$((count+1))
+    # scp crawlWayBack-timestamps.js $addr:/home/goelayu/webArchive/scripts/ &
+    # ssh -o StrictHostKeyChecking=no $addr "cd /data; tar zcf - performance" > /vault-home/goelayu/webArchive/data/storage-mix-large/1m-snapshot/$crawler/performance.tar.gz &
+    # scp crawlWayBack-timestamps.js $addr:/data/logs /vault-home/goelayu/webArchive/data/storage-mix-large/1m-snapshot/$crawler/ &
+    ssh -o StrictHostKeyChecking=no $addr /bin/bash << HERE
+    find /data/performance -iname plt | wc -l
+HERE
+    count=$((count+1))
 done<"$1"
 
 wait $(jobs -p)

@@ -12,7 +12,7 @@ while read i; do
     addr=`echo $i | cut -d' ' -f2`;
     # echo Launching sites $site1, $site2 at $addr
     ssh -t $addr << HERE
-        tmux new-session -d -s crawl
+        tmux new-session -d -s crawl2
         tmux send-keys "cd webArchive/scripts && bash init-crawler.sh" 'C-m'
 HERE
 done<"$1"

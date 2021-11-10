@@ -206,7 +206,7 @@ var parseResponse = async function(res){
 
 
 async function crawlWayBack(url){
-    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&from=202011&to=202011&output=json&matchType=prefix&filter=mimetype:text/html&filter=statuscode:200&limit=7000`;
+    var apiEndPoint = `${WAYBACK_CDX}?url=${url}&from=202012&to=202012&output=json&matchType=prefix&filter=mimetype:text/html&filter=statuscode:200&limit=7000`;
     console.log(apiEndPoint);
     http.get(apiEndPoint, parseResponse);
     // await parseResponse(res);
