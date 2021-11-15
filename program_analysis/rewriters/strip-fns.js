@@ -46,7 +46,7 @@ function instrument(src, options){
                 var nodeBody = node.body.source().substring(1, node.body.source().length-1);
                 var id = makeId(filename,node, offset);
 
-                if (keepFns.indexOf(id)<0){
+                if (keepFns.indexOf(id)<0 && id.indexOf('jquery')<0){
                     /**Eliminate this function */
                     node.body.update('{}');
                 }

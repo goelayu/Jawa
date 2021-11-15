@@ -1937,10 +1937,11 @@ var traceFilter = function (content, options) {
 				}
 
 				rewriteClosure.insertClosureProxy(node, node.body.source());
-				var branchTest = util.fnContainsBranch(`function a(){${ASTSourceMap.get(node.body)}}`, falafel)
-				metadata[index] = branchTest;
-				update(node.body, `{\ntry{__tracer.markCurrFn('${index}');\n`, node.body.source().slice(1,-1), '} finally {__tracer.unmarkCurrFn();}}');
+				// var branchTest = util.fnContainsBranch(`function a(){${ASTSourceMap.get(node.body)}}`, falafel)
+				// metadata[index] = branchTest;
+				// update(node.body, `{\ntry{__tracer.markCurrFn('${index}');\n`, node.body.source().slice(1,-1), '} finally {__tracer.unmarkCurrFn();}}');
 				// console.log(metadata)
+				
 				// update(node.body, '{ \ntry {\n',options.tracer_name,'.cacheInit(', JSON.stringify(index),',arguments, new.target',',',JSON.stringify(enableRecord),');\n',
 				// 	node.body.source());
 

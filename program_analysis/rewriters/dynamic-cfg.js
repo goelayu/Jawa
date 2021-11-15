@@ -51,9 +51,20 @@ function instrument(src, options){
                         if (typeof window != 'undefined') __tracer = window.top.__tracer;
                         else {__tracer = {__enter__:function(){}, __exit__:function(){}}}
                     }
+                    // if (__tracer && __tracer.cacheInit){
+                    //     __tracer.cacheInit("${options.filename}")
+                    // }
                     })();\n`;
+                // var programEnd = `\n
+                // if (__tracer && __tracer.exitFunction)
+                //     __tracer.exitFunction();
+                // `;
+                // node.update(`${tracerCheck} ${node.source()} ${programEnd}`);
                 node.update(`${tracerCheck} ${node.source()}`);
+                // update(node, options.prefix,tracerCheck,sourceNodes(node), programEnd)
+                
             } else if (node.type == 'FunctionDeclaration' || node.type == 'FunctionExpression'){
+                // return;
                 var nodeBody = node.body.source().substring(1, node.body.source().length-1);
                 var hackForTDecl = 'The "original" argument must be of type Function';
                 if (nodeBody.indexOf(hackForTDecl)>=0) return;

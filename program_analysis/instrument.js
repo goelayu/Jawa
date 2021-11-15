@@ -18,6 +18,7 @@ program
 
 var rewriter = null, intercepts, isSafeReadCheck = false;
 var returnInfoFile = program.input + ".info";
+const STRINGIFIER = fs.readFileSync(`${__dirname}/omni-stringifier.js`,'utf-8');
 
 function IsJsonString(str) {
     try {
@@ -110,7 +111,7 @@ function instrumentHTML(src, filename){
 
     var intercepts = fs.readFileSync('./runtime/dynamic-api-intercepts.js','utf-8');
 
-    var tracerStr = `<script> ${intercepts + getTracerObj()} </script>`;
+    var tracerStr = `<script> ${(STRINGIFIER ? STRINGIFIER : "") +  intercepts + getTracerObj()} </script>`;
 
     src = preStr + tracerStr + postStr;
 
