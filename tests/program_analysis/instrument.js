@@ -11,8 +11,10 @@ const INSTRUMENTOR = '/vault-home/goelayu/webArchive/program_analysis/instrument
 function testFuncLen(){
     var src=`
     function a(){
-        var bcd;
+        var bcd = anotherglobal;
         function b(){
+            global = bcd + 2;
+            bcd = 4;
             function d(){
 
             }
@@ -22,12 +24,17 @@ function testFuncLen(){
                 
             }
         }
+        return b;
     }
+    var ret = a();
+    ret();
     `;
-    var testFile = "7878";
+    var testFile = "test.js";
     fs.writeFileSync(testFile, src);
-    var cmd = `node ${INSTRUMENTOR} -i ${testFile} -n testing -t js -r dynamic-cfg`;
-    spawnSync(cmd, {shell:true});
+    var cmd = `node ${INSTRUMENTOR} -i ${testFile} -n "testurl;;;;${testFile}" -t js -r state`;
+    var res = spawnSync(cmd, {shell:true});
+    console.log(res.stdout.toString(), res.stderr.toString())
+    console.log(`Input length: ${src.length}`)
 }
 
 testFuncLen();
