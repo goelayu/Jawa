@@ -1,4 +1,6 @@
 *
+!node_module_changes/
+!node_module_changes/**/
 !dom-distill/
 !dom-distill/*/
 !program_analysis/
