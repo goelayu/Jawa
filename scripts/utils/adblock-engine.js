@@ -7,7 +7,7 @@ const fs = require('fs'),
     program = require('commander'),
     blocker = require('@cliqz/adblocker');
 
-const EASYPRIVACY=`${__dirname}/../../filter-lists/combined.txt`;
+const EASYPRIVACY=`${__dirname}/../../filter-lists/combined-alexa-3k.txt`;
 program
     .option('-u, --urls [urls]','file containing list of URLs')
     .option('-f, --filters [filters]','file containing list of filters (optional)')
