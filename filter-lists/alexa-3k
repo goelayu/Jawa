@@ -1,4 +1,4 @@
-abs.twimg.com
+abs.twimg.com$domain=~twitter.com
 platform.twitter.com/widgets.js
 c.amazon-adsystem.com
 www.googletagservices.com
@@ -15,7 +15,7 @@ cdn.adsafeprotected.com/
 macro.adnami.io
 ats.rlcdn.com
 t.skimresources.com
-www.gstatic.com/firebasejs
+!www.gstatic.com/firebasejs
 cdn.taboola.com
 beacon.krxd.net
 static.ads-twitter.com/
@@ -28,9 +28,17 @@ https://script.ioam.de/
 cookieconsent
 www.googletagmanager.com
 cdn.optimizely.com
-gdpr.privacymanager.io
+privacymanager.io
 showads.js
-/ad.js
+!/ad/*
+!/ads/*
 s.go-mpulse.net/boomerang
-js.stripe.com
-media.trafficjunky.net #at 2152 frequency
+stripe.com
+media.trafficjunky.net !at 2152 frequency
+geolocation.onetrust.com
+sharethis.com
+pinit.js
+disqus.com
+fbcdn.net
+www.npttech.com
+swg.js
