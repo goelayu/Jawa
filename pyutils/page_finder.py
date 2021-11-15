@@ -24,7 +24,7 @@ def extract_links(url):
             links.append(link.get('href'))
         
         site_token = url.split('.')[1]
-        links_first_party = [l for l in links if site_token in l and 'twitter' not in l and 'instagram' not in l]
+        links_first_party = [l for l in links if site_token in l]
         return links_first_party
     except Exception as e:
         # print e

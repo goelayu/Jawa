@@ -195,9 +195,9 @@ def instrument(root, fileType,args,file_obj):
 
     print "Instrumenting file {} with type {}".format(fullurl, fileType)
 
-    if 'wombat' in fullurl:
-        intercept_location_wombat(http_response, TEMP_FILE, args, file)
-        return
+    # if 'wombat' in fullurl:
+    #     intercept_location_wombat(http_response, TEMP_FILE, args, file)
+    #     return
 
     if fileType == 'js' and ('web.archive.org/_static/js/' in fullurl or 'archive.org/includes/' in fullurl):
         print "Skipping client-side libraries for archive.org", fullurl
@@ -286,15 +286,15 @@ def instrument(root, fileType,args,file_obj):
     log_file=open(_log_path+"logs","w+")
     error_file=open(_log_path+"errors","w")
     src_file = open(_log_path+'/'+filename,'w')
-    content_file_full = open(_log_path+'/content_full','w')
+    # content_file_full = open(_log_path+'/content_full','w')
     id_file = open(_log_path+'ids','w')
     content_file = open(_log_path+'content','w')
 
     content_file.write(orig_content)
     content_file.close()
 
-    content_file_full.write(content)
-    content_file_full.close()
+    # content_file_full.write(content)
+    # content_file_full.close()
 
     src_file_data = {'type':fileType}
 
