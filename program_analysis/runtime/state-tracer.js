@@ -114,7 +114,7 @@ function __declTracerObject__(window) {
     var ND = [];
     var curRoot = null;
     var functionToScopes = {};
-    // var omniStringifier = Omni ? new Omni() : "";
+    var omniStringifier = Omni ? new Omni() : "";
     // var parse = omniStringifier.parse;
     var rootInvocs = [];
     var sigSizeLimit = 500; // Number of reads and writes allowed per invocations
@@ -200,6 +200,7 @@ function __declTracerObject__(window) {
     }
 
     window.addEventListener("load", function(){
+        evtTracking = false;
         if (!pageRecorded) {
             console.log("PROXY STATS");
             console.log(window.proxyReadCount, window.proxyWriteCount);
@@ -643,17 +644,17 @@ function __declTracerObject__(window) {
                 return _getComputedStyle.apply(thisObj,arguments);
             };
 
-            var _defineProperty = Object.defineProperty;
-            self.Object.defineProperty = function(){
-                for (var i=0;i<arguments.length;i++){
-                    var arg = arguments[i];
-                    if (arg && arg.value && arg.value.__isProxy)
-                        arg.value = arg.value.__target;
-                    if (arg && arg.__isProxy)
-                        arguments[i] = arg.__target;
-                }
-                return _defineProperty.apply(this, arguments);
-            }
+            // var _defineProperty = Object.defineProperty;
+            // self.Object.defineProperty = function(){
+            //     for (var i=0;i<arguments.length;i++){
+            //         var arg = arguments[i];
+            //         if (arg && arg.value && arg.value.__isProxy)
+            //             arg.value = arg.value.__target;
+            //         if (arg && arg.__isProxy)
+            //             arguments[i] = arg.__target;
+            //     }
+            //     return _defineProperty.apply(this, arguments);
+            // }
 
             var _alert = window.aler;
             window.alert = function(){
@@ -745,9 +746,9 @@ function __declTracerObject__(window) {
 
                                 // track DOM element and the corresponding class key
                                 if (_shadowStackHead && evtTracking){
-                                    var dompath = getDomPath(thisObj);
-                                    if (dompath.length > 1)
-                                        customLocalStorage[_shadowStackHead].DOMS.push([dompath, classKey, JSON.stringify(arguments)])
+                                    // var dompath = getDomPath(thisObj);
+                                    // if (dompath.length > 1)
+                                    customLocalStorage[_shadowStackHead].DOMS.push([_class, classKey, JSON.stringify(arguments), (arguments[0] && arguments[0].nodeName)])
                                 }
                                 return origMethod.apply(thisObj,arguments);
                             };
@@ -818,13 +819,13 @@ function __declTracerObject__(window) {
 
         /*Not sure why we need these call exceptions*/
         var callExceptions = [/*"hasOwnProperty","toString","toLocaleString","isPrototypeOf"*/];
-        var origCall = Function.prototype.call;
-        Function.prototype.call = function() {
-            var _t,n = this.__isProxy ? this.__target.name : this.name;
-            if (arguments[0] && arguments[0].__isProxy)
-                arguments[0] = arguments[0].__target;
-            return origCall.apply(this, arguments);
-        }
+        // var origCall = Function.prototype.call;
+        // Function.prototype.call = function() {
+        //     var _t,n = this.__isProxy ? this.__target.name : this.name;
+        //     if (arguments[0] && arguments[0].__isProxy)
+        //         arguments[0] = arguments[0].__target;
+        //     return origCall.apply(this, arguments);
+        // }
     } else {
         /*
         Even if the page is not loaded, increase the setTimeout value
@@ -2534,7 +2535,7 @@ function __declTracerObject__(window) {
     this.createClosureProxy = function(closureObj, scopeId){
         if (pageLoaded || _shadowStackHead in nonCacheableNodes) return closureObj;
         var nodeId = _shadowStackHead ? _shadowStackHead : null;
-        if (!nodeId ) return closureObj;
+        // if (!nodeId ) return closureObj;
         if (!Object.keys(closureObj).length) return closureObj;
         if (closureObj.__isProxy) closureObj = closureObj.__target;
         var proxyHandler;
@@ -2853,7 +2854,7 @@ function __declTracerObject__(window) {
                             var path = parentPath + pathDelim + str;
                             var val = entry[3];
                             // if (state == "write")
-                            //     val = omniStringifier.stringify(val, state, 2);
+                            val = omniStringifier.stringify(val, state, 2);
                             sig[1] = path;
                             sig[2] = val;
                             sig[3] = entry[4];
