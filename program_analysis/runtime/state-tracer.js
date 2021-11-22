@@ -1067,6 +1067,7 @@ function __declTracerObject__(window) {
             //         // childLogStr = "void 0";
             // }
 
+            if (!evtTracking) return;
 
             // Doesn't make sense to log function reads, as I currently don't have a correct way of stringifying them
             if (!customLocalStorage[nodeId][logType])
@@ -1074,7 +1075,7 @@ function __declTracerObject__(window) {
             if (logType.indexOf("reads")>=0) {
                 if (logType.indexOf('closure')>=0)
                     logType = `${closureScope}_reads`;
-                var log = [logType, rootId, key, childLogStr,currFnPointer[currFnPointer.length -1] ];
+                var log = [logType, rootId, key, value,childId];
                 // customLocalStorage[nodeId].readKeys.add(logType);
                 customLocalStorage[nodeId].push(log);
                 // customLocalStorage[nodeId][logType].push(log);
@@ -1082,7 +1083,7 @@ function __declTracerObject__(window) {
                 if (logType.indexOf('closure')>=0)
                     logType = `${closureScope}_writes`;
                 // customLocalStorage[nodeId].writeKeys.add(logType);
-                var log = [logType, rootId, key, childLogStr,currFnPointer[currFnPointer.length -1]  ];
+                var log = [logType, rootId, key, value,childId ];
                 customLocalStorage[nodeId].push(log);
                 // customLocalStorage[nodeId][logType].push(log);
                 // if (customLocalStorage[nodeId].filter(e=>e[0].indexOf("reads")>=0 && e[3] === rootId).length)
@@ -1489,7 +1490,11 @@ function __declTracerObject__(window) {
     }
 
     this.getProcessedSignature = function() {
-        return processedSignature;
+        var res = processedSignature;
+        Object.keys(res).forEach(key=>{
+            res[key] = res[key].filter(e=>e!=null && e.length == 3);
+        });
+        return res;
     }
 
     this.setCustomCache = function(customCache) {
@@ -2072,7 +2077,7 @@ function __declTracerObject__(window) {
                 // if (customLocalStorage[_shadowStackHead])
                 customLocalStorage[_shadowStackHead].push(cacheIndex)
                 // Before entering child function, freeze the state of the parent function
-                // freezeReadState(_shadowStackHead);
+                freezeReadState(_shadowStackHead);
             } else {
                 parentNodes.push(cacheIndex);
             }
@@ -2370,7 +2375,7 @@ function __declTracerObject__(window) {
             // customLocalStorage[nodeId] = signature.filter((e)=> { return e[0] != key || 
             //     (rootObjects.indexOf(e[4])<0 && currStateWrites.indexOf(e[4])<0)} );
             //Disable filtering of signature entriesinde
-            // customLocalStorage[nodeId] = signature.filter((e)=>{return filterSignature(e, rootObjects, currStateWrites, key)});
+            customLocalStorage[nodeId] = signature.filter((e)=>{return filterSignature(e, rootObjects, currStateWrites, key)});
             (signature.returnValue != null) && (customLocalStorage[nodeId].returnValue = signature.returnValue)
             signature.IBF && (customLocalStorage[nodeId].IBF = signature.IBF)
             customLocalStorage[nodeId].ec = signature.ec
@@ -2378,11 +2383,8 @@ function __declTracerObject__(window) {
             customLocalStorage[nodeId].writeKeys = signature.writeKeys;
             signature = customLocalStorage[nodeId];
             signature.forEach((readArr,ind)=>{
-                if (typeof readArr[3] == "number" && readArr[0] == key){
-                    var proxyPrivates = state == "global" ? globalProxyHandler : proxyMap[nodeId];
-                    var obj = proxyPrivates.accessToPrivates().idToObject[readArr[3]];
-                    if (!obj) console.error("Object not found during freezing read state");
-                    var str = omniStringifier.stringify(obj,"read",1);
+                if (readArr[0] == key){
+                    var str = omniStringifier.stringify(readArr[3],"read",1);
                     if (str){
                         if (str instanceof Error){
                             nonCacheableNodes[nodeId] = str.message;
@@ -2820,14 +2822,15 @@ function __declTracerObject__(window) {
                 var process = function(nodeId){
                     var arr = signature[nodeId], roots = [];
                     var writeObjs = {}, prunedInds = [], readsSeen = [],
-                        writeObjsCh = [], readObjs = {};
+                        writeObjsCh = [], readObjs = {}, parentOfReads = []; //this obj was further read, therefore don't log it. 
                     arr.forEach(function(entry,ind){
                         //skip child placeholders
-                        if (typeof entry == "string") return;
+                        if (typeof entry == "string" || entry == null) return;
                         var type = entry[0];
                         if (type.indexOf(logType)<0) return;
                         var isWrite = type.indexOf("_reads")<0
                         var state = isWrite ? "write" : "read";
+                        parentOfReads.push(entry[4]);
                         if (isWrite){
                             if (!writeObjs[entry[1]]){
                                 writeObjs[entry[1]] = [];
@@ -2836,8 +2839,11 @@ function __declTracerObject__(window) {
                             writeObjsCh = writeObjsCh.concat(getAllChildren(entry[1],entry[2]));
                         }
                         else if (writeObjs[entry[1]] && (writeObjs[entry[1]].indexOf(entry[2])>=0)
-                            || writeObjsCh.indexOf(entry[1])>=0) {
+                            || writeObjsCh.indexOf(entry[1])>=0 
+                            || parentOfReads.indexOf(entry[1])>=0) {
                             prunedInds.push(ind);
+                            //make the entry null
+                            processedSig[nodeId][ind] = null;
                             return;
                         }
                         var sig = [type];
@@ -2853,17 +2859,24 @@ function __declTracerObject__(window) {
                             else str = entry[2] + '';
                             var path = parentPath + pathDelim + str;
                             var val = entry[3];
-                            // if (state == "write")
+                            // if (state == "read")
                             val = omniStringifier.stringify(val, state, 2);
                             sig[1] = path;
                             sig[2] = val;
-                            sig[3] = entry[4];
+                            // sig[3] = entry[4];
 
                             //Special case while reading window
                             if (entry[4] === 0 && !isWrite) {
                                 sig[1] += pathDelim + "self";
                                 sig[2] = path;
                             }
+
+                            //prune certain redundant signatures
+                            if (typeof sig[2] != "string"
+                                || typeof sig[2].indexOf('__')>=0){
+                                processedSig[nodeId][ind] = null;
+                                return;
+                                }
                         } catch (e) {
                             //TODO
                             //suppressing for now

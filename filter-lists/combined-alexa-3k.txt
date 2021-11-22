@@ -41,7 +41,8 @@ pinit.js
 disqus.com
 fbcdn.net
 www.npttech.com
-swg.js[Adblock Plus 2.0]
+swg.js
+[Adblock Plus 2.0]
 ! Version: 202103222245
 ! Title: EasyList
 ! Last modified: 22 Mar 2021 22:45 UTC
