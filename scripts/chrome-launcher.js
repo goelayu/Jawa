@@ -28,7 +28,7 @@ program
     .option('--load-iter [value]', 'page loading iteration count')
     .option('--chrome-dir [value]', 'path to the chrome user directory, only useful if loadIter is present')
     .option('--filter', 'filters all the archive-irrelevant files')
-    .option('--dimension', 'set customd chrome dimensions')
+    .option('--deterministic', 'turn deterministic execution mode')
     .option('--wait', 'waits before exiting chrome')
     .parse(process.argv);
 
@@ -44,7 +44,6 @@ async function launch(){
     const options = {
         executablePath: "/usr/bin/google-chrome-stable",
         headless: program.testing ? false : true,
-        defaultViewport: null,
         args : [ '--ignore-certificate-errors'/*, '--blink-settings=scriptEnabled=false'*/, '--auto-open-devtools-for-tabs', '--disable-web-security',
         '--disable-features=IsolateOrigins,site-per-process,CrossSiteDocumentBlockingAlways,CrossSiteDocumentBlockingIfIsolating',
         '--no-sandbox',
@@ -52,7 +51,10 @@ async function launch(){
         // '--no-first-run'],
         // ignoreDefaultArgs: true,
     }
-    
+    // program.testing && options.args.push(
+    //         `--window-size=600,600`
+    // )
+    console.log(options);
     if (program.dimension){
         console.log('custom dimensions')
         // options.args.push(` --window-size=700,1000`);
@@ -73,10 +75,13 @@ async function launch(){
     let page = await browser.newPage();
     var nLogs = [], cLogs = [], jProfile;
     var cdp = await page.target().createCDPSession();
-
-    if (program.dimension){
+    console.log(await browser.userAgent());
+    var _height = await page.evaluateHandle(()=> window.screen.height);
+    var _width = await page.evaluateHandle(()=> window.screen.height);
+    var height = await _height.jsonValue(), width = await _width.jsonValue();
+    // console.log(height, width)
+    if (program.deterministic){
         // await emulateUserAgent(page, 'iPhone 6');
-        console.log('setting custom dimensions')
         // await page.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4182.0 Safari/537.36");
         //   console.log(await browser.userAgent());
         // await page.setViewport({ width: 1261, height: 3816 })
@@ -241,7 +246,7 @@ async function launch(){
 
     await extractPLT(page);
     if (program.screenshot)
-        await page.screenshot({path: `${outDir}/screenshot.png`, fullPage: true});
+        await page.screenshot({path: `${outDir}/screenshot.png`, fullPage: false});
 
     if (program.custom){
         let cstmEntries =  program.custom.split(',');
@@ -437,7 +442,7 @@ var extractHandlers = async function(page,cdp, nTimes){
     for (var i = 0;i<nTimes;i++){
         //trigger event handlers
         await page.evaluateHandle(()=> triggerEvents(_final_elems))
-        await chromeFns.getCallGraph(page, program, i);
+        // await chromeFns.getCallGraph(page, program, i);
     } 
     // var cgEnd = process.hrtime(cgStart);
     // console.log(`${program.url} Time EVT ${cgEnd[0]} ${cgEnd[1]/(1000*1000)}`)
