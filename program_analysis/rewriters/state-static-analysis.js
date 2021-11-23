@@ -850,6 +850,8 @@ var traceFilter = function (content, options) {
 		//rewrite to remove all window.location occurances with location so that the overwritten location
 		//variable can be read instead
 		content = content.replace(/window.location/g, 'location');
+		console.log('beginning code parsing');
+		var start = new Date();
 		m = fala({
 			source: content,
 			locations: true,
@@ -918,7 +920,9 @@ var traceFilter = function (content, options) {
 
 			});
 		}
-
+		console.log('done building AST')
+		console.log('Time:%dms', new Date() - start);
+		start = new Date();
 		ASTNodes.forEach((node) => {
 
 			if (node.type === 'FunctionExpression' || node.type === 'FunctionDeclaration') {
@@ -934,26 +938,7 @@ var traceFilter = function (content, options) {
 					// Hacky code: modifying the parent link, should never do that. 
 					node.id.parent = node.parent;
 					scope.addLocalVariable(node);
-				}
-				else {
-					if (node.parent.type == "VariableDeclarator")
-						functionName = node.parent.id.name;
-					else if (node.parent.type == "AssignmentExpression") {
-						functionName = node.parent.left.source();
-					}				
-				}
-
-				/*
-				function name to location is used during signature propogation 
-				and there can be commented out as long as the code
-				for enabling signature propagation is commented out.
-				*/
-				// if (functionName){
-				// 	if (!(functionNameToLocation[functionName]))
-				// 		functionNameToLocation[functionName] = [];
-				// 	console.log(functionNameToLocation[functionName])
-				// 	functionNameToLocation[functionName].push(node.loc);
-				// }	
+				}	
 
 			} else if (node.type == "ForInStatement" || node.type == "ForOfStatement"){
 				if (node.left.type == "Identifier"){
@@ -966,179 +951,65 @@ var traceFilter = function (content, options) {
 			else if (node.type == "TryStatement") {
 				if (node.handler)
 					scope.addLocalVariable(node.handler.param);
-			} else if (node.type == "IfStatement") {
-					var readArray = [];
-					var {readArray, local, argReads, antiLocal} = signature.handleReads(node.test);
-					if (antiLocal.length){
-						markFunctionUnCacheable(node, "antiLocal");
-					}
-					scope.addGlobalReads(readArray);
-
-
 			} else if (node.type === 'VariableDeclarator') {
 						scope.addLocalVariable(node);
-						var _functionId = util.getFunctionIdentifier(node);
-						if (_functionId ){
-							if (node.init){
-								var functionId = makeId('function', options.path, _functionId);
-								if (!functionAliasMap[functionId])
-									functionAliasMap[functionId] = {};
-								if (!functionToDOMtracking[functionId])
-									functionToDOMtracking[functionId] = {};
-								functionAliasMap[functionId][node.id.source()] = node.init;
-								if (node.init.source().indexOf("create")>=0)
-									functionToDOMtracking[functionId][node.id.source()] = "";
-							} 
-						}
 
 			// Handles any global variable being assigned any value
 			// or a local variable becoming an alias of a global variable
-			} else if (node.type == "AssignmentExpression" || node.type == "LogicalExpression" || node.type == "BinaryExpression"){
-				/*
-				if an argument is redefined inside a function, it is no longer an argument and only a 
-				local variable and hence not to be tracked
-				*/
-				/*
-				Store a map of every alias assignment
-				*/
-				if (node.type == "AssignmentExpression") {
-					var _functionId = util.getFunctionIdentifier(node);
-					if (_functionId){
-						var functionId = makeId('function', options.path, _functionId);
-						if (!functionAliasMap[functionId])
-							functionAliasMap[functionId] = {};
-						// if (!functionAliasMap[functionId][node.id.source()])
-						functionAliasMap[functionId][node.left.source()] = node.right;
-
-					}
-				}
-				// if (node.type == "AssignmentExpression" && node.left.type == "Identifier" && scope.IsLocalVariable(node.left)>=0)
-				// 	scope.addLocalVariable(node.left);
-				var {readArray,local,argReads, antiLocal} = signature.handleReads(node.right);
-				if (antiLocal.length)
-					markFunctionUnCacheable(node,"antiLocal");
-				var {readArray,local,argReads, antiLocal} = signature.handleReads(node.left);
-				if (antiLocal.length)
-					markFunctionUnCacheable(node, "antiLocal");
-
-				scope.addGlobalReads(signature.handleReads(node.right).readArray);
-			} else if (node.type == "UpdateExpression"){
-				var {readArray,local,argReads, antiLocal} = signature.handleReads(node.argument);
-				if (antiLocal.length)
-					markFunctionUnCacheable(node, "antiLocal");
-			} else if (node.type == "CallExpression") {
-				
-				// Check if the arguments passed are global or not
-				if (node.arguments) {
-					var globalReads = [];
-					node.arguments.forEach(function(param){
-						var {readArray, local, argReads, antiLocal} = signature.handleReads(param);
-						if (antiLocal.length)
-							markFunctionUnCacheable(node, "antiLocal");
-						globalReads = globalReads.concat(readArray);
-					});
-					// add global arguments to read set
-					scope.addGlobalReads(globalReads);
-				}
-
-				// var globalDOMMethods = Object.keys(propertyObj.global);
-				// var localDOMMethods = Object.keys(propertyObj.local);
-				// var isLocal = false;
-
-				// if (node.parent.type == "SequenceExpression" || node.parent.type == "ExpressionStatement") {
-
-				// 	// First check if a local DOM method
-				// 	localDOMMethods.forEach(function(DOMMethod){
-				// 		if (node.callee.source().toLowerCase().includes(DOMMethod.toLowerCase()))
-				// 			isLocal = true;
-				// 	});
-				// 	globalDOMMethods.forEach(function(DOMMethod){
-				// 		if (!isLocal && node.callee.source().toLowerCase().includes(DOMMethod.toLowerCase())) {
-				// 			scope.addGlobalWrites(node);
-				// 			markFunctionUnCacheable(node,"DOM");
-				// 			}
-				// 	});
-				// }
-				// if ( (node.parent.type == "ExpressionStatement" || node.parent.type == "SequenceExpression" || node.parent.type == "ConditionalExpression")
-				// 		&& node.callee.type != "FunctionExpression" ) {
-				// 	var _functionId = util.getFunctionIdentifier(node);
-				// 	if (_functionId) {
-				// 		var functionId = makeId('function', options.path, _functionId);
-				// 		var evalString = getCompleteExpression(node);
-				// 		ceToFinalExpression.set(node, evalString);
-				// 	}
-				// }
-			} else if (node.type == "MemberExpression") {
-				var _functionId = util.getFunctionIdentifier(node);
-				//Either the member expression is inside a function, or passed as an argument to a call expression outside function
-				if (_functionId) {
-					if ( (node.object.type == "Identifier" || node.object.type == "ThisExpression")) {
-						var functionId = makeId('function', options.path, _functionId);
-						//check if the member expression object is defined using DOM create methods
-						if (functionToDOMtracking[functionId] && functionToDOMtracking[functionId][node.object.source()]!= null
-							&& node.parent.type == "AssignmentExpression"){
-
-
-						}
-					}
-				}
 			}
 		});
-
+		console.log('Done with second iteration %dms', new Date() - start);
 		/* In this second iteration of the AST we will freeze the debug info 
 		ie all the global writes, reads and aliases 
 		*/
-		ASTNodes.forEach(function(node) {
+		// ASTNodes.forEach(function(node) {
 
-			if (node.type == "FunctionDeclaration" || node.type == "FunctionExpression") {
-				if (node.globalReads) node.globalReads = node.globalReads.map(function(e){ return e.source();});
-				if (node.globalWrites) node.globalWrites = node.globalWrites.map(function(e){ return e.source();});
-				if (node.globalAlias) node.globalAlias = printFriendlyAlias(node.globalAlias);
-				var index = makeId('function', options.path, node);
+		// 	if (node.type == "FunctionDeclaration" || node.type == "FunctionExpression") {
+		// 		var index = makeId('function', options.path, node);
 
-				//create Indexes for storing nonlocals
-				functionToNonLocals[index] = [];
+		// 		//create Indexes for storing nonlocals
+		// 		functionToNonLocals[index] = [];
 
-				if (isNonDeterminist(node.source()) && uncacheableFunctions["ND"].indexOf(node) < 0)
-					markFunctionUnCacheable(node, "ND");
+		// 		if (isNonDeterminist(node.source()) && uncacheableFunctions["ND"].indexOf(node) < 0)
+		// 			markFunctionUnCacheable(node, "ND");
 
-				var fnName = util.getNameFromFunction(node)
-				if  ((options.rti || options.cg) && instrumentedNodes.indexOf(node)>=0 && ((fnName && inBuiltOverrides.filter(e=>fnName.toLowerCase().indexOf(e)>=0).length)
-					|| isInBuiltFunction(fnName)) ) {
-					console.log("[Static Analyzer] Unhandled: in built overrides in source code," + fnName);
-					markFunctionUnCacheable(node,"RTI");
-				}
+		// 		var fnName = util.getNameFromFunction(node)
+		// 		if  ((options.rti || options.cg) && instrumentedNodes.indexOf(node)>=0 && ((fnName && inBuiltOverrides.filter(e=>fnName.toLowerCase().indexOf(e)>=0).length)
+		// 			|| isInBuiltFunction(fnName)) ) {
+		// 			console.log("[Static Analyzer] Unhandled: in built overrides in source code," + fnName);
+		// 			markFunctionUnCacheable(node,"RTI");
+		// 		}
 
-				if (node.source().indexOf("this")>=0)
-					functionsContainingThis.push(index);
-				/*Moved this in the second loop, so that the first loop can take care of hoisting first, before you analyse IBF*/
-			} else if (node.type == "CallExpression"){
-				var getIBFSource = ["get",".push"];
-				if ( (node.parent.type == "ExpressionStatement" || node.parent.type == "SequenceExpression" || node.parent.type == "LogicalExpression" || node.parent.type == "ConditionalExpression")
-						&& node.callee.type != "FunctionExpression" && getIBFSource.filter(e=>node.source().indexOf(e)<0).length > 1) {
-					var _functionId = util.getFunctionIdentifier(node);
-					if (_functionId) {
-						var functionId = makeId('function', options.path, _functionId);
-						if (node.source().indexOf("setTimeout")>=0){
-							markFunctionUnCacheable(_functionId,"RTI");
-							console.log("[Static Analyzer] Unhandled: setTimeout in source code");
-							return;
-						}
-						// var evalString = getCompleteExpression(node);
-						// ceToFinalExpression.set(node, evalString);
-					}
-				}
-			} else if (node.type == "AssignmentExpression"){
-				if (node.parent.type == "AssignmentExpression" || (node.parent.type == "VariableDeclarator") || node.parent.type == "ConditionalExpression"){
+		// 		if (node.source().indexOf("this")>=0)
+		// 			functionsContainingThis.push(index);
+		// 		/*Moved this in the second loop, so that the first loop can take care of hoisting first, before you analyse IBF*/
+		// 	} else if (node.type == "CallExpression"){
+		// 		var getIBFSource = ["get",".push"];
+		// 		if ( (node.parent.type == "ExpressionStatement" || node.parent.type == "SequenceExpression" || node.parent.type == "LogicalExpression" || node.parent.type == "ConditionalExpression")
+		// 				&& node.callee.type != "FunctionExpression" && getIBFSource.filter(e=>node.source().indexOf(e)<0).length > 1) {
+		// 			var _functionId = util.getFunctionIdentifier(node);
+		// 			if (_functionId) {
+		// 				var functionId = makeId('function', options.path, _functionId);
+		// 				if (node.source().indexOf("setTimeout")>=0){
+		// 					markFunctionUnCacheable(_functionId,"RTI");
+		// 					console.log("[Static Analyzer] Unhandled: setTimeout in source code");
+		// 					return;
+		// 				}
+		// 				// var evalString = getCompleteExpression(node);
+		// 				// ceToFinalExpression.set(node, evalString);
+		// 			}
+		// 		}
+		// 	} else if (node.type == "AssignmentExpression"){
+		// 		if (node.parent.type == "AssignmentExpression" || (node.parent.type == "VariableDeclarator") || node.parent.type == "ConditionalExpression"){
 
-				}
-					// var _functionId = util.getFunctionIdentifier(node);
-					// if (_functionId) {
-					// 	markFunctionUnCacheable(_functionId, "RTI");
-					// 	console.log("[Static Analyzer] Unhandled: multi assignment in source code");
-					// }
-			}
-		});
+		// 		}
+		// 			// var _functionId = util.getFunctionIdentifier(node);
+		// 			// if (_functionId) {
+		// 			// 	markFunctionUnCacheable(_functionId, "RTI");
+		// 			// 	console.log("[Static Analyzer] Unhandled: multi assignment in source code");
+		// 			// }
+		// 	}
+		// });
 
 		/*
 			The 3rd and final iteration over the AST to actually instrument
@@ -1147,12 +1018,12 @@ var traceFilter = function (content, options) {
 		ASTNodes.forEach(function(node) {
 
 			/*If a node is marked to be notified, do that*/
-			if (nodeFutureModified && node == nodeFutureModified){
-				/*While inserting closure accessors, if the node modified is inside if else
-				without braces, then explicit braces need to be added in order to preserve scope*/
-				update(node, "{",node.source(),"}")
-				nodeFutureModified=null;
-			}
+			// if (nodeFutureModified && node == nodeFutureModified){
+			// 	/*While inserting closure accessors, if the node modified is inside if else
+			// 	without braces, then explicit braces need to be added in order to preserve scope*/
+			// 	update(node, "{",node.source(),"}")
+			// 	nodeFutureModified=null;
+			// }
 			if (node.type === "Program") { 
 				/*
 				Some JS files don't have access to the global execution context and they have a dynamically generated
@@ -1226,93 +1097,6 @@ var traceFilter = function (content, options) {
 				rewriteGlobals(readArray);
 				rewriteClosure(antiLocal,_functionId);
 				
-				// if (_functionId) {
-
-				// 	
-
-				// 	argReads.length && rewriteArguments(argReads);
-					// antiLocal.length && Array.prototype.push.apply(functionToNonLocals[makeId('function', options.path, _functionId)], antiLocal);
-				// 	antiLocal.forEach(function(read){
-				// 		if (options.useProxy){
-				// 				update(read, 'closureProxy.',read.source());
-				// 		}
-				// 	});
-				// 	readArray.forEach(function(read){
-				// 		var newRead = util.logReadsHelper(read, scope.checkAndReplaceAlias(read));
-				// 		// console.log(read.source());
-				// 		if (options.caching)
-				// 			update(read, options.tracer_name, '.logRead(', JSON.stringify(functionId),',[', newRead, '],[', util.getAllIdentifiersFromMemberExpression(read),'])');
-				// 		if (options.useProxy) {
-				// 			if (read.source() == "arguments"){
-				// 				if (_functionId)
-				// 					update(read, "argumentProxy")
-				// 				return;
-				// 			}
-				// 			if (util.checkIfReservedWord(read)) return;
-				// 			//update this as long as it is not a simple assignment to this expression
-				// 			if (read.source() == "this") {
-				// 				if (node.right.source() != "this")
-				// 					update(read, "thisProxy");
-				// 				return;
-				// 			}
-				// 			if (read.source() == "window")
-				// 					update(read, options.proxyName)
-				// 				else
-				// 					update(read, options.proxyName, '.', read.source());
-				// 		}
-				// 	});
-
-				// 	/*
-				// 	if assignment expressions and the right hand side is identifier then skip
-				// 	*/
-				// 	// if (node.type == "AssignmentExpression" && node.left.type == "Identifier") return;
-				// 	var {readArray, local,argReads, antiLocal} = signature.handleReads(node.left);
-					
-				// 	Don't rewrite arguments if the argument gets rewritten, because then the reference is broken. 
-				// 	Can;t really do this, because the subsequent uses have been modified, and therefore will result in error
-				// 	The real reason this would fail is if the argument is not passed during invocation, then subsequent 
-				// 	changes won't be same as the actual variable being modified in this assignment expression
-					
-				// 	// if (!(node.type == "AssignmentExpression" && node.left.type == "Identifier")) {
-				// 	// 	argReads.length && rewriteArguments(argReads);
-				// 	// }
-				// 	// 
-				// 	var argReWritten = false
-				// 	argReads.forEach((arg)=>{
-				// 		if (arg.val == node.left && node.type == "AssignmentExpression"){
-				// 			scope.addLocalVariable(node.left);
-				// 			argReWritten = true;
-				// 		}
-				// 	})
-				// 	!argReWritten && argReads.length && rewriteArguments(argReads);
-				// 	antiLocal.length && Array.prototype.push.apply(functionToNonLocals[makeId('function', options.path, _functionId)], antiLocal);
-				// 	antiLocal.forEach(function(read){
-				// 		/*FIX
-				// 		 If the entire closure variable gets rewritten, no way
-				// 		 to currently track the changes and apply them propery 
-				// 		 Read up about javascript pass by reference, for variables*/
-				// 		if (options.useProxy){
-				// 			// if (read.type == "Identifier") {
-				// 			// 	update(read,read.source(),'=','closureProxy.',read.source());
-				// 			// 	return;
-				// 			// }
-				// 			update(read, 'closureProxy.',read.source());
-				// 		}
-				// 	});
-				// 	readArray.forEach(function(read){
-				// 		if (util.checkIfReservedWord(read)) return;
-				// 		if (read.source() == "this") {
-				// 			update(read, "thisProxy");
-				// 			return
-				// 		}
-				// 		if (read.source() == "window")
-				// 			update(read, options.proxyName)
-				// 		else
-				// 			update(read, options.proxyName, '.', read.source());
-				// 	});
-
-				// }
-
 
 				if (node.operator == "==" || node.operator == "===" || node.operator == "!==" || node.operator == "!="
 					|| node.operator == "instanceof"){
@@ -1359,16 +1143,6 @@ var traceFilter = function (content, options) {
 				// }
 				// dont' handle those assignment expressions which are a child of conditional expressions as they 
 				// may or may not get executed
-				if (scope.IsLocalVariable(node.left) > 0){
-					var newWrite = util.logWritesHelper(node, scope.checkAndReplaceAlias(node.left));
-					if (options.caching)
-						update(node,node.left.source(),node.operator, options.tracer_name,'.logWrite(',JSON.stringify(functionId),newWrite,',[', util.getAllIdentifiersFromMemberExpression(node.left),'])');
-					if (options.useProxy) {
-			
-					}
-				} else if (scope.IsLocalVariable(node.right) > 0){
-					
-				}
 
 			}  else if (node.type == "ConditionalExpression") {
 				var _functionId = util.getFunctionIdentifier(node,true);
@@ -1545,9 +1319,9 @@ var traceFilter = function (content, options) {
 					var _functionId = util.getFunctionIdentifier(node,true);
 					if (_functionId) {
 						readArray.forEach(function(read){
-							var newRead = util.logReadsHelper(read,scope.checkAndReplaceAlias(read));
-							if (options.caching)
-								update(read, options.tracer_name, '.logRead(', JSON.stringify(functionId),',[', newRead, '],[', util.getAllIdentifiersFromMemberExpression(read),'])');
+							// var newRead = util.logReadsHelper(read,scope.checkAndReplaceAlias(read));
+							// if (options.caching)
+							// 	update(read, options.tracer_name, '.logRead(', JSON.stringify(functionId),',[', newRead, '],[', util.getAllIdentifiersFromMemberExpression(read),'])');
 							if (options.useProxy){
 								if (util.checkIfReservedWord(read)) return;
 								if (read.source() == "this") {
@@ -1580,9 +1354,9 @@ var traceFilter = function (content, options) {
 						// 	}
 						// });
 						readArray.forEach(function(read){
-							var newRead = util.logReadsHelper(read,scope.checkAndReplaceAlias(read));
-							if (options.caching)
-								update(read, options.tracer_name, '.logRead(', JSON.stringify(functionId),',[', newRead, '],[', util.getAllIdentifiersFromMemberExpression(read),'])');
+							// var newRead = util.logReadsHelper(read,scope.checkAndReplaceAlias(read));
+							// if (options.caching)
+							// 	update(read, options.tracer_name, '.logRead(', JSON.stringify(functionId),',[', newRead, '],[', util.getAllIdentifiersFromMemberExpression(read),'])');
 							if (options.useProxy){
 								if (util.checkIfReservedWord(read)) return;
 								if (read.source() == "this") {
@@ -1685,9 +1459,9 @@ var traceFilter = function (content, options) {
 					// 	}
 					// });
 					globalReads.forEach(function(read){
-						var newRead = util.logReadsHelper(read,scope.checkAndReplaceAlias(read));
-						if (options.caching)
-							update(read, options.tracer_name, '.logRead(', JSON.stringify(functionId),',[', newRead, '],[', util.getAllIdentifiersFromMemberExpression(read),'])');
+						// var newRead = util.logReadsHelper(read,scope.checkAndReplaceAlias(read));
+						// if (options.caching)
+						// 	update(read, options.tracer_name, '.logRead(', JSON.stringify(functionId),',[', newRead, '],[', util.getAllIdentifiersFromMemberExpression(read),'])');
 						if (options.useProxy){
 							if (util.checkIfReservedWord(read)) return;
 							if (read.source() == "this") {
@@ -1790,32 +1564,27 @@ var traceFilter = function (content, options) {
 				var isLocal = false;
 
 
-				if (node.parent.type == "SequenceExpression" || node.parent.type == "ExpressionStatement") {
+				// if (node.parent.type == "SequenceExpression" || node.parent.type == "ExpressionStatement") {
 
-					// First check if a local DOM method
-					localDOMMethods.forEach(function(DOMMethod){
-						if (node.callee.source().toLowerCase().includes(DOMMethod.toLowerCase()))
-							isLocal = true;
-					});
-					globalDOMMethods.forEach(function(DOMMethod){
-						if (!isLocal && node.callee.source().toLowerCase().includes(DOMMethod.toLowerCase())) {
-							// checkAndReplaceAlias(node);
-							var _functionId = util.getFunctionIdentifier(node);
-							if (_functionId) {
-								// var functionId = makeId('function', options.path, _functionId);
-								// if (uncacheableFunctions.indexOf(functionId) == -1) {
-								// 	// uncacheableFunctions.push(functionId);
-								// }
-								// update(node, options.tracer_name,'.setMutationContext(', node.source(),',', JSON.stringify(functionId), ')');
-							}
-						}
-					});
-				}
-			} else if (node.type == "ThrowStatement"){
-				var _functionId = util.getFunctionIdentifier(node);
-				if (_functionId) {
-					// update(node, "throw ", options.tracer_name,'.logThrowStatement(',node.argument.source(),');',);
-				}
+				// 	// First check if a local DOM method
+				// 	localDOMMethods.forEach(function(DOMMethod){
+				// 		if (node.callee.source().toLowerCase().includes(DOMMethod.toLowerCase()))
+				// 			isLocal = true;
+				// 	});
+				// 	globalDOMMethods.forEach(function(DOMMethod){
+				// 		if (!isLocal && node.callee.source().toLowerCase().includes(DOMMethod.toLowerCase())) {
+				// 			// checkAndReplaceAlias(node);
+				// 			var _functionId = util.getFunctionIdentifier(node);
+				// 			if (_functionId) {
+				// 				// var functionId = makeId('function', options.path, _functionId);
+				// 				// if (uncacheableFunctions.indexOf(functionId) == -1) {
+				// 				// 	// uncacheableFunctions.push(functionId);
+				// 				// }
+				// 				// update(node, options.tracer_name,'.setMutationContext(', node.source(),',', JSON.stringify(functionId), ')');
+				// 			}
+				// 		}
+				// 	});
+				// }
 			} else if (node.type == "ReturnStatement") {
 				var _functionId = util.getFunctionIdentifier(node,true);
 				if (_functionId) {
@@ -1885,9 +1654,9 @@ var traceFilter = function (content, options) {
 				var containsReturn = false, closures = [];
 				var index = makeId('function', options.path, node);
 				if (node.containsReturn) containsReturn = true;
-				if (functionToNonLocals[index].length) {
-					// closures = insertClosureProxy(node, index);
-				}
+				// if (functionToNonLocals[index].length) {
+				// 	// closures = insertClosureProxy(node, index);
+				// }
 				var nodeBody = node.body.source().substring(1, node.body.source().length-1);
 				if ( (options.rti || options.myCg)){
 					if (uncacheableFunctions["RTI"].indexOf(node)>=0) {
@@ -1918,13 +1687,13 @@ var traceFilter = function (content, options) {
 				//Start modifiying the function 
 				staticInfo.rtiDebugInfo.matchedNodes.push([index,node.time]);
 
-				var replayObjects = ",arguments,";
-				if (functionToNonLocals[index].length)
-					replayObjects+="__closureObj,";
-				else replayObjects += "null,";
-				if (functionsContainingThis.indexOf(index)>=0)
-					replayObjects+="this";
-				else replayObjects += "null";
+				// var replayObjects = ",arguments,";
+				// if (functionToNonLocals[index].length)
+				// 	replayObjects+="__closureObj,";
+				// else replayObjects += "null,";
+				// if (functionsContainingThis.indexOf(index)>=0)
+				// 	replayObjects+="this";
+				// else replayObjects += "null";
 				var _traceBegin = "" + options.tracer_name + ".cacheAndReplay(";
 				// update(node.body, '\n', ' var __tracerRet; \nif ( __tracerRet = ', _traceBegin, JSON.stringify(index) ,replayObjects,
 				// 	 ')) \n return __tracerRet; \n',
