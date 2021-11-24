@@ -18,8 +18,8 @@ program
 
 var rewriter = null, intercepts, isSafeReadCheck = false;
 var returnInfoFile = program.input + ".info";
-const STRINGIFIER = fs.readFileSync(`${__dirname}/omni-stringifier.js`,'utf-8');
-
+// const STRINGIFIER = fs.readFileSync(`${__dirname}/omni-stringifier.js`,'utf-8');
+var STRINGIFIER = null;
 function IsJsonString(str) {
     try {
         JSON.parse(str);
