@@ -288,10 +288,10 @@ def instrument(root, fileType,args,file_obj):
     src_file = open(_log_path+'/'+filename,'w')
     # content_file_full = open(_log_path+'/content_full','w')
     id_file = open(_log_path+'ids','w')
-    content_file = open(_log_path+'content','w')
+    # content_file = open(_log_path+'content','w')
 
-    content_file.write(orig_content)
-    content_file.close()
+    # content_file.write(orig_content)
+    # content_file.close()
 
     # content_file_full.write(content)
     # content_file_full.close()
@@ -303,7 +303,8 @@ def instrument(root, fileType,args,file_obj):
 
     if fileType == 'js':
         # content =  re.sub("FILE ARCHIVED(.|\n)*",'', content)
-        src_file_data['length']=len(content)
+        src_file_data['full_length']=len(content)
+        src_file_data['wire_length']=len(orig_content)
         # src_file_data['hash']=hashlib.sha256().update(content).digest()
         # src_file_data['hash'] = hashlib.md5(content).hexdigest()
     else:
