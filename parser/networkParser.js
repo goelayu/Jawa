@@ -117,9 +117,9 @@ function parseNetworkLogs(netLog){
     }
 
     var sortedNetworkEntries = Object.entries(requestIdToObject).map(e=>e[1]).sort((a,b)=>{
-        var aStart = a.redirectResponse ? a.redirectFetch : a.requestFetch;
-        var bStart = b.redirectResponse ? b.redirectFetch : b.requestFetch;
-        return aStart - bStart;
+        // var aStart = a.redirectResponse ? a.redirectFetch : a.requestFetch;
+        // var bStart = b.redirectResponse ? b.redirectFetch : b.requestFetch;
+        return a.wallTime - b.wallTime;
     });
     return sortedNetworkEntries;
 }
@@ -141,6 +141,7 @@ function NetworkEvent(data){
     this.redirects = [];
     this.frameId = data.frameId;
     this.type = data.type;
+    this.walltime = isRequest ? data.wallTime : null;
 }
 
 module.exports = {
