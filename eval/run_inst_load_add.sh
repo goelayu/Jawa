@@ -3,14 +3,14 @@
 
 src_dir='/w/goelayu/webArchive/data'
 
-inst_cmd_dir='/vault-home/goelayu/webArchive/data/storage-mix-large/500k-snapshot/stats/inst_cmds'
-replay_cmd_dir='/vault-home/goelayu/webArchive/data/storage-mix-large/500k-snapshot/stats/replay_cmds'
+inst_cmd_dir='/vault-home/goelayu/webArchive/data/storage-mix-large/1m-snapshot/stats/inst_cmds'
+replay_cmd_dir='/vault-home/goelayu/webArchive/data/storage-mix-large/1m-snapshot/stats/replay_cmds'
 
-replay_log_dir='/vault-home/goelayu/webArchive/logs/storage-mix-large/500k-snapshot/'
+replay_log_dir='/vault-home/goelayu/webArchive/logs/storage-mix-large/1m-snapshot/'
 
 fin_tars_dir='/vault-home/goelayu/webArchive/data/500k/fin_tars'
 src_tars_dir='/vault-home/goelayu/webArchive/data/500k/src_tars'
-raw_dir='/x/goelayu/webArchive/data/raw_dirs/storage-mix-large/500k-snapshot'
+raw_dir='/x/goelayu/webArchive/data/raw_dirs/storage-mix-large/1m-snapshot'
 
 log_dir='/vault-home/goelayu/webArchive/logs/NSDI22/add_crawls/inst'
 
@@ -27,7 +27,7 @@ while read crawler; do
     # #extract the tar
     # cp /vault-home/goelayu/webArchive/data/500k/add_crawls/set1/${site}/${site}.tar.gz .
     start=`date +%s`
-    tar -xzf /vault-home/goelayu/webArchive/data/storage-mix-large/500k-snapshot/$crawler/record.tar.gz
+    tar -xzf /vault-home/goelayu/webArchive/data/storage-mix-large/1m-snapshot/$crawler/record.tar.gz
     end=`date +%s`
     runtime=$((end-start))
     # echo 'done copying tar'
@@ -47,6 +47,7 @@ while read crawler; do
     end=`date +%s`
     runtime=$((end-start))
     echo 'done launching inst commands from', $(pwd) $runtime
+    rm -r /w/goelayu/webArchive/data/$crawler/orig &
     # # load pages in chrome
     cd /vault-home/goelayu/webArchive/scripts/
     start=`date +%s`
@@ -66,9 +67,12 @@ while read crawler; do
     # rsync -a $site/instOutput/* $raw_dir/$site/instOutput && rm -r $site/instOutput
     # create tars for both instOutput and performance since they are needed for analysis, delete everything else
     start=`date +%s`
-    tar -cf ${crawler}.performance.tar $crawler/performance && mv ${crawler}.performance.tar ${raw_dir}/$crawler/
-    tar -cf ${crawler}.instOutput.tar $crawler/instOutput && mv ${crawler}.instOutput.tar ${raw_dir}/$crawler/
-    rm -r $crawler
+    tar -cf ${raw_dir}/$crawler/${crawler}.performance.tar $crawler/performance &
+    tar -cf ${raw_dir}/$crawler/${crawler}.instOutput.tar $crawler/instOutput &
+    tar -cf ${raw_dir}/$crawler/${crawler}.mod.tar $crawler/mod &
+    wait $(jobs -p)
+    echo Done tarring output directories
+    rm -r $crawler &
     end=`date +%s`
     runtime=$((end-start))
     # tar --use-compress-program=pigz -cf $site.tar.src.pigz $site/orig $site/mod && mv $site.tar.src.pigz $src_tars_dir
