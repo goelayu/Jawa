@@ -9,47 +9,38 @@ program
 
 
 var parseLogFile = function(f){
-    var res = {};
+    var res = [];
     var file = fs.readFileSync(f, 'utf-8');
     file.split('\n').forEach((line)=>{
         if (line == '') return;
-        var [_ts, count] = line.split(' ');
-        var ts = _ts.split('/')[10],
-            page = _ts.split('/')[9];
-        if (!(page in res))
-            res[page] = [];
-        res[page].push([Number.parseInt(ts), count]);
+        var [ts, count] = line.split(' ');
+        res.push([Number.parseInt(ts), count]);
     })
-    Object.keys(res).forEach((page)=>{
-        res[page] = res[page].sort((a,b)=>{return a[0]-b[0]});
-    })
-    return res;
-    // return res.sort((a,b)=>{return a[0]-b[0]});
+    // return res;
+    return res.sort((a,b)=>{return a[0]-b[0]});
 }
 
 var computePersistenceInfo = function(){
     var alldata = parseLogFile(program.log);
-    Object.keys(alldata).forEach((page)=>{
-        data = alldata[page];
-        var totalMax = curMax = 0;
-            curCount = data[0][1];
-        data.forEach((entry)=>{
-            var [ts, count] = entry;
-            if (count != curCount){
-                //reset
-                if (curMax > totalMax) {
-                    // console.log(`found new total max: ${curMax}, prev: ${totalMax}`)
-                    totalMax = curMax;
-                    
-                }
-                curMax = 0;
-                curCount = count;
-            } else {
-                curMax++;
+    var totalMax = curMax = 0, maxValue = 0;
+            curCount = alldata[0][1];
+    alldata.forEach((data)=>{
+        var [ts, count] = data;
+        if (count != curCount){
+            //reset
+            if (curMax > totalMax) {
+                // console.log(`found new total max: ${curMax}, prev: ${totalMax}`)
+                totalMax = curMax;
+                maxValue = count;
             }
-        });
-        console.log(page, totalMax)
+            curMax = 0;
+            curCount = count;
+        } else {
+            curMax++;
+        }
+
     });
+    console.log(totalMax, maxValue)
 }
 
 computePersistenceInfo();
