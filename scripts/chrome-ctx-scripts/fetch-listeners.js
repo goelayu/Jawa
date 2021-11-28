@@ -124,14 +124,20 @@ function getEventId(el, evt){
 
 function _triggerEvent(el, evt){
     var event = new Event(evt);
-    // window.__tracer.setEventId(getEventId(el,evt));
-    window.__tracer.cacheInit(getEventId(el,evt ));
+    //enable cacheinit when trying to get state access of event handlers
+    // window.__tracer.cacheInit(getEventId(el,evt ));
+    // enable set event id and __enter__ for getting cg of events
+    window.__tracer.setEventId(getEventId(el,evt));
+    window.__tracer.__enter__(getEventId(el,evt ));
     if (evt == "click") {
         el.click();
         return;
     }
     el.dispatchEvent && el.dispatchEvent(event);
-    window.__tracer.exitFunction();
+    //__exit__ for cg of events
+    window.__tracer.__exit__();
+    //exitfunction for state access
+    //window.__tracer.exitFunction();
 }
 
 function shuffle(array) {
@@ -157,12 +163,12 @@ function triggerEvents(elems){
     //shuffle elements array
     shuffle(elems);
 
-    // turn on the tracer logging
-    // window.__tracer.setTracingMode(true);
-    // window.__tracer.setCaptureMode('postload');
+    // turn on the tracer logging and set the capture mode for cg of event handlers
+    window.__tracer.setTracingMode(true);
+    window.__tracer.setCaptureMode('postload');
 
-    //clear custom storage
-    window.__tracer.clearCustomStorage();
+    //clear custom storage only when getting state access
+    // window.__tracer.clearCustomStorage();
     elems.forEach((_e)=>{
         try {
             var [elem, handlers] = _e;
@@ -175,7 +181,8 @@ function triggerEvents(elems){
             /**no op */
         }
     });
-    // window.__tracer.setTracingMode(false);
+    //only set this when getting cg for events, like how you turn it on above
+    window.__tracer.setTracingMode(false);
 }
 
 function getCandidateElements(listeners){
