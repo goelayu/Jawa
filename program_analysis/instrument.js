@@ -156,13 +156,12 @@ var mergeValsArr = function(dict){
 var getEVTFns = function(path){
     var nGraphs = 10, fns = new Set;
     try {   
-        for (var i =0; i<10;i++){
-            var evtFile = `${path}/cg${i}`,
-                evt = JSON.parse(fs.readFileSync(evtFile, 'utf-8'));
+         var evtFile = `${path}/cg0`,
+            evt = JSON.parse(fs.readFileSync(evtFile, 'utf-8'));
             var _fns = mergeValsArr(evt);
             _fns.forEach(fns.add, fns);
-        }
-    } catch (err) {}
+      
+    } catch (err) {console.error(err);}
     console.log(`evt graph of size ${fns.size}`);
     return [...fns];
 }
@@ -174,7 +173,7 @@ var getAllFns = function(path){
         var _execFns = JSON.parse(fs.readFileSync(fnFile,"utf-8")), _evtCG,
         execFns = [...new Set(_execFns.preload.concat(_execFns.postload))];
         execFns = execFns.concat(getEVTFns(path));
-    } catch (err) {};
+    } catch (err) {console.error(err);};
     return execFns;
 }
 

@@ -1,6 +1,9 @@
 *
 !node_module_changes/
 !node_module_changes/**/
+!jawa-proto/
+!jawa-proto/*js
+!jawa-proto/*py
 !dom-distill/
 !dom-distill/*/
 !program_analysis/

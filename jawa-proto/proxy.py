@@ -16,12 +16,13 @@ def rewrite_js(content, type):
     file_name = str(random.randint(0, 100000))
     with open(file_name, 'w') as f:
         f.write(content)
-    cmd = "node {} -i {} -n testName -t {} -r dynamic-cfg".format(
+    cmd = "node {} -i {} -n ';;;;testName' -t {} -r dynamic-cfg".format(
         rewriter, file_name, type)
     print(cmd)
     subprocess.call(cmd, stdout=subprocess.DEVNULL, shell=True)
     with open(file_name, 'r') as f:
         content = f.read()
+    os.remove(file_name)
     return content
 
 
@@ -33,7 +34,7 @@ def response(flow):
     try:
 
         content_type = None
-        print('thread id', os.getpid())
+        # print('thread id', os.getpid())
         for key in flow.response.headers.keys():
             if key.lower() == "content-type":
                 content_type = flow.response.headers[key].lower()
