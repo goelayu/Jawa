@@ -442,7 +442,7 @@ var extractHandlers = async function(page,cdp, nTimes){
     for (var i = 0;i<nTimes;i++){
         //trigger event handlers
         await page.evaluateHandle(()=> triggerEvents(_final_elems))
-        // await chromeFns.getCallGraph(page, program, i);
+        await chromeFns.getCallGraph(page, program, i);
     } 
     // var cgEnd = process.hrtime(cgStart);
     // console.log(`${program.url} Time EVT ${cgEnd[0]} ${cgEnd[1]/(1000*1000)}`)
