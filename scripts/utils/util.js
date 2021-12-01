@@ -172,16 +172,16 @@ var getSizePerType = function(data){
                 break;
             }
         }
-        if (type != 'script') continue
-        console.log(n.url);
-        continue;
+        // if (type != 'script') continue
+        // console.log(n.url);
+        // continue;
         if (mainTypes.indexOf(type)<0)
             type = 'Other';
         if (!(type in type2size))
             type2size[type] = 0;
         type2size[type] += n.size;
     };
-    // var totalSize = Object.values(type2size).reduce((acc,cur)=>{return acc + cur;},0);
+    var totalSize = Object.values(type2size).reduce((acc,cur)=>{return acc + cur;},0);
     // // Object.keys(type2size).forEach((t)=>{
     // //     (t == 'Script') && console.log(`${type2size[t]/totalSize},${t}`);
     // // });
@@ -191,7 +191,7 @@ var getSizePerType = function(data){
     //     return;
     // }
     // // console.log(type2size)
-    // type2size.script != JSERRORCOUNT && console.log(type2size.script,totalSize)
+    type2size.script != JSERRORCOUNT && console.log(type2size.script,totalSize)
     // return type2size;
 }
 
@@ -654,6 +654,15 @@ var instCoverage = function(first, second){
 
 }
 
+var quickNet = function(net){
+    /** enables quick network analysis
+     *
+     */
+     var net = netParser.parseNetworkLogs(net);
+     var firstNet = net[0];
+     console.log(firstNet.response.status);
+}
+
 switch (program.type){
     case "prune": pruneDB(parse(program.input)); break
     case "netSize": getNetSize(parse(program.input)); break;
@@ -673,5 +682,6 @@ switch (program.type){
     case 'initiator': initiatedRequests(program.input, program.anotherin); break;
     case 'coverage' : combineCoverage(program.input, program.anotherin); break;
     case 'Icoverage' : instCoverage(program.input, program.anotherin); break;
+    case 'quick' : quickNet(parse(program.input));break;
 
 }
