@@ -63,7 +63,7 @@ var removeComments = function (content, zip) {
 }
 
 var dedupMime = function (mimeData, jsData, store, path, page, pageMD) {
-    var cWrites = 0;
+    var cWrites = 0, njsFiles = 0;
     pageMD[page] = {
         other: { cWrites: 0 },
         js: { lookups: 0, sSize: 0, cWrites: 0, cSize: 0 },
@@ -90,7 +90,7 @@ var dedupMime = function (mimeData, jsData, store, path, page, pageMD) {
         store[fType].total += length;
     })
     pageMD[page].other.cWrites = cWrites;
-
+    program.verbose && console.log(page)
     jsData.forEach((file) => {
         var fileDir = `${path}/${file}`;
         // var content = fs.readFileSync(`${fileDir}/content`);
@@ -108,6 +108,8 @@ var dedupMime = function (mimeData, jsData, store, path, page, pageMD) {
         // var wocommentContent = removeComments(content, fileInfo.zip)
         // var hash = crypto.createHash('md5').update(wocommentContent).digest('hex');
         // var origUrl = getOriginalURL(fileInfo.url);
+        njsFiles++;
+        program.verbose && console.log(`url: ${fileInfo.url}, size: ${size}`)
         var archiveUrl = fileInfo.url;
         var storeKey = hash;
         var type = 'js';
@@ -126,6 +128,7 @@ var dedupMime = function (mimeData, jsData, store, path, page, pageMD) {
         store[type].total += size;
     })
 
+    program.verbose && console.log(`${page} nFiles: ${njsFiles}`)
 
 }
 
@@ -151,10 +154,11 @@ function main() {
         }
         dedupMime(mimeData, jsData, store, srcDir, page, pageMD);
         // var perc = Number.parseInt(idx*100/pages.length);
+        // program.verbose && console.log(page)
         program.verbose && console.log(`js ${store.js.size} image ${store.image.size} css ${store.css.size} html  ${store.html.size}`)
 
     })
-    console.log(`Finres: js ${store.js.size} image ${store.image.size} css ${store.css.size} html  ${store.html.size}`)
+    console.log(`Finres dedup: js ${store.js.size} image ${store.image.size} css ${store.css.size} html  ${store.html.size}`)
     console.log(`Finres: js ${store.js.total} image ${store.image.total} css ${store.css.total} html ${store.html.total}`)
 
     program.output && fs.writeFileSync(program.output, JSON.stringify(pageMD));

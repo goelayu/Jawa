@@ -89,6 +89,7 @@ var getPerFileData = function (fns, resDir, excludedFiles) {
             var allIds = getAllIds([file], resDir);
             if (!allIds[file]) return; //TODO
             var fileSrc = JSON.parse(fs.readFileSync(`${resDir}/${file}/${file}`, 'utf-8'));
+            if (fileSrc.type != "js") return; //some html files mascarade as js files
             var fns = fileFns[file];
             // var storeKey = file.replace(/\d/g,'');
             var storeKey = file;
@@ -108,7 +109,7 @@ var getAllIds = function (filenames, dir) {
             var ids = JSON.parse(fs.readFileSync(idFile, 'utf-8'));
             allIds[file] = ids;
         } catch (e) {
-            program.verbose && console.error(`Error while readings ids for ${file}`);
+            program.verbose && console.error(`Error while reading ids for ${file}, ${e}`);
         }
     });
     return allIds;
@@ -178,13 +179,13 @@ var getUnionIds = function (ids) {
 */
 var queryAndUpdateStore = function (filesData, store, page, pageMD) {
     var fileTotal = fileDedup = fnTotal = fnDedup = fnUnion = 0;
-
+    program.verbose && console.log(`${page}, nFiles: ${Object.keys(filesData).length}`);
     Object.keys(filesData).forEach((file) => {
         var [curfns, curIds, curfileInfo] = filesData[file];
         var zipRatio = curfileInfo.full_length == 0 ? 1 : parseFloat((curfileInfo.wire_length / curfileInfo.full_length).toFixed(2));
         curfileInfo.zipRatio = zipRatio;
         var fnsSize = utils.sumFnSizes(curfns, curIds);
-        program.verbose && console.log(`ratio is ${zipRatio}`)
+        // program.verbose && console.log(`ratio is ${zipRatio}`)
         // var fileKey = getFileKey(file)
         // var _storeKey = Object.keys(curIds) + '' + fileKey;
         //     storeKey = crypto.createHash('md5').update(_storeKey).digest('hex');
@@ -193,8 +194,8 @@ var queryAndUpdateStore = function (filesData, store, page, pageMD) {
         var curFnOrder = curfns;
 
         pageMD._files.push(storeKey);
-
-        program.verbose && console.log(`copy: ${storeKey}`)
+        program.verbose && console.log(`url: ${storeKey}, size:${curfileInfo.wire_length}`)
+        // program.verbose && console.log(`copy: ${storeKey}`)
         if (oldVersion) {
 
             //duplicate file
@@ -211,7 +212,7 @@ var queryAndUpdateStore = function (filesData, store, page, pageMD) {
                 fnDedup += fnsSize * zipRatio;
                 store.fnDedup += fnsSize * zipRatio;
                 oldFnOrders.push(curFnOrder);
-                program.verbose && console.log(`fn-match: ${storeKey}`)
+                // program.verbose && console.log(`fn-match: ${storeKey}`)
             }
 
             var newUnion = mergeFns(oldUnion, curfns);
@@ -219,7 +220,7 @@ var queryAndUpdateStore = function (filesData, store, page, pageMD) {
 
             // if union is updated, update union length;
             if (newUnion.length > oldUnion.length) {
-                program.verbose && console.log(`union: ${storeKey}`)
+                // program.verbose && console.log(`union: ${storeKey}`)
                 var unionLen = utils.sumFnSizes(newUnion, curIds);
                 fnUnion += unionLen * zipRatio;
                 store.fnUnion += unionLen * zipRatio;
@@ -244,11 +245,11 @@ var queryAndUpdateStore = function (filesData, store, page, pageMD) {
 
             fnDedup += fnsSize * zipRatio;
             store.fnDedup += fnsSize * zipRatio;
-            program.verbose && console.log(`fn-match: ${storeKey}`)
+            // program.verbose && console.log(`fn-match: ${storeKey}`)
 
             fnUnion += fnsSize * zipRatio;
             store.fnUnion += fnsSize * zipRatio;
-            program.verbose && console.log(`union: ${storeKey}`)
+            // program.verbose && console.log(`union: ${storeKey}`)
 
             pageMD.cSize.orig += CRAWL_ENTRY_LEN
             pageMD.cSize.union += CRAWL_ENTRY_LEN + (getUnionIds(curfns) + '').length; // updating crawl index
@@ -314,7 +315,7 @@ var dedupAnalysis = function () {
             var _execFns = parse(`${program.performance}/${path}/allFns`), _evtCG, evtCG,
                 execFns = [...new Set(_execFns.preload.concat(_execFns.postload))];
 
-            program.verbose && console.log(path);
+            // program.verbose && console.log(path);
             // _evtCG = parse(`${program.performance}/${path}/hybridcg`)
             try {
                 _evtCG = parse(`${program.performance}/${path}/cg0`)
