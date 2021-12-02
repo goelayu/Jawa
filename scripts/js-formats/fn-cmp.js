@@ -28,7 +28,7 @@ const SERVING_ENTRY_APPEND = 32
 var fs = require('fs'),
     program = require('commander'),
     utils = require('../../program_analysis/utils/util'),
-    crypto = require('crypto');
+    netParser = require('parser/networkParser');
 const { createRequire } = require('module');
 
 program
@@ -44,8 +44,38 @@ var parse = function (f) {
     return JSON.parse(fs.readFileSync(f, 'utf-8'));
 }
 
-var stripHash = function (str) {
+var getOrigUrl = function (n) {
+    if (ignoreUrl(n)) return null;
+    var timeStamp = timeStampInURL(n.url);
+    if (!timeStamp) return null;
+    var urlPrefix = `https://web.archive.org/web/${timeStamp}`;
+    var _origUrl = n.url.split(urlPrefix)
+    if (_origUrl.length > 1)
+        return _origUrl[1];
+}
 
+var ignoreUrl = function (n) {
+    return n.request.method != "GET"
+        || n.url.indexOf('data') == 0
+        || !n.type
+        || !n.size
+        || n.response.status != 200;
+    // || n.size < 1000;
+
+}
+
+var timeStampInURL = function (url) {
+    // Only extract timestamp from the main part of the url
+    var idx = url.indexOf('?');
+    url = idx >= 0 ? url.slice(0, idx) : url;
+    var hasNumbers = url.match(/\d+/g);
+    if (hasNumbers) {
+        for (var num of hasNumbers) {
+            if (num.length == 14)
+                return num;
+        }
+    }
+    return false
 }
 
 var convertToFiles = function (fns, excludedFiles) {
@@ -99,6 +129,31 @@ var getPerFileData = function (fns, resDir, excludedFiles) {
         }
     });
     return res;
+}
+
+var getDataFromNet = function (n) {
+    try {
+        var net = netParser.parseNetworkLogs(JSON.parse(fs.readFileSync(n, 'utf-8')));
+        var netData = {};
+        for (var n of net) {
+            // console.log(n)
+            if (!n.response || !n.size) continue;
+            if (n.response.url.indexOf('web.archive.org/_static/js/') >= 0 || n.response.url.indexOf('archive.org/includes/') >= 0) continue;
+            // var url = getOrigUrl(n);
+            // if (!url) continue;
+
+            var type = n.type.indexOf('script') >= 0 ? 'js' : 'other';
+            if (type != 'js') continue;
+            var l = n.response.url.split('/');
+            var kURL = l[l.length - 1];
+
+            netData[kURL] = [n.size, n.response.url];
+        }
+        return netData;
+    } catch (e) {
+        console.error(e)
+        return {};
+    }
 }
 
 var getAllIds = function (filenames, dir) {
@@ -164,6 +219,24 @@ var getUnionIds = function (ids) {
         var i = e.split('-');
         return i.slice(i.length - 4,).join('-');
     });
+}
+
+var getMissingFileData = function (netData, fnFiles, dedupStore) {
+    fnFiles = fnFiles.map(e => { var l = e.split('/'); return l[l.length - 1]; });
+    var netFiles = Object.keys(netData);
+    program.verbose && console.log(netFiles)
+    var missingFiles = netFiles.filter(x => !fnFiles.includes(x));
+    program.verbose && console.log(`missing files: ${missingFiles.length}, ${missingFiles}`);
+    return missingFiles.reduce((acc, curr) => {
+        var [size, origURL] = netData[curr];
+        if (dedupStore.indexOf(origURL) >= 0) {
+            console.log('missing data already exists')
+            return acc;
+        }
+        console.log(origURL)
+        dedupStore.push(origURL);
+        return acc + size;
+    }, 0);
 }
 
 /**
@@ -262,7 +335,10 @@ var queryAndUpdateStore = function (filesData, store, page, pageMD) {
         fnTotal += fnsSize * zipRatio;
         store.fnTotal += fnsSize * zipRatio;
     });
-    program.verbose && console.log(`filetotal: ${fileTotal} fileDedup: ${fileDedup} fnTotal: ${fnTotal} fnDedup: ${fnDedup} fnUnion ${fnUnion}`);
+    var netFile = `${program.performance}/${page}/network`;
+    var missingData = getMissingFileData(getDataFromNet(netFile), pageMD._files, store.missingDedupStore);
+    store.missingTotal += missingData;
+    program.verbose && console.log(`filetotal: ${fileTotal} fileDedup: ${fileDedup} fnTotal: ${fnTotal} fnDedup: ${fnDedup} fnUnion ${fnUnion} missingData: ${missingData}`);
 }
 
 var processFnUnion = function (store) {
@@ -300,7 +376,7 @@ var processPageMD = function (store, perPageMD) {
 */
 var dedupAnalysis = function () {
     var total = 0, dedup = 0, fileTotal = 0, excludedTotal = 0;
-    var store = { entries: {}, fileTotal: 0, fileDedup: 0, fnTotal: 0, fnDedup: 0, fnUnion: 0 };
+    var store = { entries: {}, fileTotal: 0, fileDedup: 0, fnTotal: 0, fnDedup: 0, fnUnion: 0, missingTotal: 0, missingDedupStore: [] };
 
     var perPageMD = {};
 
@@ -360,7 +436,7 @@ var dedupAnalysis = function () {
     });
     processPageMD(store, perPageMD);
     with (store) {
-        console.log(`Final: filetotal: ${fileTotal} fileDedup: ${fileDedup} fnTotal: ${fnTotal} fnDedup: ${fnDedup} fnUnion ${processFnUnion(store, perPageMD)}`);
+        console.log(`Final: filetotal: ${fileTotal} fileDedup: ${fileDedup} fnTotal: ${fnTotal} fnDedup: ${fnDedup} fnUnion ${processFnUnion(store, perPageMD)} missingTotal: ${missingTotal}`);
     }
 
 }
