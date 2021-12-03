@@ -44,7 +44,7 @@ async function main(){
     }
     else if (program.type == 'count'){
         var res = await getPageCount();
-        console.log(res.length)
+        fs.writeFileSync(`${program.url.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.snaps`,JSON.stringify(res.map(e=>[e[1],e[2]])));
     }
 }
 

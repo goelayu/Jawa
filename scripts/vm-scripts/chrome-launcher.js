@@ -26,6 +26,8 @@ program
 
 const SERIALIZESTYLES="/home/goelayu/webArchive/scripts/serializeWithStyle.js"
 
+console.log(program.url)
+
 async function launch(){
     const options = {
         executablePath: "/usr/bin/google-chrome",
@@ -78,7 +80,7 @@ async function launch(){
         await page.screenshot({path: `${outDir}/screenshot.png`, fullPage: true});
 
     // if (program.custom)
-    // await extractDOM(page);
+    //await extractDOM(page);
     
     if (program.mhtml)
         await getMhtml(cdp);
