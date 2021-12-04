@@ -1,3 +1,18 @@
+import random
+from functools import partial
+import multiprocessing as mp
+import unicodedata
+import hashlib
+import time
+import json
+from copy import deepcopy
+import subprocess
+import re
+import os
+import zlib
+import argparse
+import http_record_pb2
+import brotli
 import sys
 sys.path = [p for p in sys.path if 'vault' not in p]
 # for p in sys.path:
@@ -6,22 +21,6 @@ sys.path = [p for p in sys.path if 'vault' not in p]
 #         sys.path.remove(p)
 #         # break
 
-import brotli
-import http_record_pb2
-import argparse
-import zlib
-import os
-import re
-import subprocess
-import sys
-from copy import deepcopy
-import json
-import time
-import hashlib
-import unicodedata
-import multiprocessing as mp
-from functools import partial
-import random
 # from adblockparser import AdblockRules
 # from jsonrpclib import Server
 # from pyutils.mahimahi import Mahimahi
@@ -41,14 +40,17 @@ wombat_location = '/w/goelayu/webArchive/data/wombat.js'
 # analytic_files = mp_manager.list()
 # custom_files = mp_manager.list()
 
+
 def copy(source, destination):
     subprocess.Popen("cp {} {}/".format(source, destination), shell=True)
 
+
 def read_filter():
-    path='../filter-lists/archive-filter.txt'
-    with open(path,'rb') as f:
+    path = '../filter-lists/archive-filter.txt'
+    with open(path, 'rb') as f:
         filters = f.readlines()
     return strip_list(filters)
+
 
 def strip_list(l):
     r = []
@@ -58,13 +60,14 @@ def strip_list(l):
 
 # custom_filter = read_filter()
 
+
 def unchunk(body):
     new_body = ""
     # iterate through chunks until we hit the last chunk
     crlf_loc = body.find('\r\n')
-    chunk_size = int( body[:crlf_loc], 16 )
+    chunk_size = int(body[:crlf_loc], 16)
     body = body[crlf_loc+2:]
-    while( chunk_size != 0 ):
+    while(chunk_size != 0):
         # add chunk content to new body and remove from old body
         new_body += body[0:chunk_size]
         body = body[chunk_size:]
@@ -74,13 +77,14 @@ def unchunk(body):
 
         # get chunk size
         crlf_loc = body.find('\r\n')
-        chunk_size = int( body[:crlf_loc], 16 )
+        chunk_size = int(body[:crlf_loc], 16)
         body = body[crlf_loc+2:]
 
     # on the last chunk
     body = body[crlf_loc+2:]
 
     return new_body
+
 
 def get_valid_filename(s):
     """
@@ -95,15 +99,17 @@ def get_valid_filename(s):
     s = str(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '_', s)
 
+
 def get_filter_rules():
     start = time.time()
-    with open(filter_list,'rb') as f:
+    with open(filter_list, 'rb') as f:
         raw_rules = f.read().decode('utf8').splitlines()
     end = time.time()
     print 'read rules', end - start
-    rules = AdblockRules(raw_rules,use_re2=True, max_mem=512*1024*1024)
+    rules = AdblockRules(raw_rules, use_re2=True, max_mem=512*1024*1024)
     print 'created filter', time.time()-end
     return rules
+
 
 def get_mm_header(mm_obj, key):
     for header in mm_obj.request.header:
@@ -111,6 +117,7 @@ def get_mm_header(mm_obj, key):
             return header.value
 
     return None
+
 
 def _intercept_location_wombat(body):
     overrwrite_location_methods = '''
@@ -130,11 +137,12 @@ def _intercept_location_wombat(body):
 
     return body[:location] + overrwrite_location_methods + body[:location]
 
+
 def intercept_location_wombat(mm_obj, TEMP_FILE, args, file):
     body = mm_obj.response.body
-    TEMP_FILE_zip='{}.zip'.format(TEMP_FILE)
+    TEMP_FILE_zip = '{}.zip'.format(TEMP_FILE)
     print mm_obj.request.first_line
-    
+
     is_zipped = False
     # for header in mm_obj.response.header:
     #     if header.key.lower() == "content-encoding":
@@ -144,21 +152,20 @@ def intercept_location_wombat(mm_obj, TEMP_FILE, args, file):
     #         subprocess.call(zipCommand, shell=True)
     #         body = open(TEMP_FILE,'r').read()
     #         break
-    
 
     # if is_zipped:
     #     body = zlib.decompress(bytes(bytearray(body)), zlib.MAX_WBITS|32)
-    
+
     # body = _intercept_location_wombat(body)
 
     # open(TEMP_FILE,'w').write(body)
     # TEMP_FILE_zip='{}.zip'.format(TEMP_FILE)
     # zipCommand = "gzip -c {} > {}".format(TEMP_FILE, TEMP_FILE_zip)
     # subprocess.call(zipCommand, shell=True)
-    mm_obj.response.body = open(wombat_location,'r').read()
+    mm_obj.response.body = open(wombat_location, 'r').read()
     clone_mm_obj = deepcopy(mm_obj)
-    
-    for key in ['content-encoding','transfer-encoding']:
+
+    for key in ['content-encoding', 'transfer-encoding']:
         for header in mm_obj.response.header:
             if header.key.lower() == key:
                 mm_obj.response.header.remove(header)
@@ -167,11 +174,11 @@ def intercept_location_wombat(mm_obj, TEMP_FILE, args, file):
     outputFile.write(mm_obj.SerializeToString())
 
     outputFile.close()
-    subprocess.call("rm {} {}".format(TEMP_FILE, TEMP_FILE_zip),stderr=open("/dev/null","r"), shell=True)
+    subprocess.call("rm {} {}".format(TEMP_FILE, TEMP_FILE_zip),
+                    stderr=open("/dev/null", "r"), shell=True)
 
 
-
-def instrument(root, fileType,args,file_obj):
+def instrument(root, fileType, args, file_obj):
     http_response = file_obj['mm']
     file = file_obj['file']
     # f = open(os.path.join(root,file), "rb")
@@ -189,9 +196,11 @@ def instrument(root, fileType,args,file_obj):
     log_directory = args.logDir
 
     subprocess.call("mkdir -p {}".format(log_directory), shell=True)
-    TEMP_FILE = log_directory + '/' + str(os.getpid()) + str(random.randint(0, 100000))
+    TEMP_FILE = log_directory + '/' + \
+        str(os.getpid()) + str(random.randint(0, 100000))
 
-    fullurl = "http://{}{}".format(get_mm_header(http_response,'host'),filename)
+    fullurl = "http://{}{}".format(get_mm_header(http_response,
+                                                 'host'), filename)
 
     print "Instrumenting file {} with type {}".format(fullurl, fileType)
 
@@ -201,7 +210,7 @@ def instrument(root, fileType,args,file_obj):
 
     if fileType == 'js' and ('web.archive.org/_static/js/' in fullurl or 'archive.org/includes/' in fullurl):
         print "Skipping client-side libraries for archive.org", fullurl
-        copy(os.path.join(root,file), args.output)
+        copy(os.path.join(root, file), args.output)
         return
 
     # skip non critical archive urls
@@ -211,15 +220,16 @@ def instrument(root, fileType,args,file_obj):
     #     copy(os.path.join(root,file), args.output)
     #     return
 
-    #remove timestamp from filename
-    filename = re.sub('\/web\/\d{14}','',filename)
+    # remove timestamp from filename
+    filename = re.sub('\/web\/\d{14}', '', filename)
 
     if len(filename) > 50:
         filename = filename[-50:]
     if filename == "/":
         filename = url+filename
 
-    filename = get_valid_filename(filename) + '-hash-' + hashlib.md5(origPath).hexdigest()
+    filename = get_valid_filename(
+        filename) + '-hash-' + hashlib.md5(origPath).hexdigest()
 
     # check whether its a analytics file or not
     # if fileType == 'js' and args.filter and filter_rules.should_block(fullurl,options={'third-party':True}):
@@ -230,10 +240,9 @@ def instrument(root, fileType,args,file_obj):
     #     for rule in custom_filter:
     #         if rule in fullurl:
     #             print "Discovered custom filtered file", fullurl
-    #             custom_files.append(filename) 
-    
+    #             custom_files.append(filename)
 
-    node_debugging_port = random.randint(9300,9900)
+    node_debugging_port = random.randint(9300, 9900)
     # pid = os.fork()
 
     # if pid == 0:
@@ -255,7 +264,8 @@ def instrument(root, fileType,args,file_obj):
     if gzip:
         try:
             if gzipType.lower() != "br":
-                decompressed_data = zlib.decompress(bytes(bytearray(content)), zlib.MAX_WBITS|32)
+                decompressed_data = zlib.decompress(
+                    bytes(bytearray(content)), zlib.MAX_WBITS | 32)
             else:
                 decompressed_data = brotli.decompress(content)
             content = decompressed_data
@@ -263,14 +273,15 @@ def instrument(root, fileType,args,file_obj):
         except zlib.error as e:
             print "Corrupted decoding: " + file + str(e)
             print "Simply copying the file"
-            copy(os.path.join(root,file), args.output)
+            copy(os.path.join(root, file), args.output)
             f.close()
             return
             # os._exit(0)
-    else: 
+    else:
         f.write(content)
     f.close()
-    command = " {} -i {} -n '{}' -t {} -r {}".format(analyzer_script,TEMP_FILE, url + ";;;;" + filename,fileType, args.rewriter)
+    command = " {} -i {} -n '{}' -t {} -r {}".format(
+        analyzer_script, TEMP_FILE, url + ";;;;" + filename, fileType, args.rewriter)
 
     if (args.debug) and fileType == args.debug:
         command = "node --inspect-brk={}".format(node_debugging_port) + command
@@ -280,14 +291,14 @@ def instrument(root, fileType,args,file_obj):
 
     if args.allfns:
         command += " --fns {}".format(args.allfns)
-    
+
     subprocess.call("mkdir -p {}".format(_log_path), shell=True)
 
-    log_file=open(_log_path+"logs","w+")
-    error_file=open(_log_path+"errors","w")
-    src_file = open(_log_path+'/'+filename,'w')
+    log_file = open(_log_path+"logs", "w+")
+    error_file = open(_log_path+"errors", "w")
+    src_file = open(_log_path+'/'+filename, 'w')
     # content_file_full = open(_log_path+'/content_full','w')
-    id_file = open(_log_path+'ids','w')
+    id_file = open(_log_path+'ids', 'w')
     # content_file = open(_log_path+'content','w')
 
     # content_file.write(orig_content)
@@ -296,34 +307,35 @@ def instrument(root, fileType,args,file_obj):
     # content_file_full.write(content)
     # content_file_full.close()
 
-    src_file_data = {'type':fileType}
+    src_file_data = {'type': fileType}
 
     print "Executing ", command
-    cmd = subprocess.call(command, stdout=log_file, stderr =error_file, shell=True)
+    cmd = subprocess.call(command, stdout=log_file,
+                          stderr=error_file, shell=True)
 
     if fileType == 'js':
         # content =  re.sub("FILE ARCHIVED(.|\n)*",'', content)
-        src_file_data['full_length']=len(content)
-        src_file_data['wire_length']=len(orig_content)
+        src_file_data['full_length'] = len(content)
+        src_file_data['wire_length'] = len(orig_content)
         # src_file_data['hash']=hashlib.sha256().update(content).digest()
         # src_file_data['hash'] = hashlib.md5(content).hexdigest()
     else:
-        log_file=open(_log_path+"logs","r")
+        log_file = open(_log_path+"logs", "r")
         lf = log_file.read()
-        src_file_data['length']=len(lf)
+        src_file_data['length'] = len(lf)
         # src_file_data['hash']=hashlib.md5(lf).hexdigest()
 
     src_file_data['zip'] = gzipType
     src_file_data['url'] = fullurl
     src_file.write(json.dumps(src_file_data))
-    
+
     log_file.close()
     error_file.close()
     src_file.close()
-    
+
     try:
-        returnInfoFile = TEMP_FILE + ".info";
-        returnInfo = "".join(open(returnInfoFile,'r').readlines())
+        returnInfoFile = TEMP_FILE + ".info"
+        returnInfo = "".join(open(returnInfoFile, 'r').readlines())
 
         id_file.write(returnInfo)
     except IOError as e:
@@ -335,11 +347,12 @@ def instrument(root, fileType,args,file_obj):
         file_with_content = TEMP_FILE_zip
         if gzipType.lower() != "br":
             zipUtil = "gzip"
-        else: zipUtil = "brotli"
+        else:
+            zipUtil = "brotli"
         zipCommand = "{} -c {} > {}".format(zipUtil, TEMP_FILE, TEMP_FILE_zip)
         subprocess.call(zipCommand, shell=True)
         # while cmd.poll() is None:
-            # continue
+        # continue
     else:
         file_with_content = TEMP_FILE
 
@@ -375,13 +388,15 @@ def instrument(root, fileType,args,file_obj):
 
     # print " response header looks like " , output_http_response.response.header
     outputFile = open(os.path.join(args.output, file), "w")
-    
+
     outputFile.write(output_http_response.SerializeToString())
 
     outputFile.close()
     tmpFile.close()
 
-    subprocess.call("rm {} {} {}".format(TEMP_FILE, TEMP_FILE_zip, TEMP_FILE +".info"),stderr=open("/dev/null","r"), shell=True)
+    subprocess.call("rm {} {} {}".format(TEMP_FILE, TEMP_FILE_zip,
+                                         TEMP_FILE + ".info"), stderr=open("/dev/null", "r"), shell=True)
+
 
 def main(args):
     file_counter = 0
@@ -404,14 +419,14 @@ def main(args):
         htmlFiles = []
         jsFiles = []
         file_obj = []
-        urls = {'js':[], 'html':[]}
+        urls = {'js': [], 'html': []}
         th = time.time()
 
         remaining_files = []
         for file in files:
             try:
                 file_counter += 1
-                f = open(os.path.join(root,file), "rb")
+                f = open(os.path.join(root, file), "rb")
                 http_response = http_record_pb2.RequestResponse()
                 http_response.ParseFromString(f.read())
                 f.close()
@@ -421,19 +436,22 @@ def main(args):
 
                 print "Checking: {} file : {}".format(file, file_counter)
 
-                filename = http_response.request.first_line.split()[1] 
-                fullurl = "http://{}{}".format(get_mm_header(http_response,'host'),filename)
+                filename = http_response.request.first_line.split()[1]
+                fullurl = "http://{}{}".format(
+                    get_mm_header(http_response, 'host'), filename)
 
-                req_method = http_response.request.first_line.split()[0] # GET url-suffix HTTP1.1
-                status = http_response.response.first_line.split()[1] #http1.1 200 ok
+                req_method = http_response.request.first_line.split()[
+                    0]  # GET url-suffix HTTP1.1
+                status = http_response.response.first_line.split()[
+                    1]  # http1.1 200 ok
 
                 if status != '200' or req_method != 'GET':
-                    copy(os.path.join(root,file), args.output)
+                    copy(os.path.join(root, file), args.output)
                     continue
-                    
+
                 file_type = None
 
-                cur_file_obj = {'file':file, 'mm':http_response}
+                cur_file_obj = {'file': file, 'mm': http_response}
                 for header in http_response.response.header:
                     if header.key.lower() == "content-type":
                         file_type = header.value.lower()
@@ -441,18 +459,17 @@ def main(args):
                             fileType = "js"
                             copyFile = False
                             jsFiles.append(cur_file_obj)
-                            urls['js'].append([fullurl,filename])
+                            urls['js'].append([fullurl, filename])
                         elif "html" in header.value.lower():
                             fileType = "html"
                             copyFile = False
                             htmlFiles.append(cur_file_obj)
-                            urls['html'].append([fullurl,filename])
-                
+                            urls['html'].append([fullurl, filename])
 
                 if copyFile or fileType == 'html':
                     print "Simply copying the file without modification.. "
                     # print http_response.request.first_line
-                    copy(os.path.join(root,file), args.output)
+                    copy(os.path.join(root, file), args.output)
 
                     # track metadata about this file
                     file_info = {'type': file_type, 'url': fullurl}
@@ -464,7 +481,6 @@ def main(args):
 
                     remaining_files.append(file_info)
 
-
             except IOError as e:
                 print args.input + ": Could not open file ", e
 
@@ -474,12 +490,12 @@ def main(args):
     pool = mp.Pool(mp.cpu_count())
 
     instrument_singleton = partial(instrument, root, "js", args)
-    
+
     th = time.time()
     pool.map(instrument_singleton, jsFiles)
     pool.close()
     pool.join()
-    
+
     if args.profile:
         print '[Time] Done with JS {}'.format(time.time()-th)
 
@@ -488,7 +504,6 @@ def main(args):
     #     print "waiting on pid", pid
     #     os.waitpid(pid,0)
     print "All the JS child processes died..\n Main thread terminating"
-
 
     pool = mp.Pool(mp.cpu_count())
 
@@ -500,13 +515,12 @@ def main(args):
     # if args.profile:
     #     print '[Time] Done with html {}'.format(time.time()-th)
 
-
     th = time.time()
     metadata_dir = "{}/{}".format(args.logDir, "__metadata__")
     subprocess.call("mkdir -p {}".format(metadata_dir), shell=True)
-    analytics_file = open("{}/analytics".format(metadata_dir),'w')
-    urls_file = open("{}/urls".format(metadata_dir),'w')
-    _remaining_file = open("{}/allfiles".format(metadata_dir),'w')
+    analytics_file = open("{}/analytics".format(metadata_dir), 'w')
+    urls_file = open("{}/urls".format(metadata_dir), 'w')
+    _remaining_file = open("{}/allfiles".format(metadata_dir), 'w')
     _remaining_file.write(json.dumps(remaining_files))
     _remaining_file.close()
     # for i in analytic_files:
@@ -522,20 +536,23 @@ def main(args):
     urls_file.close()
     if args.profile:
         print '[Time] Dump metadata {}'.format(time.time()-th)
-    
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help='path to input directory')
     parser.add_argument('output', help='path to output directory')
-    parser.add_argument('rewriter', help='type of instrumentation to perform', default="comments", choices=["comments","dynamic-cfg", "state"])
+    parser.add_argument('rewriter', help='type of instrumentation to perform',
+                        default="comments", choices=["comments", "dynamic-cfg", "state"])
     parser.add_argument('logDir', help='path to log output directory')
     parser.add_argument('--jsProfile', help='path to the js profile')
     parser.add_argument('--allfns', help="allfns which need to be preserved")
-    parser.add_argument('--cgInfo',help="path to the cg info")
-    parser.add_argument('--debug',help="enable node debugging using -inspect flag")
-    parser.add_argument('--filter',help="enable analytics filtering",action='store_true')
-    parser.add_argument('--profile',help="turn on profiling of code", action='store_true')
+    parser.add_argument('--cgInfo', help="path to the cg info")
+    parser.add_argument(
+        '--debug', help="enable node debugging using -inspect flag")
+    parser.add_argument(
+        '--filter', help="enable analytics filtering", action='store_true')
+    parser.add_argument(
+        '--profile', help="turn on profiling of code", action='store_true')
     args = parser.parse_args()
     main(args)
-
