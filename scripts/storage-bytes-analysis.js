@@ -15,71 +15,71 @@ program
     .option('-p, --performance [val]', 'directory containing performance data')
     .parse(process.argv);
 
-var parse = function(f){
-    return JSON.parse(fs.readFileSync(f,'utf-8'));
+var parse = function (f) {
+    return JSON.parse(fs.readFileSync(f, 'utf-8'));
 }
 
-var unique = function(arr){
+var unique = function (arr) {
     return [...new Set(arr)];
 }
 
-var concatArr = function(dict){
+var concatArr = function (dict) {
     /**
      * Linearizes an array of arrays
      */
     var res = [];
-    Object.values(dict).forEach((a)=>{
+    Object.values(dict).forEach((a) => {
         res = res.concat(a);
     });
     return unique(res);
 }
 
-var extractFileNames = function(fns){
+var extractFileNames = function (fns) {
     /**
      * Parses the dynamic cfg and creates a filename array
      */
     var filenames = new Set;
-    fns.forEach((id)=>{
-        var _filename =  id.split('-').slice(0,id.split('-').length - 4).join('-');
+    fns.forEach((id) => {
+        var _filename = id.split('-').slice(0, id.split('-').length - 4).join('-');
         if (_filename != '')
             filenames.add(_filename);
     })
     return [...filenames];
 }
 
-var getJsSrcSize = function(evtFiles){
+var getJsSrcSize = function (evtFiles) {
     var allJsFiles = fs.readdirSync(program.logDir);
     var totalSize = evtSize = 0;
-    allJsFiles.forEach((file)=>{
+    allJsFiles.forEach((file) => {
         if (file == '' || file == 'cg' || file == 'fg' || file == 'py_out'
-        || file == 'missingFns' || file.indexOf('-script-')>=0) return
+            || file == 'missingFns' || file.indexOf('-script-') >= 0) return
 
         var s = fs.readFileSync(`${program.logDir}/${file}/${file}`);
         totalSize += s.length;
-        if (evtFiles.indexOf(file)>=0)
+        if (evtFiles.indexOf(file) >= 0)
             evtSize += s.length;
     });
     console.log(evtFiles.length, allJsFiles.length)
     return [totalSize, evtSize];
 }
 
-var getIdLen = function(allIds){
+var getIdLen = function (allIds) {
     // returns all ids an array
     var idSrcLen = {};
-    Object.values(allIds).forEach((idDict)=>{
+    Object.values(allIds).forEach((idDict) => {
         //idDict is a dict with key as ln and values as id, source length tuple
-        Object.values(idDict).forEach((idLen)=>{
-            idSrcLen[idLen[0]] = [idLen[1],idLen[2]];
+        Object.keys(idDict).forEach((fn) => {
+            idSrcLen[fn] = idDict[fn];
         });
     });
     return idSrcLen;
 }
 
-var getAllIds = function(){
+var getAllIds = function () {
     var filenames = fs.readdirSync(program.logDir);
     var allIds = {};
-    filenames.forEach((file)=>{
-        try {    
+    filenames.forEach((file) => {
+        try {
             var idFile = `${program.logDir}/${file}/ids`;
             var ids = JSON.parse(fs.readFileSync(idFile, 'utf-8'));
             allIds[file] = ids;
@@ -90,22 +90,22 @@ var getAllIds = function(){
     return allIds;
 }
 
-function main(){
-    var evtFnsFile = `${program.performance}/cg`;
-    var evtDict = parse(evtFnsFile);
-    var evtFns = concatArr(evtDict);
-    var evtFiles = extractFileNames(evtFns);
-    var [totalSize, evtSize] = getJsSrcSize(evtFiles);
-    // var totalSize = util.getFileSize(program.logDir)
+function main() {
+    // var evtFnsFile = `${program.performance}/cg`;
+    // var evtDict = parse(evtFnsFile);
+    // var evtFns = concatArr(evtDict);
+    // var evtFiles = extractFileNames(evtFns);
+    // var [totalSize, evtSize] = getJsSrcSize(evtFiles);
+    var totalSize = util.getFileSize(program.logDir)
     var allIds = getAllIds();
 
     var preLoadFns = parse(`${program.performance}/allFns`);
     var idSrcLen = getIdLen(allIds);
 
     var preloadSize = util.sumFnSizes(preLoadFns.preload, idSrcLen);
-    var preloadSizeExcluded = util.sumFnSizes(preLoadFns.preload, idSrcLen, evtFiles);
+    // var preloadSizeExcluded = util.sumFnSizes(preLoadFns.preload, idSrcLen, evtFiles);
 
-    // console.log(totalSize, preloadSize, evtSize, preloadSizeExcluded);
+    console.log(totalSize, preloadSize);
 
 }
 
