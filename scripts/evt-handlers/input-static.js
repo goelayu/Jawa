@@ -54,9 +54,50 @@ var parseJS = function (fileStore, src, file) {
     falafel({ source: src, locations: true }, function (node) {
         if (node.type == 'FunctionDeclaration' || node.type == 'FunctionExpression') {
             var id = makeId(node);
-            fileStore[id] = node.source();
+            var body = `function a(){${node.body.source()}}`;
+            if (fnContainsBranch(body, falafel).length) {
+                fileStore[id] = body;
+            }
         }
     });
+}
+
+var fnContainsBranch = function (src, falafel) {
+    var removeInnerFunctions = function (src) {
+        return falafel(src, function (node) {
+            if ((node.type == 'FunctionDeclaration' || node.type == 'FunctionExpression') && node.parent.type != 'Program') {
+                node.body.update('{}');
+            }
+        }).toString();
+    }
+    var containsCallExpression = function (src) {
+        try {
+            var hasCallExpression = false;
+            falafel(`function a(){${src}}`, function (node) {
+                if (node.type == 'CallExpression') hasCallExpression = true;
+            });
+            return hasCallExpression;
+        } catch (e) {
+            return false;
+        }
+    }
+    src = removeInnerFunctions(src);
+    // var branches = ["IfStatement", "ConditionalExpression"];
+    var branches = ["IfStatement"];
+    var astNodes = [], res = [];
+    falafel(src, function (node) {
+        astNodes.push(node);
+    });
+    for (var n of astNodes) {
+        var br = branches.find(e => n.type == e);
+        if (br) {
+            if ((n.consequent && containsCallExpression(n.consequent.source())) ||
+                (n.alternate && containsCallExpression(n.alternate.source()))) { }
+            res.push([br, n.source()]);
+        }
+    }
+    return res;
+
 }
 
 var initializeFileData = function (files) {
