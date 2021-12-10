@@ -86,7 +86,10 @@ replay(){
 			echo "Running on port" $port
 			mkdir -p $3/$i
 			echo "$cmd node chrome-launcher.js -u $2 -l -o $3/$i -n --timeout 60000 --screenshot --load-iter $i --chrome-dir $CUSTOMCHROMEDIR $DATAFLAGS"
+			oldhome=$HOME
+			export HOME=/home/goelayu
 			$cmd node chrome-launcher.js -u $2 -l -o $3/$i -n --timeout 60000 --load-iter $i --chrome-dir $CUSTOMCHROMEDIR $DATAFLAGS
+			export HOME=$oldhome
 		done
 		echo 'Done waiting'
 		return
@@ -96,7 +99,11 @@ replay(){
 	port=`shuf -i 9600-9900 -n 1`
 	echo "Running on port" $port
 	echo "$cmd node chrome-launcher.js -u $2 -l -o $3 $DATAFLAGS"
+	oldhome=$HOME
+	export HOME=/home/goelayu
+	
     time $cmd node  chrome-launcher.js -u $2 -l -o $3 $DATAFLAGS
+	export HOME=$oldhome
 	replay_pid=$!
 	echo "Done waiting"
 }

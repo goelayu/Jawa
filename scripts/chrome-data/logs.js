@@ -155,6 +155,7 @@ function matchingExceptions(log1, log2){
 }
 
 var errorFromMain = function(log){
+	// return false;
 	var net = netParser.parseNetworkLogs(parse(program.network));
 	return log.exceptionDetails &&
 		log.exceptionDetails.url == net[0].documentURL;
@@ -168,8 +169,8 @@ function calculateErrors(log){
 			l.exceptionDetails.exception &&
 			l.exceptionDetails.exception.description && 
 			l.exceptionDetails.exception.description.indexOf('404 NOT FOUND')<0 &&
-			l.exceptionDetails.text && l.exceptionDetails.text.indexOf('in promise')<0 &&
-			!errorFromMain(l)) {
+			l.exceptionDetails.text && l.exceptionDetails.text.indexOf('in promise')<0 /*&&
+			!errorFromMain(l) */ ) {
 				if (program.verbose)
 					console.log(l.exceptionDetails.exception.description)
 				count++;
