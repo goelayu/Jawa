@@ -22,6 +22,10 @@ var getOrigUrl = function (n) {
     if (ignoreUrl(n)) return null;
     var timeStamp = timeStampInURL(n.url);
     if (!timeStamp) return null;
+    if (n.redirects.length) {
+        return n.redirects[n.redirects.length - 1].url;
+    }
+    return n.url;
     var urlPrefix = `https://web.archive.org/web/${timeStamp}`;
     var _origUrl = n.url.split(urlPrefix)
     if (_origUrl.length > 1)
@@ -90,12 +94,13 @@ var updateDataStore = function (n, dataStore, engines, page) {
         if (!url) continue;
 
         var type = n.type.indexOf('script') >= 0 ? 'js' : 'other';
-        var key = `${url}+${n.size}`;
+        // var key = `${url}+${n.size}`;
+        var key = url;
         if (dataStore[type].keys.indexOf(key) < 0) {
             dataStore[type].dedup += n.size
             dataStore[type].keys.push(key);
             localStore[type].dedup += n.size
-            localStore[type].keys.push(key);
+            // localStore[type].keys.push(key);
 
             //check against filter lists
             // if (type == 'js') {

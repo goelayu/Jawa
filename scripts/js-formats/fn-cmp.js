@@ -34,6 +34,7 @@ const { createRequire } = require('module');
 program
     .option('-d, --dir [dir]', "directory containing resource files")
     .option('-p, --performance [performance]', 'directory containing performance data')
+    .option('-e, --evt [evt]', 'path to event call graph')
     .option('-u, --urls [urls]', 'file containing list of urls for dedup analysis')
     .option('-v, --verbose', 'enable verbose logging')
     .option('-f, --filter', 'filter out irrelevant files')
@@ -94,6 +95,26 @@ var convertToFiles = function (fns, excludedFiles) {
         // console.log('filename is', fnFile)
         if (!(fnFile in fileFns))
             fileFns[fnFile] = [];
+
+        fileFns[fnFile].push(f);
+    });
+    //repeat the process with evt fns
+    fns.evt.forEach((f) => {
+        if (f.indexOf('-hash-') < 0) return;
+        var endIndx = 4;
+        if (f.indexOf('-script-') >= 0)
+            endIndx = 6;
+        var fnFile = f.split('-').slice(0, f.split('-').length - endIndx).join('-');
+        if (excludedFiles.indexOf(fnFile) >= 0) return;
+        if (fnFile == 'undefined') {
+            console.error('undefined filename');
+            return;
+        }
+        // console.log('filename is', fnFile)
+        if (!(fnFile in fileFns)) {
+            console.log(`found file which wasn't loaded, ${fnFile}`);
+            return;
+        }
 
         fileFns[fnFile].push(f);
     });
@@ -394,7 +415,8 @@ var dedupAnalysis = function () {
             // program.verbose && console.log(path);
             // _evtCG = parse(`${program.performance}/${path}/hybridcg`)
             try {
-                _evtCG = parse(`${program.performance}/${path}/cg0`)
+                // _evtCG = parse(`${program.performance}/${path}/cg0`)
+                _evtCG = parse(`${program.evt}/${path}/cg0`);
                 evtCG = unique(mergeValsArr(_evtCG));
                 // if (!_evtCG.length)
                 //     _evtCG = [];
@@ -402,7 +424,8 @@ var dedupAnalysis = function () {
             } catch {
                 evtCG = [];
             }
-            execFns = [...new Set(execFns.concat(evtCG))]
+            // execFns = [...new Set(execFns.concat(evtCG))]
+            execFns.evt = evtCG;
         } catch (e) {
             // console.log(e)
             execFns = [];
