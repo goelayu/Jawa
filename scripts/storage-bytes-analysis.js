@@ -90,22 +90,47 @@ var getAllIds = function () {
     return allIds;
 }
 
+var getExecutedFunctions = function () {
+    /**
+     * returns functions from single run,vs all runs
+     */
+    var paths = fs.readFileSync(program.performance, 'utf-8').split('\n');
+    var allFns = [], singleFns = [];
+    var smallestLenFn = Number.MAX_VALUE;
+    paths.forEach((path, idx) => {
+        if (path == '') return;
+        // console.log(path)
+        var fns = JSON.parse(fs.readFileSync(path, 'utf-8'));
+        allFns = allFns.concat(fns.preload);
+        // if (idx == 0) {
+        //     singleFns = fns.preload;
+        //     // smallestLenFn = fns.preload.length;
+        // }
+        if (fns.preload.length < smallestLenFn) {
+            smallestLenFn = fns.preload.length;
+            singleFns = fns.preload;
+        }
+    });
+    return [unique(allFns), unique(singleFns)];
+}
+
 function main() {
     // var evtFnsFile = `${program.performance}/cg`;
     // var evtDict = parse(evtFnsFile);
     // var evtFns = concatArr(evtDict);
     // var evtFiles = extractFileNames(evtFns);
     // var [totalSize, evtSize] = getJsSrcSize(evtFiles);
-    var totalSize = util.getFileSize(program.logDir)
     var allIds = getAllIds();
-
-    var preLoadFns = parse(`${program.performance}/allFns`);
+    // var preLoadFns = parse(`${program.performance}/allFns`);
     var idSrcLen = getIdLen(allIds);
+    var totalSize = util.getFileSize(program.logDir)
+    var [allFns, singleFns] = getExecutedFunctions();
 
-    var preloadSize = util.sumFnSizes(preLoadFns.preload, idSrcLen);
+    var singleSize = util.sumFnSizes(singleFns, idSrcLen);
+    var allSize = util.sumFnSizes(allFns, idSrcLen);
     // var preloadSizeExcluded = util.sumFnSizes(preLoadFns.preload, idSrcLen, evtFiles);
 
-    console.log(totalSize, preloadSize);
+    console.log(totalSize, singleSize, allSize);
 
 }
 

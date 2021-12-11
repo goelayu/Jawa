@@ -64,9 +64,9 @@ async function launch() {
 
     var outDir = program.output;
 
-    if (program.loadIter) {
-        options.userDataDir = program.chromeDir;
-    }
+    // if (program.loadIter) {
+    //     options.userDataDir = program.chromeDir;
+    // }
     if (program.filter) {
         puppeteer = require('puppeteer-extra');
         puppeteer.use(AdblockerPlugin({ blockTrackers: true, useCache: false }))
@@ -76,58 +76,68 @@ async function launch() {
     let page = await browser.newPage();
     var nLogs = [], cLogs = [], jProfile;
     var cdp = await page.target().createCDPSession();
-    console.log(await browser.userAgent());
     var _height = await page.evaluateHandle(() => window.screen.height);
     var _width = await page.evaluateHandle(() => window.screen.height);
     var height = await _height.jsonValue(), width = await _width.jsonValue();
     // console.log(height, width)
     if (program.deterministic) {
-        // await emulateUserAgent(page, 'iPhone 6');
+        // await emulateUserAgent(page, 'iPhone 4');
         // await page.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4182.0 Safari/537.36");
         //   console.log(await browser.userAgent());
         // await page.setViewport({ width: 1261, height: 3816 })
         await page.evaluateOnNewDocument((intercepts) => {
-            var origSetTimeout = window.setTimeout;
-            window.setTimeout = function () {
-                // if (arguments.length > 1 && !isNaN(Number.parseFloat(arguments[1]))){
-                //     arguments[1] = 0;
-                // }
-                // return origSetTimeout.apply(this, arguments);
-            }
-            window.setInterval = function () {
-
-            }
-
-            window.requestAnimationFrame = function () {
-
-            }
-
-            window.setImmediate = function () {
-
-            }
-
-            var observers = ['MutationObserver', 'ResizeObserver', 'IntersectionObserver', 'PerformanceObserver'];
-            observers.forEach((o) => {
-                window[o] = function () { };
-            })
-            // Object.defineProperty(navigator, "language", {
-            //     get: function() {
-            //         return "en-US";
+            Object.defineProperty(navigator, "language", {
+                get: function () {
+                    return "en-GB";
+                }
+            });
+            Object.defineProperty(navigator, "languages", {
+                get: function () {
+                    return ["en-GB"];
+                }
+            });
+            //     var origSetTimeout = window.setTimeout;
+            //     window.setTimeout = function () {
+            //         // if (arguments.length > 1 && !isNaN(Number.parseFloat(arguments[1]))){
+            //         //     arguments[1] = 0;
+            //         // }
+            //         // return origSetTimeout.apply(this, arguments);
             //     }
-            // });
-            // Object.defineProperty(navigator, "languages", {
-            //     get: function() {
-            //         return ["en-US"];
-            //     }
-            // });
-            // Date = function (r) { function n(n, t, a, u, i, f, o) { var c; switch (arguments.length) { case 0: case 1: c = new r(e); break; default: a = a || 1, u = u || 0, i = i || 0, f = f || 0, o = o || 0, c = new r(e) }return c } var e = 1619575609705; return n.parse = r.parse, n.UTC = r.UTC, n.toString = r.toString, n.prototype = r.prototype, n.now = function () { return 1438500151554 }, n }(Date);
-            // Math.exp = function () { function r(r) { var n = new ArrayBuffer(8); return new Float64Array(n)[0] = r, 0 | new Uint32Array(n)[1] } function n(r) { var n = new ArrayBuffer(8); return new Float64Array(n)[0] = r, new Uint32Array(n)[0] } function e(r, n) { var e = new ArrayBuffer(8); return new Uint32Array(e)[1] = r, new Uint32Array(e)[0] = n, new Float64Array(e)[0] } var t = [.5, -.5], a = [.6931471803691238, -.6931471803691238], u = [1.9082149292705877e-10, -1.9082149292705877e-10]; return function (i) { var f, o = 0, c = 0, w = 0, y = r(i), v = y >> 31 & 1; if ((y &= 2147483647) >= 1082535490) { if (y >= 2146435072) return isNaN(i) ? i : 0 == v ? i : 0; if (i > 709.782712893384) return 1 / 0; if (i < -745.1332191019411) return 0 } if (y > 1071001154) { if (y < 1072734898) { if (1 == i) return Math.E; c = i - a[v], w = u[v], o = 1 - v - v } else o = 1.4426950408889634 * i + t[v] | 0, f = o, c = i - f * a[0], w = f * u[0]; i = c - w } else { if (y < 1043333120) return 1 + i; o = 0 } f = i * i; var s = i - f * (.16666666666666602 + f * (f * (6613756321437934e-20 + f * (4.1381367970572385e-8 * f - 16533902205465252e-22)) - .0027777777777015593)); if (0 == o) return 1 - (i * s / (s - 2) - i); var A = 1 - (w - i * s / (2 - s) - c); return o >= -1021 ? A = e((o << 20) + r(A), n(A)) : (A = e((o + 1e3 << 20) + r(A), n(A)), A *= 9.332636185032189e-302) } }(),/*Math.random=function(){var r,n,e,t;return r=.8725217853207141,n=.520505596883595,e=.22893249243497849,t=1,function(){var a=2091639*r+2.3283064365386963e-10*t;return r=n,n=e,t=0|a,e=a-t}}()*/Math.random = function () { return 0.9322873996837797 }, Object.keys = function (r) { return function (n) { var e; return e = r(n), e.sort(), e } }(Object.keys);
+            //     window.setInterval = function () {
 
-            // var oldRandom = Math.random;
-            // Math.random = function(){
-            //     oldRandom.apply(this, arguments);
-            // }
-            // eval(intercepts);
+            //     }
+
+            //     window.requestAnimationFrame = function () {
+
+            //     }
+
+            //     window.setImmediate = function () {
+
+            //     }
+
+            //     var observers = ['MutationObserver', 'ResizeObserver', 'IntersectionObserver', 'PerformanceObserver'];
+            //     observers.forEach((o) => {
+            //         window[o] = function () { };
+            //     })
+            //     // Object.defineProperty(navigator, "language", {
+            //     //     get: function() {
+            //     //         return "en-US";
+            //     //     }
+            //     // });
+            //     // Object.defineProperty(navigator, "languages", {
+            //     //     get: function() {
+            //     //         return ["en-US"];
+            //     //     }
+            //     // });
+
+            //     Date = function (r) { function n(n, t, a, u, i, f, o) { var c; switch (arguments.length) { case 0: case 1: c = new r(e); break; default: a = a || 1, u = u || 0, i = i || 0, f = f || 0, o = o || 0, c = new r(e) }return c } var e = 1619575609705; return n.parse = r.parse, n.UTC = r.UTC, n.toString = r.toString, n.prototype = r.prototype, n.now = function () { return 1438500151554 }, n }(Date);
+            //     Math.exp = function () { function r(r) { var n = new ArrayBuffer(8); return new Float64Array(n)[0] = r, 0 | new Uint32Array(n)[1] } function n(r) { var n = new ArrayBuffer(8); return new Float64Array(n)[0] = r, new Uint32Array(n)[0] } function e(r, n) { var e = new ArrayBuffer(8); return new Uint32Array(e)[1] = r, new Uint32Array(e)[0] = n, new Float64Array(e)[0] } var t = [.5, -.5], a = [.6931471803691238, -.6931471803691238], u = [1.9082149292705877e-10, -1.9082149292705877e-10]; return function (i) { var f, o = 0, c = 0, w = 0, y = r(i), v = y >> 31 & 1; if ((y &= 2147483647) >= 1082535490) { if (y >= 2146435072) return isNaN(i) ? i : 0 == v ? i : 0; if (i > 709.782712893384) return 1 / 0; if (i < -745.1332191019411) return 0 } if (y > 1071001154) { if (y < 1072734898) { if (1 == i) return Math.E; c = i - a[v], w = u[v], o = 1 - v - v } else o = 1.4426950408889634 * i + t[v] | 0, f = o, c = i - f * a[0], w = f * u[0]; i = c - w } else { if (y < 1043333120) return 1 + i; o = 0 } f = i * i; var s = i - f * (.16666666666666602 + f * (f * (6613756321437934e-20 + f * (4.1381367970572385e-8 * f - 16533902205465252e-22)) - .0027777777777015593)); if (0 == o) return 1 - (i * s / (s - 2) - i); var A = 1 - (w - i * s / (2 - s) - c); return o >= -1021 ? A = e((o << 20) + r(A), n(A)) : (A = e((o + 1e3 << 20) + r(A), n(A)), A *= 9.332636185032189e-302) } }(),/*Math.random=function(){var r,n,e,t;return r=.8725217853207141,n=.520505596883595,e=.22893249243497849,t=1,function(){var a=2091639*r+2.3283064365386963e-10*t;return r=n,n=e,t=0|a,e=a-t}}()*/Math.random = function () { return 0.9322873996837797 }, Object.keys = function (r) { return function (n) { var e; return e = r(n), e.sort(), e } }(Object.keys);
+
+            //     // var oldRandom = Math.random;
+            //     // Math.random = function(){
+            //     //     oldRandom.apply(this, arguments);
+            //     // }
+            eval(intercepts);
         }, intercepts);
     } else {
         // await page.evaluateOnNewDocument(() => {
@@ -151,24 +161,21 @@ async function launch() {
 
     if (program.loadIter) {
         console.log(`Part of a series of page loads`)
-        var count = program.loadIter, agent = 'desktop';
-        if (count == 0 || count == 1)
-            agent = 'desktop'
-        await emulateUserAgent(page, agent);
+        await emulateUserAgent(page, program.loadIter);
     }
 
-    await page.setRequestInterception(true);
-    page.on('request', (request) => {
-        if (request.url().indexOf('wombat.js') >= 0) {
-            request.respond({
-                status: 200,
-                contentType: 'application/javascript; charset=utf-8',
-                body: customWombat
-            });
-        } else {
-            request.continue();
-        }
-    });
+    // await page.setRequestInterception(true);
+    // page.on('request', (request) => {
+    //     if (request.url().indexOf('wombat.js') >= 0) {
+    //         request.respond({
+    //             status: 200,
+    //             contentType: 'application/javascript; charset=utf-8',
+    //             body: customWombat
+    //         });
+    //     } else {
+    //         request.continue();
+    //     }
+    // });
 
     // console.log(`User agent is: ${await browser.userAgent()}`);
     await initCDP(cdp);
@@ -319,23 +326,15 @@ var initCDP = async function (cdp) {
     await cdp.send('Profiler.enable');
 }
 
-var emulateUserAgent = async function (page, agent) {
-    /**
-     * If agent value not provided, randomly chooses an agent from the list; 
-     */
-    var devices = puppeteerOg.devices;
-    if (!agent) {
-        var deviceNames = Object.keys(devices);
-        // deviceNames.push('desktop');
-        agent = deviceNames[Math.floor(Math.random() * deviceNames.length)];
-    }
-    console.log('found agent', agent)
-    if (agent == 'desktop') {
+var emulateUserAgent = async function (page, loadIter) {
+    var deviceIndex = loadIter * 2;
+    if (deviceIndex == 0) {
         await page.setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36");
         return
     }
 
-    var agentSettings = devices[agent];
+    var agentSettings = puppeteer.devices[deviceIndex];
+    console.log(`setting: ${agentSettings.userAgent}`);
     await page.emulate(agentSettings);
 }
 
@@ -439,7 +438,7 @@ var extractHandlers = async function (page, cdp, nTimes) {
     for (var i = 0; i < nTimes; i++) {
         //trigger event handlers
         await page.evaluateHandle(() => triggerEvents(_final_elems))
-        // await chromeFns.getCallGraph(page, program, i);
+        await chromeFns.getCallGraph(page, program, i);
     }
     // var cgEnd = process.hrtime(cgStart);
     // console.log(`${program.url} Time EVT ${cgEnd[0]} ${cgEnd[1]/(1000*1000)}`)
