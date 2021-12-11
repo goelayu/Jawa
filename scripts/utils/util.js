@@ -418,6 +418,72 @@ var matchNetwork = function (net1, net2) {
     // console.log(net1.filter(e=>!ignoreUrl(e)).reduce(sum,0), net2.filter(e=>!ignoreUrl(e)).reduce(sum, 0));
 }
 
+var failedRequestsBreakdown = function (net1, net2) {
+
+    var exactMatch = function (url1, url2) {
+        return url1 == url2;
+    }
+
+    var queryMatch = function (u1, u2) {
+        // return u1 == u2;
+        u1 = u1.split('?')[0],
+            u2 = u2.split('?')[0];
+
+        if (u1 == u2) return true;
+        return false;
+    }
+
+    var fuzzMatch = function (src, options) {
+        var bestMatch, bestScore = 0;
+        options.forEach((target) => {
+            var score;
+            if ((score = fuzz.ratio(src, target)) > bestScore) {
+                bestScore = score;
+                bestMatch = target;
+            }
+        })
+        return bestMatch;
+    }
+
+    net1 = netParser.parseNetworkLogs(parse(net1)),
+        net2 = netParser.parseNetworkLogs(parse(net2));
+
+    //get all failed requests
+    var totalNet2 = net2.filter(e => e.response && e.type && e.response.status == 200);
+    var failedRequests = net2.filter(e => e.response && e.response.status != 200);
+    var exactMatchCount = failedRequests.length;
+
+    var querystrip = fuzzy = exactMatchCount,
+        fuzzyCache = [];
+    for (var f of failedRequests) {
+        var foundMatch = false;
+        for (var n1 of net1) {
+            if (exactMatch(n1.url, f.url)) {
+                exactMatchCount--;
+                break;
+            }
+        }
+        for (var n1 of net1) {
+            if (queryMatch(n1.url, f.url)) {
+                querystrip--;
+                foundMatch = true;
+                break;
+            }
+        }
+        if (foundMatch) {
+            fuzzy--;
+            continue;
+        }
+        // else console.log(f.url)
+        var fuzzBestMatch = fuzzMatch(f.url, net1.filter(e => e.type == f.type).map(e => e.url));
+        if (fuzzBestMatch && fuzzyCache.indexOf(fuzzBestMatch) < 0) {
+            fuzzy--;
+            fuzzyCache.push(fuzzBestMatch)
+        }
+    }
+    console.log(totalNet2.length, exactMatchCount, querystrip, fuzzy);
+}
+
 var getResOnPage = function (data) {
     var net = netParser.parseNetworkLogs(parse(data)),
         total = 0, size = 0;
@@ -690,5 +756,6 @@ switch (program.type) {
     case 'coverage': combineCoverage(program.input, program.anotherin); break;
     case 'Icoverage': instCoverage(program.input, program.anotherin); break;
     case 'quick': quickNet(parse(program.input)); break;
+    case 'brk': failedRequestsBreakdown(program.input, program.anotherin); break;
 
 }
