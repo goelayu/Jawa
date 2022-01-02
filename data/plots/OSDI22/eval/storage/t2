@@ -1,0 +1,128 @@
+www.abcnews.go.com Dedup:  js 5246506879 image 750931057 css 84607468 html  285381153
+www.abcnews.go.com Orig:  js 16542478459 image 2428033248 css 277477645 html 374235983
+www.abcnews.go.com System:  Final: filetotal: 10695282223 fileDedup: 3193321200 fnTotal: 4190759859.980565 fnDedup: 2281889519.2200007 fnUnion 1932831611
+www.abcnews.go.com System (filter):  Final: filetotal: 9185668299 fileDedup: 2647730072 fnTotal: 3640015275.640319 fnDedup: 2038434666.2699924 fnUnion 1674443308
+www.abcnews.go.com unionAll 1683021718
+www.abcnews.go.com cSizeOrig  6201041 sSizeOrig  84689550
+www.abcnews.go.com cSizeUnion  159987997 sSizeUnion  75435812
+www.abcnews.go.com -4 -1 1
+www.accuweather.com Dedup:  js 1977012725 image 583994150 css 18644138 html  277970710
+www.accuweather.com Orig:  js 5934693622 image 1419050026 css 159871645 html 364185831
+www.accuweather.com System:  Final: filetotal: 5236075574 fileDedup: 1613427789 fnTotal: 2240966441.789468 fnDedup: 1324880788.7599807 fnUnion 1035822406
+www.accuweather.com System (filter):  Final: filetotal: 2342181436 fileDedup: 554335455 fnTotal: 1013967620.1499472 fnDedup: 537798420.1400076 fnUnion 496115310
+www.accuweather.com unionAll 393663555
+www.accuweather.com cSizeOrig  2905056 sSizeOrig  81039750
+www.accuweather.com cSizeUnion  85674645 sSizeUnion  73739599
+www.accuweather.com -1 2 5
+www.aljazeera.com Dedup:  js 3247928995 image 2254396377 css 41063653 html  864763597
+www.aljazeera.com Orig:  js 10596278079 image 3388682099 css 234988730 html 1573376404
+www.aljazeera.com System:  Final: filetotal: 7989519089 fileDedup: 2202059993 fnTotal: 3945337323.6800346 fnDedup: 2030460840.7999482 fnUnion 1723404537
+www.aljazeera.com System (filter):  Final: filetotal: 6534092037 fileDedup: 1787199372 fnTotal: 3253237678.8699784 fnDedup: 1733509407.7099776 fnUnion 1377710342
+www.aljazeera.com unionAll 1439242175
+www.aljazeera.com cSizeOrig  4330480 sSizeOrig  97765800
+www.aljazeera.com cSizeUnion  132182446 sSizeUnion  93980405
+www.aljazeera.com -1 1 4
+www.business-standard.com Dedup:  js 1833644760 image 526825183 css 31875886 html  341451040
+www.business-standard.com Orig:  js 15040122689 image 1655823392 css 540791970 html 2080154463
+www.business-standard.com System:  Final: filetotal: 9697709252 fileDedup: 1250564816 fnTotal: 1597047186.0000691 fnDedup: 813355035.629999 fnUnion 451975449
+www.business-standard.com System (filter):  Final: filetotal: 8652992009 fileDedup: 793822725 fnTotal: 1147137716.5999997 fnDedup: 529960798.8999998 fnUnion 244443320
+www.business-standard.com unionAll 361853392
+www.business-standard.com cSizeOrig  2456531 sSizeOrig  111978075
+www.business-standard.com cSizeUnion  24462471 sSizeUnion  109040613
+www.business-standard.com -2 2 8
+www.chicagotribune.com Dedup:  js 3409597662 image 443329293 css 47999437 html  746242103
+www.chicagotribune.com Orig:  js 13080926344 image 1370158953 css 249512320 html 936850650
+www.chicagotribune.com System:  Adding evt graph: 30
+www.chicagotribune.com System (filter):  Adding evt graph: 30
+www.chicagotribune.com unionAll 572239794
+www.chicagotribune.com cSizeOrig  6878641 sSizeOrig  164622975
+www.chicagotribune.com cSizeUnion  88151166 sSizeUnion  144189390
+www.chicagotribune.com -6 -1 5
+www.chron.com Dedup:  js 3718428615 image 6107891296 css 34111305 html  489332274
+www.chron.com Orig:  js 16641741526 image 8648806537 css 219007427 html 1220408606
+www.chron.com System:  Final: filetotal: 12420220666 fileDedup: 2776092878 fnTotal: 6019492460.729389 fnDedup: 2540906051.0000772 fnUnion 2051918539
+www.chron.com System (filter):  Final: filetotal: 9260513320 fileDedup: 1979173032 fnTotal: 4961827870.739589 fnDedup: 2193329083.200046 fnUnion 1485454730
+www.chron.com unionAll 1694980719
+www.chron.com cSizeOrig  5790092 sSizeOrig  139982700
+www.chron.com cSizeUnion  111900629 sSizeUnion  132308326
+www.chron.com 0 8 18
+www.cnbc.com Dedup:  js 2773782031 image 247123953 css 22872652 html  1498337614
+www.cnbc.com Orig:  js 7769564341 image 334395891 css 99113356 html 1515179304
+www.cnbc.com System:  Final: filetotal: 2970485176 fileDedup: 745347668 fnTotal: 593626809.5599833 fnDedup: 339031397.09000874 fnUnion 282797678
+www.cnbc.com System (filter):  Final: filetotal: 2710732124 fileDedup: 621220325 fnTotal: 492317808.22000945 fnDedup: 282764163.6900105 fnUnion 158395741
+www.cnbc.com unionAll 154750385
+www.cnbc.com cSizeOrig  3974740 sSizeOrig  81172575
+www.cnbc.com cSizeUnion  17720674 sSizeUnion  78751004
+www.cnbc.com -3 -2 -1
+www.dailycaller.com Dedup:  js 3167737615 image 173064300 css 27387902 html  1246509087
+www.dailycaller.com Orig:  js 13122478947 image 1474477297 css 64853185 html 1736831316
+www.dailycaller.com System:  Final: filetotal: 9499312767 fileDedup: 1769242343 fnTotal: 4880968051.471016 fnDedup: 1990483778.6198633 fnUnion 1373775881
+www.dailycaller.com System (filter):  Final: filetotal: 6485283844 fileDedup: 1263969147 fnTotal: 3768662286.6301894 fnDedup: 1634633533.6398518 fnUnion 1025561397
+www.dailycaller.com unionAll 1090550548
+www.dailycaller.com cSizeOrig  3916143 sSizeOrig  138369000
+www.dailycaller.com cSizeUnion  95580311 sSizeUnion  129004883
+www.dailycaller.com 0 4 8
+www.economist.com Dedup:  js 2049783694 image 405428414 css 93358809 html  319011509
+www.economist.com Orig:  js 13114487185 image 1238148969 css 780270127 html 339611263
+www.economist.com System:  Final: filetotal: 9793209580 fileDedup: 1369596881 fnTotal: 3913747934.579864 fnDedup: 1120459585.9099827 fnUnion 1044837842
+www.economist.com System (filter):  Final: filetotal: 5630165689 fileDedup: 616674400 fnTotal: 2503138138.4091797 fnDedup: 554592462.7300221 fnUnion 612107891
+www.economist.com unionAll 410820349
+www.economist.com cSizeOrig  3703931 sSizeOrig  125432175
+www.economist.com cSizeUnion  62133222 sSizeUnion  113365809
+www.economist.com -7 -2 3
+www.financialexpress.com Dedup:  js 1970271524 image 193113705 css 44964893 html  216965099
+www.financialexpress.com Orig:  js 10847546914 image 680572296 css 204196702 html 440230410
+www.financialexpress.com System:  Final: filetotal: 5239251680 fileDedup: 1537941200 fnTotal: 2156585224.0192947 fnDedup: 1010359143.589972 fnUnion 750850686
+www.financialexpress.com System (filter):  Final: filetotal: 3243596565 fileDedup: 658832004 fnTotal: 1305811823.9097073 fnDedup: 419099524.4900161 fnUnion 362606124
+www.financialexpress.com unionAll 351637636
+www.financialexpress.com cSizeOrig  3698695 sSizeOrig  90838000
+www.financialexpress.com cSizeUnion  35883451 sSizeUnion  86480980
+www.financialexpress.com 1 8 17
+www.france24.com Dedup:  js 1341873217 image 63057016 css 22660333 html  395246827
+www.france24.com Orig:  js 8996532567 image 214576756 css 214623229 html 444274136
+www.france24.com System:  Final: filetotal: 6659729583 fileDedup: 770180691 fnTotal: 2534590756.950381 fnDedup: 553574505.2999998 fnUnion 362002819
+www.france24.com System (filter):  Final: filetotal: 5223889989 fileDedup: 606565805 fnTotal: 1982671572.9301984 fnDedup: 402454501.5600019 fnUnion 284432631
+www.france24.com unionAll 307165645
+www.france24.com cSizeOrig  1705704 sSizeOrig  61928350
+www.france24.com cSizeUnion  42405962 sSizeUnion  61391394
+www.france24.com 4 7 11
+www.newsweek.com Dedup:  js 8438003636 image 737165171 css 64335978 html  1129754542
+www.newsweek.com Orig:  js 19814316949 image 2253517601 css 251382846 html 1781854844
+www.newsweek.com System:  Final: filetotal: 11522210979 fileDedup: 3831091987 fnTotal: 4871085265.619011 fnDedup: 2633556504.509963 fnUnion 2276773874
+www.newsweek.com System (filter):  Final: filetotal: 8393673163 fileDedup: 2795237534 fnTotal: 3525502478.4188137 fnDedup: 1975735882.6102362 fnUnion 1714181321
+www.newsweek.com unionAll 1634751106
+www.newsweek.com cSizeOrig  8143366 sSizeOrig  177373075
+www.newsweek.com cSizeUnion  201386694 sSizeUnion  172324507
+www.newsweek.com 1 6 11
+www.oregonlive.com Dedup:  js 4110842018 image 2481650761 css 69998778 html  316770754
+www.oregonlive.com Orig:  js 23925556241 image 4041897686 css 522936919 html 765412639
+www.oregonlive.com System:  Final: filetotal: 22179814677 fileDedup: 3646671614 fnTotal: 8957935330.063923 fnDedup: 3736912209.539968 fnUnion 2817020901
+www.oregonlive.com System (filter):  Final: filetotal: 15493587886 fileDedup: 2533036651 fnTotal: 5805505859.780918 fnDedup: 2760659828.9799256 fnUnion 1853245868
+www.oregonlive.com unionAll 1795997895
+www.oregonlive.com cSizeOrig  6122116 sSizeOrig  157019500
+www.oregonlive.com cSizeUnion  240427036 sSizeUnion  135250468
+www.oregonlive.com 1 20 34
+www.theatlantic.com Dedup:  js 3258315588 image 1031127478 css 37075287 html  391083600
+www.theatlantic.com Orig:  js 11700852200 image 1702781205 css 101709701 html 474407153
+www.theatlantic.com System:  Final: filetotal: 10235153993 fileDedup: 2305836819 fnTotal: 4891454311 fnDedup: 2313852500 fnUnion 1038546484
+www.theatlantic.com System (filter):  Final: filetotal: 6900527934 fileDedup: 1627761820 fnTotal: 2929338129 fnDedup: 1570758647 fnUnion 696940777
+www.theatlantic.com unionAll 1165318709
+www.theatlantic.com cSizeOrig  3783395 sSizeOrig  83109400
+www.theatlantic.com cSizeUnion  133446818 sSizeUnion  78078822
+www.theatlantic.com -3 2 10
+www.theguardian.com Dedup:  js 2209420225 image 602706212 css 145703481 html  752378812
+www.theguardian.com Orig:  js 5197801250 image 1581649127 css 407778897 html 848258504
+www.theguardian.com System:  Final: filetotal: 3777728810 fileDedup: 1270805847 fnTotal: 1686980578.8408577 fnDedup: 823994389.3899236 fnUnion 903503618
+www.theguardian.com System (filter):  Final: filetotal: 3436305285 fileDedup: 1029105920 fnTotal: 1510867126.4207056 fnDedup: 696180756.1499491 fnUnion 775224286
+www.theguardian.com unionAll 585197379
+www.theguardian.com cSizeOrig  4800411 sSizeOrig  70945325
+www.theguardian.com cSizeUnion  123375662 sSizeUnion  71310301
+www.theguardian.com 1 5 13
+www.time.com Dedup:  js 2993080928 image 302912251 css 44579812 html  1510159579
+www.time.com Orig:  js 8132806629 image 886256222 css 554887604 html 1706434549
+www.time.com System:  Final: filetotal: 6397258523 fileDedup: 1454033209 fnTotal: 2195934802.649723 fnDedup: 765559519.2200031 fnUnion 727686875
+www.time.com System (filter):  Final: filetotal: 3705616456 fileDedup: 917728101 fnTotal: 1328715993.3198109 fnDedup: 529551624.6999973 fnUnion 542299906
+www.time.com unionAll 419865320
+www.time.com cSizeOrig  2287978 sSizeOrig  56555950
+www.time.com cSizeUnion  56829604 sSizeUnion  49899017
+www.time.com -7 -3 3
