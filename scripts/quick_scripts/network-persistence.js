@@ -13,17 +13,18 @@ program
     .parse(process.argv);
 
 var getOrigUrl = function (n) {
+    var url;
     if (ignoreUrl(n)) return null;
     var timeStamp = timeStampInURL(n.url);
     if (!timeStamp) return null;
     if (n.redirects.length) {
-        return n.redirects[n.redirects.length - 1].url;
+        url = stripQuery(n.redirects[n.redirects.length - 1].url);
     }
-    return n.url;
+    url = stripQuery(n.url);
     var urlPrefix = `https://web.archive.org/web/${timeStamp}`;
-    var _origUrl = n.url.split(urlPrefix)
+    var _origUrl = url.split(urlPrefix)
     if (_origUrl.length > 1)
-        return _origUrl[1];
+        return [_origUrl[1], timeStamp];
 }
 
 var ignoreUrl = function (n) {
@@ -50,6 +51,32 @@ var timeStampInURL = function (url) {
     return false
 }
 
+var isSameSize = function (src, target) {
+    // return false;
+    return Math.abs((src - target) / target) < 0.01
+}
+
+var isSubset = function (src, target) {
+    return src.every((e) => {
+        return target.some((e2) => {
+            return (e[0] == e2[0] && (e[1] == e2[1] || isSameSize(e[2], e2[2])));
+        });
+    });
+}
+
+var isUniqueSnapshot = function (arr, snapshots) {
+    var unique = true;
+    for (var i = 0; i < snapshots.length; i++) {
+        if (isSubset(arr, snapshots[i])) return false;
+    }
+    return unique;
+}
+
+var stripQuery = function (url) {
+    var idx = url.indexOf('?');
+    return idx >= 0 ? url.slice(0, idx) : url;
+}
+
 var getDataFromNet = function (n) {
     try {
         var net = netParser.parseNetworkLogs(JSON.parse(fs.readFileSync(n, 'utf-8')));
@@ -59,7 +86,7 @@ var getDataFromNet = function (n) {
             if (!origUrl) continue;
             var type = n.type.indexOf('script') >= 0 ? 'js' : 'other';
             if (type != 'js') continue;
-            netData.push(origUrl)
+            netData.push([...origUrl, n.size])
         }
         return netData;
     } catch (e) {
@@ -84,9 +111,10 @@ var main = function () {
         if (p == '') return;
         try {
             program.verbose && console.log(p);
-            var curNetFiles = getDataFromNet(`${program.path}/${p}/network`).toString();
-            console.log(curNetFiles)
-            if (netFiles.unique.indexOf(curNetFiles) < 0) {
+            var curNetFiles = getDataFromNet(p);
+            if (!curNetFiles.length) return;
+            console.log(p, curNetFiles)
+            if (isUniqueSnapshot(curNetFiles, netFiles.unique)) {
                 netFiles.unique.push(curNetFiles);
             }
             netFiles.all.push(curNetFiles);

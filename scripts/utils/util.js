@@ -161,11 +161,11 @@ var getSizePerType = function (data) {
     var net = netParser.parseNetworkLogs(parse(data));
     var type2size = {};
     for (var n of net) {
-        if (!n.type || !n.size
-            || !isCriticalReq(n)) continue;
-        var type;
+        if (!n.type || !n.size) continue;
+        // || !isCriticalReq(n)) continue;
+        var type = null;
         // var mainTypes = ['Image', 'Script','Document', 'Stylesheet'];
-        const mainTypes = ["image", "html", "script", "css", "json", ""];
+        const mainTypes = ["image", "html", "script", "css", "json"];
         for (var t of mainTypes) {
             if (n.type.indexOf(t) >= 0) {
                 type = t;
@@ -175,8 +175,10 @@ var getSizePerType = function (data) {
         // if (type != 'script') continue
         // console.log(n.url);
         // continue;
-        if (mainTypes.indexOf(type) < 0)
-            type = 'Other';
+        // console.log(type, n.type)
+        // if (mainTypes.indexOf(type) < 0)
+        //     type = 'Other';
+        if (!type) type = 'other'
         if (!(type in type2size))
             type2size[type] = 0;
         type2size[type] += n.size;
@@ -198,10 +200,11 @@ var getSizePerType = function (data) {
 var getNumPerType = function (data) {
     var net = netParser.parseNetworkLogs((data));
     var type2num = {};
-    console.log(net[0].redirects.length, net.length);
-    return;
+    // console.log(net[0].redirects.length, net.length);
+    // return;
     for (var n of net) {
-        if (!n.type || !isCriticalReq(n)) continue;
+        if (!n.type) continue;
+        // if (!n.type || !isCriticalReq(n)) continue;
 
         if (!(n.type in type2num))
             type2num[n.type] = 0;
@@ -211,6 +214,7 @@ var getNumPerType = function (data) {
     // Object.keys(type2size).forEach((t)=>{
     //     console.log(`${t} ${type2size[t]/totalSize}`);
     // });
+    console.log(type2num)
     console.log(type2num['Script'], totalSize);
     // return type2size;
 }
@@ -333,6 +337,63 @@ var ignoreUrl = function (n, net) {
 
 }
 
+var findMatchForFailed = function (net1, net2) {
+    var net1 = netParser.parseNetworkLogs(parse(net1));
+    var net2 = netParser.parseNetworkLogs(parse(net2));
+    var failed = [], totalB = failedB = 0;
+    // console.log(net1)
+
+    var getOrigUrl = function (n) {
+        // if (ignoreUrl(n)) return null;
+        var timeStamp = timeStampInURL(n.url);
+        if (!timeStamp) return null;
+        if (n.redirects.length) {
+            return n.redirects[n.redirects.length - 1].url;
+        }
+        return n.url;
+        var urlPrefix = `https://web.archive.org/web/${timeStamp}`;
+        var _origUrl = n.url.split(urlPrefix)
+        if (_origUrl.length > 1)
+            return _origUrl[1];
+    }
+
+    for (var n of net1) {
+        if (!isValidUrl(n)) continue;
+        if (!n.response) continue;
+
+        if (n.response && n.response.status > 400 && n.response.status < 500) {
+            failed.push(n);
+        }
+        if (!getOrigUrl(n)) continue;
+        if (!n.size) continue;
+        totalB += n.size;
+    }
+    var fuzzMatch = function (src, options) {
+        var sUrl = getOrigUrl(src)
+        var bestMatch, bestScore = 0;
+        options.forEach((target) => {
+            var score;
+            if ((score = fuzz.ratio(sUrl, target.url)) > bestScore) {
+                bestScore = score;
+                bestMatch = target;
+            }
+        })
+        return bestMatch;
+    }
+
+    for (var f of failed) {
+        var fuzzBestMatch = fuzzMatch(f, net2);
+        if (fuzzBestMatch && fuzzBestMatch.size) {
+            // console.log(`${f.url} matched with ${fuzzBestMatch.url}`)
+            // console.log(f.type, fuzzBestMatch.type)
+            failedB += fuzzBestMatch.size;
+        }
+
+    }
+    console.log(failed.length, failedB, totalB);
+
+
+}
 var matchNetwork = function (net1, net2) {
     /**
      * returns the total number of bytes mismatched; size in kB
@@ -449,8 +510,8 @@ var failedRequestsBreakdown = function (net1, net2) {
         net2 = netParser.parseNetworkLogs(parse(net2));
 
     //get all failed requests
-    var totalNet2 = net2.filter(e => e.response && e.type && e.response.status == 200);
-    var failedRequests = net2.filter(e => e.response && e.response.status != 200);
+    var totalNet2 = net2.filter(e => e.response && e.type && e.response.status);
+    var failedRequests = net2.filter(e => e.response && e.response.status);
     var exactMatchCount = failedRequests.length;
 
     var querystrip = fuzzy = exactMatchCount,
@@ -460,9 +521,12 @@ var failedRequestsBreakdown = function (net1, net2) {
         for (var n1 of net1) {
             if (exactMatch(n1.url, f.url)) {
                 exactMatchCount--;
+                foundMatch = true;
                 break;
             }
         }
+        // if (!foundMatch) console.log(f.url);
+        foundMatch = false;
         for (var n1 of net1) {
             if (queryMatch(n1.url, f.url)) {
                 querystrip--;
@@ -736,6 +800,25 @@ var quickNet = function (net) {
     console.log(firstNet.response.status);
 }
 
+var singleFnEvt = function (e) {
+    var cg = JSON.parse(fs.readFileSync(e, 'utf-8'));
+    var total = single = 0;
+    Object.keys(cg).forEach(k => {
+        var fnCount = 0;
+        var fns = cg[k];
+        for (var f of fns) {
+            if (f.indexOf('_on') >= 0) {
+                if (fnCount == 1) single++;
+                total++;
+                fnCount = 0;
+            } else fnCount++;
+        }
+        if (fnCount == 1) single++;
+        total++;
+    });
+    console.log(total, single);
+}
+
 switch (program.type) {
     case "prune": pruneDB(parse(program.input)); break
     case "netSize": getNetSize(parse(program.input)); break;
@@ -757,5 +840,7 @@ switch (program.type) {
     case 'Icoverage': instCoverage(program.input, program.anotherin); break;
     case 'quick': quickNet(parse(program.input)); break;
     case 'brk': failedRequestsBreakdown(program.input, program.anotherin); break;
+    case 'failedB': findMatchForFailed(program.input, program.anotherin); break;
+    case 'evtfn': singleFnEvt(program.input); break;
 
 }

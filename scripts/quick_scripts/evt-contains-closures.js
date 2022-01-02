@@ -24,4 +24,21 @@ var containsClosure = function () {
     return false;
 }
 
-console.log(containsClosure());
+var iscomplexDOM = function () {
+    var state = JSON.parse(fs.readFileSync(program.file, 'utf8'));
+    var total = indirect = 0;
+    Object.keys(state).forEach(function (evt) {
+        var stateArr = state[evt].filter(e => e[0] == 'DOMS');
+        if (stateArr.length) {
+            total += stateArr[0][1].length;
+            var relevant = stateArr[0][1].filter(e => e[0] == 'HTMLElement' || e[0] == 'Node');
+            // console.log(relevant)
+            indirect += relevant.filter(e => e[1].indexOf('RootNode') >= 0 || e[1].indexOf('siblings') >= 0
+                || e[1].indexOf('hasChildNodes') >= 0).length;
+        }
+    });
+    console.log(total, indirect)
+}
+
+iscomplexDOM();
+// console.log(containsClosure());
