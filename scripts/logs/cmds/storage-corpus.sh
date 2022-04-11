@@ -12,11 +12,9 @@
 
 
 # create inst and replay cmds 
-goelayu@wolverines:~/webArchive/program_analysis$ ls ../data/storage-mix-large/500k-snapshot/ | grep crawler | while read crawler; do less ../data/storage-mix-large/500k-snapshot/$crawler/logs | grep 'making directory' | head -n 5000 | awk '{print $3}' | cut -d/ -f4- | while read i; do echo "mkdir -p '/w/goelayu/webA
-rchive/data/$crawler/mod/$i' && mkdir -p '/w/goelayu/webArchive/data/$crawler/instOutput/$i' && python ../pyutils/instrument.py '/w/goelayu/webArchive/data/$crawler/orig/$i' '/w/goelayu/webArchive/data/$crawler/mod/$i' dynamic-cfg '/w/goelayu/webArchive/data/$crawler/instOutput/$i' --filter &> '/w/goelayu/webArchive/
-data/$crawler/instOutput/$i/py_out'" ; done > ../data/storage-mix-large/500k-snapshot/stats/inst_cmds/$crawler &   done
+goelayu@wolverines:~/webArchive/program_analysis$ ls ../data/storage-mix-large/1m-snapshot/ | grep crawler | while read crawler; do less ../data/storage-mix-large/1m-snapshot/$crawler/logs | grep 'making directory' | awk '{print $3}' | cut -d/ -f4- | while read i; do echo "mkdir -p '/w/goelayu/webArchive/data/$crawler/mod/$i' && mkdir -p '/w/goelayu/webArchive/data/$crawler/instOutput/$i' && python ../pyutils/instrument.py '/w/goelayu/webArchive/data/$crawler/orig/$i' '/w/goelayu/webArchive/data/$crawler/mod/$i' dynamic-cfg '/w/goelayu/webArchive/data/$crawler/instOutput/$i' &> '/w/goelayu/webArchive/data/$crawler/instOutput/$i/py_out'" ; done > ../data/storage-mix-large/1m-snapshot/stats/inst_cmds/$crawler &   done
 
-goelayu@wolverines:~/webArchive/program_analysis$ ls ../data/storage-mix-large/500k-snapshot/ | grep crawler | while read crawler; do less ../data/storage-mix-large/500k-snapshot/$crawler/logs | grep 'mm-webrecord' | head -n 5000 | while read j; do i=`echo $j | awk '{print $2}' | cut -d/ -f4-`; site=`echo $j | awk '{print $6}'`; echo "DATAFLAGS=\"-n -j --wait --custom CG --timeout 30000 --logs\" ./replay_mahimahi.sh '/w/goelayu/webArchive/data/$crawler/mod/$i' '/w/goelayu/webArchive/data/$crawler/performance/$i/' replay archive $site" ; done > ../data/storage-mix-large/500k-snapshot/stats/replay_cmds/$crawler &  done
+goelayu@wolverines:~/webArchive/program_analysis$ ls ../data/storage-mix-large/1m-snapshot/ | grep crawler | while read crawler; do less ../data/storage-mix-large/1m-snapshot/$crawler/logs | grep 'mm-webrecord'  | while read j; do i=`echo $j | awk '{print $2}' | cut -d/ -f4-`; site=`echo $j | awk '{print $6}'`; echo "DATAFLAGS=\"-n -j --filter --custom CG --timeout 30000 --logs\" ./replay_mahimahi.sh '/w/goelayu/webArchive/data/$crawler/mod/$i' '/w/goelayu/webArchive/data/$crawler/performance/$i/' replay archive '$site'" ; done > ../data/storage-mix-large/1m-snapshot/stats/replay_cmds/$crawler &  done
 
 
 
