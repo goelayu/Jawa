@@ -8,7 +8,9 @@ var puppeteerOg = require('puppeteer'),
     program = require('commander'),
     fs = require('fs'),
     chromeFns = require('../scripts/chrome-ctx-scripts/fns'),
-    AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
+    AdblockerPlugin = require('puppeteer-extra-plugin-adblocker'),
+    { intercept, patterns } = require('puppeteer-interceptor'),
+    rewriter = require(`../program_analysis/rewriters/dynamic-cfg`);
 
 program
     .option('-o, --output [output]', 'path to the output directory')
@@ -39,6 +41,7 @@ const DISTILLDOM = `${__dirname}/../dom-distill/lib/domdistiller.js`
 const HANDLERS = `${__dirname}/../scripts/chrome-ctx-scripts/fetch-listeners.js`
 
 var intercepts = fs.readFileSync('../program_analysis/runtime/dynamic-api-intercepts.js', 'utf-8');
+var tracerObj = fs.readFileSync('../program_analysis/runtime/tracer.js', 'utf-8');
 
 async function launch() {
     const options = {
@@ -48,7 +51,7 @@ async function launch() {
             '--disable-features=IsolateOrigins,site-per-process,CrossSiteDocumentBlockingAlways,CrossSiteDocumentBlockingIfIsolating',
             '--no-sandbox',
             '--disable-setuid-sandbox',
-            '--proxy-server=localhost:8081'
+            // '--proxy-server=localhost:8080'
         ],
         // '--no-first-run'],
         // ignoreDefaultArgs: true,
@@ -89,28 +92,28 @@ async function launch() {
         // await page.setViewport({ width: 1261, height: 3816 })
         await page.evaluateOnNewDocument((intercepts) => {
             var origSetTimeout = window.setTimeout;
-            window.setTimeout = function () {
-                // if (arguments.length > 1 && !isNaN(Number.parseFloat(arguments[1]))){
-                //     arguments[1] = 0;
-                // }
-                // return origSetTimeout.apply(this, arguments);
-            }
-            window.setInterval = function () {
+            // window.setTimeout = function () {
+            //     // if (arguments.length > 1 && !isNaN(Number.parseFloat(arguments[1]))){
+            //     //     arguments[1] = 0;
+            //     // }
+            //     // return origSetTimeout.apply(this, arguments);
+            // }
+            // window.setInterval = function () {
 
-            }
+            // }
 
-            window.requestAnimationFrame = function () {
+            // window.requestAnimationFrame = function () {
 
-            }
+            // }
 
-            window.setImmediate = function () {
+            // window.setImmediate = function () {
 
-            }
+            // }
 
-            var observers = ['MutationObserver', 'ResizeObserver', 'IntersectionObserver', 'PerformanceObserver'];
-            observers.forEach((o) => {
-                window[o] = function () { };
-            })
+            // var observers = ['MutationObserver', 'ResizeObserver', 'IntersectionObserver', 'PerformanceObserver'];
+            // observers.forEach((o) => {
+            //     window[o] = function () { };
+            // })
             // Object.defineProperty(navigator, "language", {
             //     get: function() {
             //         return "en-US";
@@ -127,7 +130,7 @@ async function launch() {
             // Math.random = function(){
             //     oldRandom.apply(this, arguments);
             // }
-            // eval(intercepts);
+            eval(intercepts);
         }, intercepts);
     } else {
         // await page.evaluateOnNewDocument(() => {
@@ -174,7 +177,31 @@ async function launch() {
     //         }
     //     });
     // }
-
+    // await page.setRequestInterception(true);
+    // page.on('request', (request) => {
+    //     if (request.resourceType() == 'script') {
+    //         request.respond({
+    //             status: 200,
+    //             contentType: 'application/javascript; charset=utf-8',
+    //             body: 'console.log(1);'
+    //         });
+    //     } else {
+    //         request.continue();
+    //     }
+    // });
+    // intercept(page, patterns.Script('*'), {
+    //     onResponseReceived: event => {
+    //         // console.log(`${event.request.url} intercepted, going to modify`)
+    //         event.response.body = rewriter.instrument(event.response.body, { filename: 'testname' });
+    //         return event.response;
+    //     }
+    // });
+    // intercept(page, patterns.Document('*'), {
+    //     onResponseReceived: event => {
+    //         event.response.body = `<script>${tracerObj}</script>` + event.response.body;
+    //         return event.response;
+    //     }
+    // })
     // console.log(`User agent is: ${await browser.userAgent()}`);
     await initCDP(cdp);
     if (program.network) {

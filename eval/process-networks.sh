@@ -8,18 +8,22 @@
 script_dir='/vault-home/goelayu/webArchive/scripts'
 
 src_dir='/x/goelayu/webArchive/data/raw_dirs/storage-mix-large/1m-snapshot/'
+src_dir='/vault-home/goelayu/webArchive/data/storage-mix-large/1m-snapshot/'
 proc_dir='/w/goelayu/webArchive/data/'
-result_dir='/vault-home/goelayu/webArchive/results/OSDI22/discussion/persistence-network/'
+result_dir='/vault-home/goelayu/webArchive/results/OSDI22/discussion/persistence-network/subsets/'
 fn_dir='/vault-home/goelayu/webArchive/data/storage-mix-large/1m-snapshot/stats/fns/'
 while read crawler; do 
     start=`date +%s`
     echo Executing $crawler
     cd $proc_dir
-    
-    tar -xf ${src_dir}/${crawler}/${crawler}.performance.tar
+    mkdir $crawler;
+    cd $crawler
+    tar -xzf ${src_dir}/${crawler}/performance.tar.gz --wildcards --no-anchored '*network'
     cd $script_dir
     ls ${proc_dir}/${crawler}/performance | while read site; do 
-        node quick_scripts/network-persistence.js -n <(cat ${fn_dir}/$crawler | grep $site ) -p  /w/goelayu/webArchive/data/${crawler}/performance &> $result_dir/$site &
+        page=`ls ${proc_dir}/${crawler}/performance/${site} | sort | head -n 1`;
+        # node quick_scripts/network-persistence.js -n <(cat ${fn_dir}/$crawler | grep $site ) -p  /w/goelayu/webArchive/data/${crawler}/performance &> $result_dir/$site.nofilter &
+        node quick_scripts/network-persistence.js -n <(find $proc_dir/$crawler/performance/$site/$page -iname network ) -p  /w/goelayu/webArchive/data/${crawler}/performance &> $result_dir/$site.nofilter &
     done
     wait $(jobs -p)
 

@@ -40,3 +40,4 @@ script.crazyegg.com
 tiqcdn.com
 pushnotification
 assets.adobedtm.com
+pushly

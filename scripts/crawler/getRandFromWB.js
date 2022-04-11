@@ -33,7 +33,7 @@ const ALEXA1M = parseAlexa();
 
 var getWBCount = async function(url){
     try { 
-        var apiEndPoint = `${WAYBACK_CDX}?url=${url}&from=202011&to=202011&output=json&matchType=prefix&filter=mimetype:text/html&filter=statuscode:200&limit=7000`;
+        var apiEndPoint = `${WAYBACK_CDX}?url=${url}&from=202109&to=202109&output=json&filter=mimetype:text/html&filter=statuscode:200&limit=7000`;
         var response = await fetch(apiEndPoint);
         // console.log(apiEndPoint)
         var json = await response.json();
@@ -86,4 +86,8 @@ var buildCorpus = async function(){
 
 }
 
-buildCorpusForRange(program.start, program.end);
+// buildCorpusForRange(program.start, program.end);
+async function main(){
+    console.log(await getWBCount(program.start));
+};
+main();
