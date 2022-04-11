@@ -1,0 +1,25 @@
+{
+  "name": "jawa",
+  "version": "1.0.0",
+  "description": "Jawa is a rethink of modern web archival architecture, catering to the challenges posed by preponderance of JavaScript on web archives.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goelayu/Jawa.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/goelayu/Jawa/issues"
+  },
+  "homepage": "https://github.com/goelayu/Jawa#readme",
+  "dependencies": {
+    "puppeteer": "^1.20.0"
+  }
+}
