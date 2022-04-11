@@ -121,13 +121,15 @@ var initializeFileData = function (files) {
 
 var grepCallStack = function (cs, fileStore) {
     var tokens = ["offsetX", "offsetY", "pageX", "pageY", "screenX", "screenY"],
-        found = false;
+        tokensDRP = ["Math.random", "Date(", "Performance.now"]
+    found = false;
     // console.log(cs);
     for (var fn of cs) {
         var fnSrc = fileStore[fn];
         // console.log(fnSrc)
-        if (fnSrc && (found = tokens.find(e => fnSrc.indexOf(e) >= 0))) {
+        if (fnSrc && (tokens.find(e => fnSrc.indexOf(e) >= 0)) && fnSrc.indexOf('pageXOffset') < 0 && fnSrc.indexOf('pageYOffset') < 0) {
             console.log(fnSrc);
+            found = true;
             break;
         }
     }
