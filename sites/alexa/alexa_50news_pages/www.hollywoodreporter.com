@@ -1,0 +1,15 @@
+https://www.hollywoodreporter.com
+https://www.hollywoodreporter.com/topic/movie-reviews
+https://www.hollywoodreporter.com/blogs/heat-vision
+https://www.hollywoodreporter.com/subscribe3
+https://www.hollywoodreporter.com/topic/tv-reviews
+https://www.hollywoodreporter.com/blogs/thr-esq
+https://www.hollywoodreporter.com/blogs/fien-print
+https://www.hollywoodreporter.com/topic/entertainment-industry
+https://www.hollywoodreporter.com/blogs/rambling-reporter
+https://www.hollywoodreporter.com/culture
+https://www.hollywoodreporter.com/blogs/behind-screen
+https://tipline.hollywoodreporter.com
+https://www.hollywoodreporter.com/video
+https://www.hollywoodreporter.com/blogs/race
+https://thrpresents.hollywoodreporter.com/

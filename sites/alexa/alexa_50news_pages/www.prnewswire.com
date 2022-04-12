@@ -1,0 +1,15 @@
+https://www.prnewswire.com
+https://www.prnewswire.com/account/online-membership-form/
+https://www.prnewswire.com/account/online-membership-form/
+https://prnmedia.prnewswire.com/
+https://portal.prnewswire.com/
+https://www.prnewswire.com/account/online-membership-form/
+https://prnmedia.prnewswire.com/
+https://portal.prnewswire.com/
+https://www.cision.com/us/?utm_medium=website&utm_source=prnewswire&utm_content=cishomepage&utm_campaign=prnewswire
+https://portal.prnewswire.com/
+https://www.prnewswire.com/account/online-membership-form/
+https://prnmedia.prnewswire.com
+https://portal.prnewswire.com/
+https://prnewswire.mediaroom.com/index.php
+https://portal.prnewswire.com/

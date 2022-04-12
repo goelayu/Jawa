@@ -1,0 +1,15 @@
+https://www.money.cnn.com
+https://money.cnn.com/data/fear-and-greed/
+https://money.cnn.com/data/hotstocks/
+https://ck.lendingtree.com/?a=342&c=2658&p=r&s1=moneyhp&mtaid=626CF&ctype=money-hp&cmethod=refiform&rcode=10005&ccreative=overpaymortoffers_bluedoorplants&placement_name=money-hp&ad_headline=overpaymortoffers&ad_image=bluedoorplants
+https://www.fool.com/mms/mark/all-in-advert?utm_source=cnnmoney&utm_medium=contentmarketing&utm_campaign=sar-allinalert-dec2020&paid=9223&waid=9223&aid=9223&psource=esacnnwdg0210063&source=esacnnwdg0210063&wsource=esacnnwdg0210063
+https://ck.lendingtree.com/?a=342&c=2658&p=r&s1=moneyhp&mtaid=626CF&ctype=money-hp&cmethod=refiform&rcode=10005&ccreative=calcminsave_bluedoorplants&placement_name=money-hp&ad_headline=calcminsave&ad_image=bluedoorplants
+https://money.cnn.com/data/world_markets/americas/
+https://money.cnn.com/investing/markets-now
+https://money.cnn.com/data/markets/
+https://ck.lendingtree.com/?a=342&c=1556&p=r&s1=moneypromo&mtaid=626CF&ctype=moneypromo&cmethod=15yrpayoff&rcode=10005&ccreative=maketheswitch_none&placement_name=moneypromo&ad_headline=maketheswitch&ad_image=none
+https://www.fool.com/mms/mark/advert-millionaire-maker?utm_source=cnnmoney&utm_medium=contentmarketing&utm_campaign=sar-millionairemaker-dec2020&paid=9214&waid=9214&aid=9214&psource=esacnnwdg0210065&source=esacnnwdg0210065&wsource=esacnnwdg0210065
+https://money.cnn.com/data/afterhours/
+https://money.cnn.com/data/markets/
+https://money.cnn.com/data/markets/
+https://www.fool.com/mms/mark/advert-35-amazons?utm_source=cnnmoney&utm_medium=contentmarketing&utm_campaign=ai-35amazons-april2021&paid=8976&waid=8976&aid=8976&psource=esacnnwdg0210068&source=esacnnwdg0210068&wsource=esacnnwdg0210068

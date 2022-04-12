@@ -1,0 +1,15 @@
+https://www.time.com
+https://www.subscription.co.uk/time/europe/solo/Account/Login
+https://time.com/collection/video/
+https://time.com/magazine
+https://cloud.newsletters.time.com/the-brief?source=recirc-bar
+https://timecoverstore.com/collections/latest+issue
+https://time.com/section/us/
+https://time.com/section/business/
+https://time.com
+https://www.subscription.co.uk/time/asia/solo/Account/Login
+https://time.com/subscribe-body-time/
+https://timecoverstore.com/
+https://time.com/privacy/generic_privacy_new.html
+https://time.com/newsletters/?source=TD_Footer_Link
+https://www.parsintl.com/publication/time

@@ -1,0 +1,15 @@
+https://www.economictimes.indiatimes.com
+https://economictimes.indiatimes.com/markets/candlestick-screener
+https://economictimes.indiatimes.com/coronavirus
+https://economictimes.indiatimes.com/news/elections/assembly
+https://economictimes.indiatimes.com/spotlight/etboardroom?utm_source=web&utm_medium=referral&utm_campaign=know_more
+https://economictimes.indiatimes.com/spotlight/uber2021.cms
+https://economictimes.indiatimes.com/marketstats/duration-1d,marketcap-largecap,pageno-1,pid-0,sort-intraday,sortby-percentchange,sortorder-desc.cms
+https://realty.economictimes.indiatimes.com
+https://economictimes.indiatimes.com/markets
+https://tech.economictimes.indiatimes.com
+https://retail.economictimes.indiatimes.com
+https://economictimes.indiatimes.com/mobile
+https://economictimes.indiatimes.com/spotlight/ibmreshapetomorrow
+https://health.economictimes.indiatimes.com/webcast/selfcare-is-the-new-mantra-with-holistic-nutrition-and-immunity-in-the-spotlight/787
+https://economictimes.indiatimes.com/markets/stocks/stock-screener

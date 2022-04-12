@@ -1,0 +1,15 @@
+https://www.thedailybeast.com
+https://www.thedailybeast.com/company/about-us
+https://twitter.com/thedailybeast
+https://www.thedailybeast.com/corpse-found-in-colorado-cult-of-so-called-cult-love-has-won-led-by-amy-carlson?ref=home
+https://www.thedailybeast.com/category/scouted
+https://www.thedailybeast.com/sugarbabies-on-guys-like-gaetz-they-dont-think-theyre-paying-for-sex?ref=home
+https://www.thedailybeast.com/this-tennessee-city-could-be-your-next-remote-work-destination?ref=home
+https://www.thedailybeast.com/franchise/royalist
+https://www.thedailybeast.com/category/politics
+https://www.thedailybeast.com/tips
+https://www.thedailybeast.com/membership
+https://www.thedailybeast.com/category/politics
+https://www.thedailybeast.com/category/us-news/crime-and-justice
+https://www.facebook.com/thedailybeast/
+https://www.thedailybeast.com/company/contact-us

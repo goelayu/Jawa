@@ -1,0 +1,15 @@
+https://www.oregonlive.com
+https://www.oregonlive.com/crime/2021/04/oregon-city-couple-sentenced-to-probation-in-tax-evasion-case.html
+https://www.oregonlive.com/crime/2021/04/former-reality-tv-star-josh-duggar-faces-child-porn-charges.html
+https://www.oregonlive.com/nation/2021/05/may-day-protesters-worldwide-demand-more-job-protections-amid-covid-19-pandemic.html
+https://enewspo.oregonlive.com/
+https://www.oregonlive.com/beavers/
+https://www.oregonlive.com/ducks/2021/04/jackie-nared-hairston-hired-to-oregon-womens-basketball-coaching-staff.html
+https://www.oregonlive.com/ducks/2021/05/nfl-draft-2021-watch-detroit-lions-gm-brad-holmes-big-celebration-after-drafting-penei-sewell.html
+https://www.oregonlive.com/dining/2021/04/mos-seafood-and-chowder-holds-on-to-celebrate-75th-anniversary-on-the-oregon-coast.html
+https://www.oregonlive.com/ducks/2021/05/allee-bunker-drives-in-4-rbis-as-no-8-oregon-softball-tops-arizona-state-in-extras.html
+https://www.oregonlive.com/blazers/2021/05/portland-trail-blazers-defense-continues-to-play-well-as-they-take-advantage-of-shorthanded-brooklyn-nets-128-109-game-rewind.html
+https://www.oregonlive.com/business/2021/04/25-year-old-dons-gray-wig-fires-up-power-drill-to-steal-500-poker-chips-at-ilani-casino-police-say.html
+https://www.oregonlive.com/pacific-northwest-news/
+https://www.oregonlive.com/health/2021/04/blue-cross-settlement-how-to-claim-your-share-of-2-billion-payout.html-2
+https://www.oregonlive.com/politics/2021/04/oregon-lawmaker-who-let-far-right-protesters-into-capitol-charged-with-criminal-misconduct.html

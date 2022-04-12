@@ -1,0 +1,15 @@
+https://www.timesofindia.indiatimes.com
+https://timesofindia.indiatimes.com/most-searched-products/health-and-fitness/health-care/pulse-oximeter-monitor-your-pulse-rate-and-blood-oxygen-levels-accurately/articleshow/71817417.cms
+https://timesofindia.indiatimes.com/india/west-bengal-up-added-to-maharashtra-govts-list-of-places-of-sensitive-origin/articleshow/82346834.cms
+https://timesofindia.indiatimes.com/city/mysuru/articlelist/3942693.cms
+https://timesofindia.indiatimes.com/city/delhi
+https://timesofindia.indiatimes.com/city/kanpur
+https://timesofindia.indiatimes.com/videos/entertainment/trailers
+https://timesofindia.indiatimes.com/videos/city/patna/shahabuddin-former-rjd-mp-dies-due-to-covid-19/videoshow/82345774.cms
+https://timesofindia.indiatimes.com/india/plan-to-increase-sputnik-v-vaccine-production-up-to-850-million-doses-per-year-in-india-russian-envoy/articleshow/82344152.cms
+https://recipes.timesofindia.com/recipes/onion-pakoda/recipeshow/82024963.cms
+https://timesofindia.indiatimes.com/coronavirus
+https://timesofindia.indiatimes.com/city/kolhapur
+https://timesofindia.indiatimes.com/city/hubli
+https://timesofindia.indiatimes.com/etimes
+https://timesofindia.indiatimes.com/city/delhi/delhi-35-year-old-doctor-found-hanging-at-his-residence-in-malviya-nagar/articleshow/82346293.cms

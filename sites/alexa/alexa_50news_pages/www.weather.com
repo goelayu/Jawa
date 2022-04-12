@@ -1,0 +1,12 @@
+https://www.weather.com
+https://www.essentialaccessibility.com/the-weather-channel?utm_source=theweatherchannelhomepage&utm_medium=iconlarge&utm_term=eachannelpage&utm_content=header&utm_campaign=theweatherchannel
+https://features.weather.com/collateral
+https://features.weather.com/weather-films/
+https://weloveweather.tv/twc/
+https://weather.com/forecast/news/national-forecast-20141009
+https://weather.com/forecast/news/national-forecast-20141009
+https://weather.com/coronavirus
+https://weather.com/coronavirus
+https://newsroom.ibm.com/the-weather-company
+https://weloveweather.tv/twc/
+https://www.essentialaccessibility.com/the-weather-channel?utm_source=theweatherchannelhomepage&utm_medium=iconlarge&utm_term=eachannelpage&utm_content=header&utm_campaign=theweatherchannel

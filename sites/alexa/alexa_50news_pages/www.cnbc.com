@@ -1,0 +1,15 @@
+https://www.cnbc.com
+https://www.cnbc.com/2021/04/30/macys-store-employees-score-victory-in-challenging-self-checkout-.html
+https://www.cnbc.com/2021/04/30/how-to-boost-credit-score-low-mortgage-rate.html
+https://www.cnbc.com/jesse-pound/
+https://www.cnbc.com/jesse-pound/
+https://www.cnbc.com/video/2021/04/30/take-a-look-inside-disneylands-marvel-avengers-campus.html
+https://www.cnbc.com/megan-dematteo/
+https://www.cnbc.com/dan-mangan/
+https://www.cnbc.com/carmen-reinicke/
+https://www.cnbc.com/lauren-thomas/
+https://www.cnbc.com/2021/04/30/student-loan-forgiveness-may-be-on-the-way-what-to-do-in-the-meantime-.html
+https://www.cnbc.com/2021/04/30/a-major-chlorine-shortage-is-set-to-spoil-swimming-pool-fun-this-summer.html
+https://www.cnbc.com/2021/05/01/warren-buffett-has-most-of-berkshiress-portfolio-tied-up-in-just-4-stocks-heres-what-they-are.html
+https://www.cnbc.com/2021/05/01/how-apple-does-ma-small-and-quiet-with-no-bankers.html
+https://www.cnbc.com/2021/04/30/more-earnings-aprils-big-jobs-report-and-inflation-worries-could-swing-markets-in-the-week-ahead.html

@@ -1,0 +1,15 @@
+https://www.wsj.com
+https://www.wsj.com/articles/when-to-give-inheritance-money-to-your-kids-11619802000?mod=hp_jr_pos1
+https://www.wsj.com/articles/gops-blue-collar-agenda-still-a-work-in-progress-11619874000?mod=hp_lead_pos8
+https://www.wsj.com/news/politics?mod=nav_top_subsection
+https://www.wsj.com/news/life-arts/sports?mod=nav_top_subsection
+https://www.wsj.com/articles/why-an-estate-plan-is-the-best-gift-you-can-give-your-grandchild-11611671555?mod=hp_jr_pos3
+https://www.wsj.com/video/browse/business/markets?mod=nav_top_subsection
+https://www.wsj.com/news/tech/future-of-everything?mod=nav_top_subsection
+https://www.wsj.com/news/business/health-industry?mod=nav_top_subsection
+https://www.wsj.com/news/business/law-legal?mod=nav_top_subsection
+https://www.wsj.com/podcasts/latest/wsj-whats-news?mod=nav_top_subsection
+https://www.wsj.com/news/risk-compliance-journal?mod=nav_top_subsection
+https://www.wsj.com/news/magazine/travel?mod=nav_top_subsection
+https://www.wsj.com/news/business/energy-oil-gas?mod=nav_top_subsection
+https://www.wsj.com/news/types/latin-america-news?mod=nav_top_subsection

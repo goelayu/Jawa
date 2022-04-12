@@ -1,0 +1,15 @@
+https://www.bostonglobe.com
+https://mailchi.mp/bostonglobe.com/this-week-in-weed-signup-page?p1=BGMenu_Newsletters
+https://manage.bostonglobe.com/Order/newspaper/Newspaper.aspx?p1=BGFooter
+https://www.bostonglobe.com?p1=BGHeader_Logo
+https://www.bostonglobe.com/magazine/?p1=BGMenu_More
+https://www.facebook.com/sharer/sharer.php?u=https://www.bostonglobe.com/video/2021/04/28/business/on-the-street-fields-corner/?event=event25&title=On%20the%20Street%3A%20Fields%20Corner
+https://www.instagram.com/bostonglobe/
+https://pages.bostonglobe.com/login/archive?p1=BGFooter&p1=BGFooter
+https://nieonline.com/bostonglobe/
+https://www.bostonglobe.com/bgcs?p1=BGFooter
+https://www.bostonglobe.com/sports/nfl/draft/
+https://www.bostonglobe.com/podcasts?p1=BGMenu_Podcasts
+https://www.bostonglobemedia.com/?p1=BGFooter
+https://apps.bostonglobe.com/spotlight/gladiator/?p1=BGMenu_Podcasts
+https://www.bostonglobe.com/nation/special-reports/coronavirus/vaccine/?p1=Covid_Widget

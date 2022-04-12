@@ -1,0 +1,15 @@
+https://www.variety.com
+https://variety.com/2021/legit/reviews/two-sister-and-a-piano-review-jimmy-smits-daphne-rubin-vega-1234956890/
+https://variety.com/2021/tv/opinion/david-attenborough-planet-earth-life-in-color-1234953346/
+https://variety.com/v/film/
+https://variety.com/2021/tv/global/noel-clarke-police-report-1234964447/
+https://twitter.com/variety
+https://variety.com/author/gene-maddaus/
+https://variety.com/v/global/
+https://variety.com/2021/film/news/daniel-kaluuya-oscar-best-supporting-actor-judas-and-the-black-messiah-1234959322/
+https://variety.com/2021/tv/entertainment-industry/star-wars-avatar-the-last-airbender-streaming-wars-1234949795/
+https://api.pmc.com/authorization/login?returnTo=https%3A%2F%2Fvariety.com%2Fvip%2F&brand=variety-vip&source=website
+https://variety.com/video/los-angeles-return-movie-theaters/
+https://variety.com/vip/facebook-q1-review-big-revenue-beat-could-irk-regulators-1234962455/
+https://variety.com/2021/film/news/yuh-jung-youn-oscar-best-supporting-actress-minari-1234957087/
+https://variety.com/v/digital/

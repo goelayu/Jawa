@@ -1,0 +1,15 @@
+https://www.chicagotribune.com
+https://www.chicagotribune.com/columns/john-kass#ed=subfave-kass
+https://www.chicagotribune.com/business/ct-biz-tribune-publishing-alden-bainum-chicago-investors-20210430-xs5y6rbekfgbjjsgs47qognlhi-story.html
+https://www.chicagotribune.com/politics/#nt=taxonomy-article
+https://www.chicagotribune.com/news/breaking/#nt=recommender-header
+https://www.chicagotribune.com/coronavirus/#nt=taxonomy-article
+https://www.chicagotribune.com/nation-world/#nt=taxonomy-article
+https://myaccount2.chicagotribune.com#ed=subfave-manage
+https://www.chicagotribune.com/entertainment/games#ed=subfave-games
+https://www.chicagotribune.com/coronavirus/vaccine/#nt=taxonomy-article
+https://www.chicagotribune.com/lifestyles/ask-amy#ed=subfave-amy
+https://www.chicagotribune.com/news/ct-cb-chicago-tribune-story.html#ed=subfave-benefits
+https://www.chicagotribune.com/consumer-reviews/sns-bestreviews-deals-prime-day-2021-prep-20210423-ppsur5hmcngwfdpv2d2ablegxu-story.html
+https://www.chicagotribune.com/news/#nt=taxonomy-article
+https://www.chicagotribune.com/coronavirus/ct-prem-covid-19-in-person-proms-graduations-20210501-mjx4kpbjfbdp7atzurikuay6em-story.html

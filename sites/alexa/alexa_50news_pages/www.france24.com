@@ -1,0 +1,10 @@
+https://www.france24.com
+https://emailing.france24.com/en/subscribe
+https://observers.france24.com/en/
+https://academie.france24-mcd-rfi.com/en/
+https://www.france24.com/en/
+https://www.acpm.fr/Support-Numerique/site/france24-com
+https://www.france24.com/en/tag/india/
+https://www.france24.com/en/tag/afghanistan/
+https://observers.france24.com/en/americas/20210430-rob-petrosian-the-trump-supporter-impersonating-a-white-house-reporter
+https://observers.france24.com/en/africa/20210430-warning-this-video-has-nothing-to-do-with-recent-rebel-offensives-in-chad

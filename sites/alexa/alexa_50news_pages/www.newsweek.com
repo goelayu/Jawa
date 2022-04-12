@@ -1,0 +1,15 @@
+https://www.newsweek.com
+https://www.newsweek.com/insights/noteworthy-schools-2021
+https://www.newsweek.com/insights/leading-art-design-architecture-urban-planning-programs-2021
+https://www.instagram.com/newsweek/
+https://www.newsweek.com/culture
+https://www.newsweek.com/world
+https://www.newsweek.com/terms-sale
+https://www.newsweek.com/insights/legal-superstars-2021
+https://www.newsweek.com/amplify/dreaming-warmer-weather-top-10-beach-waterfront-homes
+https://www.newsweek.com
+https://pubads.g.doubleclick.net/gampad/clk?id=5673513019&iu=/43459271/newsweek/homepage
+https://www.newsweek.com/us
+https://www.newsweek.com/insights/legal-superstars-2021
+https://pubads.g.doubleclick.net/gampad/clk?id=5667927729&iu=/43459271/newsweek/homepage
+https://www.newsweek.com/insights/legal-superstars-2021

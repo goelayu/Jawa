@@ -1,0 +1,15 @@
+https://www.business-standard.com
+https://hindi.business-standard.com/
+https://books.business-standard.com/
+https://in.linkedin.com/company/business-standard
+https://www.business-standard.com/bslearning
+https://s.business-standard.com/web-push/subscribe_notifications.php
+https://epaper.business-standard.com
+https://books.business-standard.com/
+https://in.linkedin.com/company/business-standard
+https://smartinvestor.business-standard.com/
+https://hindi.business-standard.com/
+https://www.business-standard.com/podcast
+https://hindi.business-standard.com/
+https://www.business-standard.com/article/current-affairs/india-coronavirus-dispatch-daily-cases-cross-400-000-mark-for-first-time-121050100396_1.html
+https://epaper.business-standard.com

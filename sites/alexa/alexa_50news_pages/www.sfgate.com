@@ -1,0 +1,15 @@
+https://www.sfgate.com
+https://www.sfgate.com/earthquakes/
+https://www.greenstate.com/news/texas-house-oks-bill-reducing-criminal-penalty-of-possessing-small-amounts-of-marijuana/?utm_source=sfgatehprail&utm_campaign=rss&utm_medium=referral
+https://storystudio.sfgate.com/entire-floor-of-oaklands-iconic-cathedral-building-hits-the-market/
+https://marketing.sfgate.com/advertise-with-us-today
+https://www.sfgate.com/jobs/
+https://www.sfgate.com/coupons
+https://twitter.com/sfgate/
+https://instagram.com/sfgate/
+https://www.sfgate.com/weather/
+https://blog.sfgate.com/lifestyle/
+https://www.sfgate.com/movies/
+https://marketing.sfgate.com/marketplaces/recruitment
+https://www.sfgate.com/privacy-policy/#caprivacyrightss
+https://www.sfgate.com/chronicle-contacts/

@@ -1,0 +1,15 @@
+https://www.voanews.com
+https://tigrigna.voanews.com
+https://lao.voanews.com
+https://learningenglish.voanews.com
+https://tigrigna.voanews.com
+https://lao.voanews.com
+https://gr.voanews.com
+https://ir.voanews.com
+https://mk.voanews.com
+https://ba.voanews.com
+https://www.instagram.com/voanews/
+https://ir.voanews.com
+https://ba.voanews.com
+https://twitter.com/voanews
+https://mk.voanews.com

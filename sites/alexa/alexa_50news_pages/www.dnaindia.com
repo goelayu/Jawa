@@ -1,0 +1,10 @@
+https://www.dnaindia.com
+https://www.facebook.com/dnaindia
+https://www.dnaindia.com/india/report-india-records-highest-single-day-spike-with-over-4-lakh-new-covid-cases-2888485?UTM_SRC=breakingnews
+https://www.dnaindia.com/world/report-powerful-6-6-magnitude-earthquake-jolts-northern-japan-near-honshu-island-2888484?UTM_SRC=breakingnews
+https://www.dnaindia.com/india/report-former-rjd-mp-and-dreaded-gangster-mohammad-shahabuddin-dies-due-to-covid-19-2888477?UTM_SRC=breakingnews
+https://www.dnaindia.com/india/report-gujarat-18-covid-19-patients-dead-in-hospital-fire-cm-announces-rs-4-lakh-ex-gratia-2888481?UTM_SRC=breakingnews
+https://www.dnaindia.com/india/report-pm-modi-extends-greetings-on-guru-tegh-bahadur-s-400th-prakash-purab-2888466?UTM_SRC=breakingnews
+https://www.dnaindia.com/live-cricket-score/sri-lanka-vs-bangladesh-ban-in-sl-2-test-series-2021-scorecard-13484
+https://www.dnaindia.com/live-cricket-score/mumbai-indians-vs-chennai-super-kings-indian-premier-league-2021-scorecard-13434
+https://www.facebook.com/dnaindia

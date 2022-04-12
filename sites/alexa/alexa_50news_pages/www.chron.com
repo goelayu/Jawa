@@ -1,0 +1,15 @@
+https://www.chron.com
+https://coupons.chron.com/stores/home-depot/
+https://www.legacy.com/obituaries/houstonchronicle/
+https://www.chron.com/news/nation-world/nation/
+https://www.chron.com/news/houston-texas/
+https://www.houstonchronicle.com
+https://myaccount.houstonchronicle.com/FAQ.aspx
+https://coupons.chron.com/
+https://preview.houstonchronicle.com/search
+https://coupons.chron.com/stores/whole-earth-provision/
+https://www.chron.com/sports/
+https://twitter.com/chron
+https://preview.houstonchronicle.com/sponsoredevents/?ntv_ccpvw=IgwBAAAAAAAAAAAAAAAAegARA&ntv_oat=19157
+https://coupons.chron.com/stores/dicks-sporting-goods/
+https://www.houstonchronicle.com

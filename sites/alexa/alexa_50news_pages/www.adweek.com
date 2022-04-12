@@ -1,0 +1,15 @@
+https://www.adweek.com
+https://www.adweek.com/contributor/nick-gardner/
+https://www.adweek.com/category/mediaweek
+https://www.adweek.com/convergent-tv/what-to-expect-from-the-2021-virtual-newfronts/
+https://www.adweek.com/contributor/jameson-fleming/
+https://www.adweek.com/category/awards-honors/
+https://www.adweek.com/category/beer-spirits-cannabis/
+https://event.adweek.com/convergent-tv-summit-2021-whats-next
+https://www.adweek.com/category/connected-tv
+https://www.adweek.com/convergent-tv/this-elaborate-escape-room-in-a-box-helps-hype-hbos-new-fantasy-series-the-nevers/
+https://www.adweek.com/contributor/stephen-lepitak/
+https://www.adweek.com/category/platforms
+https://www.adweek.com/sponsored/how-advertisers-can-get-the-most-value-from-ott-content/
+https://www.adweek.com/category/diversity-equity-and-inclusion
+https://www.adweek.com/category/technology

@@ -1,0 +1,15 @@
+https://www.economist.com
+https://play.google.com/store/apps/details?id=com.economist.lamarr&hl=en_GB
+https://events.economist.com/?RefID=e.com-home&utm_source=e.com&utm_medium=website&utm_campaign=group-aff&utm_content=footer-link
+https://www.linkedin.com/company/the-economist
+https://jobs.economist.com/
+https://www.economistgroup.com/results_and_governance/governance/privacy
+https://www.economist.com/graphic-detail/2021/04/24/surprisingly-suicide-has-become-rarer-during-the-pandemic
+https://films.economist.com/
+https://shop.economist.com
+https://press.economist.com
+https://www.twitter.com/theeconomist
+https://www.instagram.com/theeconomist
+https://my.economist.com/user#newsletter
+https://www.economist.com/news/2020/06/19/frequently-asked-questions
+https://www.economist.com/the-economist-explains/
