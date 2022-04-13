@@ -7,7 +7,7 @@ var puppeteerOg = require("puppeteer"),
   puppeteer = require("puppeteer"),
   program = require("commander"),
   fs = require("fs"),
-  psl = require("psl"),
+  // psl = require("psl"),
   chromeFns = require("./chrome-ctx-scripts/fns");
 AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
 
