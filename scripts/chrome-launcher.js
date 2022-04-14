@@ -102,12 +102,12 @@ async function launch() {
   // await page.setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36")
   console.log(height, width);
   if (program.deterministic) {
-    // var device = puppeteer.devices[18]
-    // await page.emulate(device);
+    var device = puppeteer.devices[18];
+    await page.emulate(device);
     // await page.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4182.0 Safari/537.36");
-    await page.setUserAgent(
-      "Opera/9.80 (J2ME/MIDP; Opera Mini/5.1.21214/28.2725; U; ru) Presto/2.8.119 Version/11.10"
-    );
+    // await page.setUserAgent(
+    //   "Opera/9.80 (J2ME/MIDP; Opera Mini/5.1.21214/28.2725; U; ru) Presto/2.8.119 Version/11.10"
+    // );
     //   console.log(await browser.userAgent());
     // await page.setViewport({ width: 1261, height: 3816 })
     // await page.evaluateOnNewDocument((intercepts) => {

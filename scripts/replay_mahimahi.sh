@@ -16,7 +16,8 @@ CUSTOMCHROMEDIR=/vault-home/goelayu/CHROMEDIR/${_dir}
 
 # mm binaries in /usr/local/bin are ones which inject code while crawling, and no smart match while replay
 
-mmwebreplay=/home/goelayu/research/mahimahi/build/bin/mm-webreplay #best match
+# mmwebreplay=/home/goelayu/research/mahimahi/build/bin/mm-webreplay #best match
+mmwebreplay=mm-webreplay
 # mmnoop=/home/goelayu/research/mahimahi/build/bin/mm-noop
 mmwebrecord=/home/goelayu/research/mahimahi/build/bin/mm-webrecord #no dyn patches
 # mmwebrecord=/usr/local/bin/mm-webrecord #inject dyn patches
