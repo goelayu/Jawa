@@ -433,7 +433,8 @@ var findMatchForFailed = function (net1, net2) {
   }
   console.log(failed.length, failedB, totalB);
 };
-var matchNetwork = function (net1, net2) {
+
+var matchNetworkCount = function (net1, net2, siteType) {
   /**
    * returns the total number of bytes mismatched; size in kB
    */
@@ -447,7 +448,95 @@ var matchNetwork = function (net1, net2) {
     );
   };
   var isBestMatch = function (u1, u2) {
-    return u1 == u2;
+    if (siteType == "jawa") return u1 == u2;
+    (u1 = u1.split("?")[0]), (u2 = u2.split("?")[0]);
+
+    if (u1 == u2) return true;
+    return false;
+  };
+
+  var fuzzMatch = function (src, options) {
+    var bestMatch,
+      bestScore = 0;
+    options.forEach((target) => {
+      var score;
+      if ((score = fuzz.ratio(src, target)) > bestScore) {
+        bestScore = score;
+        bestMatch = target;
+      }
+    });
+    // console.log(bestScore, bestMatch)
+    // return bestScore > 95 ? bestMatch : null;
+    return bestMatch;
+  };
+
+  (net1 = netParser.parseNetworkLogs(parse(net1))),
+    (net2 = netParser.parseNetworkLogs(parse(net2)));
+  var total = (match = 0),
+    bestMatchCache = [];
+  //     filtern2 = net2.filter(e => !ignoreUrl(e)).map(e => e.url);
+  // if (!filtern2.length) {
+  // console.log(total, match);
+  // return;
+  // }
+  for (var n1 of net1) {
+    if (ignoreUrl(n1)) continue;
+    //   total += n1.size / 1000;
+    total++;
+    var foundIdentical = false;
+
+    // console.log(n1.url)
+    for (var n2 of net2) {
+      // if (ignoreUrl(n2)) continue;
+      // console.log('comparing with ', n2.url)
+      if (isBestMatch(n1.url, n2.url)) {
+        foundIdentical = true;
+        // console.log(n1.url, n2.url)
+        //   match += n1.size / 1000;
+        match++;
+        break;
+      }
+    }
+    // if (!foundIdentical) {
+    //     n1.type.indexOf('script') >= 0 && console.log(n1.url)
+    // }
+    // var bestMatch = fuzzMatch(n1.url, net2.filter(e => e.type == n1.type).map(e => e.url));
+
+    // if (bestMatch && bestMatchCache.indexOf(bestMatch) < 0) {
+
+    //     console.log(n1.url, bestMatch)
+    //     match += n1.size / 1000;
+    //     bestMatchCache.push(bestMatch)
+    // }
+    // else bestMatchCache.push(bestMatch)
+    // if (bestMatch){
+    //     if (bestMatch != n1.url) console.log(bestMatch, n1.url)
+    //     match += n1.size/1000;
+    // } else {
+    //     console.log(`no match for ${n1.url}`)
+    // }
+    // console.log(n1.url, bestMatch);
+  }
+  console.log(total, match);
+  // var sum = (total, cur) => {return total + cur.size}
+  // console.log(net1.filter(e=>!ignoreUrl(e)).reduce(sum,0), net2.filter(e=>!ignoreUrl(e)).reduce(sum, 0));
+};
+
+var matchNetworkSize = function (net1, net2, siteType) {
+  /**
+   * returns the total number of bytes mismatched; size in kB
+   */
+  var ignoreUrl = function (n) {
+    var type = n.type;
+    return (
+      n.request.method != "GET" ||
+      n.url.indexOf("data") == 0 ||
+      !n.type ||
+      !n.size
+    );
+  };
+  var isBestMatch = function (u1, u2) {
+    if (siteType == "jawa") return u1 == u2;
     (u1 = u1.split("?")[0]), (u2 = u2.split("?")[0]);
 
     if (u1 == u2) return true;
@@ -932,8 +1021,11 @@ switch (program.type) {
   case "error":
     getNetErrors(parse(program.input));
     break;
-  case "matchNet":
-    matchNetwork(program.input, program.anotherin);
+  case "matchNetCount":
+    matchNetworkCount(program.input, program.anotherin, program.siteType);
+    break;
+  case "matchNetSize":
+    matchNetworkSize(program.input, program.anotherin, program.siteType);
     break;
   case "initiator":
     initiatedRequests(program.input, program.anotherin);

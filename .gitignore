@@ -14,11 +14,15 @@ program_analysis/instOutput
 !scripts/
 !scripts/*/
 !scripts/**/
+!sites/
+!sites/**
 !parser/
 !pyutils/
 !tests/
 !deps/
 !deps/*
+!ae/
+!ae/*
 !filter-lists/
 !filter-lists/*
 !data/
