@@ -78,7 +78,7 @@ async function launch() {
   //     options.userDataDir = program.chromeDir;
   // }
   if (program.filter) {
-    console.log("filetering");
+    console.log("apply filtering");
     puppeteer = require("puppeteer-extra");
     puppeteer.use(AdblockerPlugin({ blockTrackers: true, useCache: false }));
   }
