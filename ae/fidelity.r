@@ -10,8 +10,8 @@ data <- read.csv(args[1], header=TRUE, sep=",")
 
 data2 <- read.csv(args[2], header=TRUE, sep=",")
 
-data$network <- factor(data$network, levels=c('Jawa', 'IA'))
-data2$network <- factor(data2$network, levels=c('Jawa', 'IA'))
+data$network <- factor(data$network, levels=c('Jawa', 'IA')) #bytes
+data2$network <- factor(data2$network, levels=c('Jawa', 'IA'))  #404s
 
 plot <- function(xlab,output,d) {
 pdf(output, height=2.5, width=5.0)
@@ -56,8 +56,8 @@ pdf(output, height=2.5, width=5.0)
   .junk <- dev.off()
 }
 
-plot("Fraction of network requests failed", "size_fidelity.pdf", data)
-plot("Fraction of bytes not fetched", "bytes_fidelity.pdf", data2)
+plot("Fraction of network requests failed", "size_fidelity.pdf", data2)
+plot("Fraction of bytes not fetched", "bytes_fidelity.pdf", data)
 
 # lines(ecdf(data2$plt))
 #for the js to computation ratio, the input file used was js_fraction_cold.csv

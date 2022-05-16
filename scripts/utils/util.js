@@ -448,7 +448,7 @@ var matchNetworkCount = function (net1, net2, siteType) {
     );
   };
   var isBestMatch = function (u1, u2) {
-    if (siteType == "jawa") return u1 == u2;
+    if (siteType != "jawa") return u1 == u2;
     (u1 = u1.split("?")[0]), (u2 = u2.split("?")[0]);
 
     if (u1 == u2) return true;
@@ -498,7 +498,7 @@ var matchNetworkCount = function (net1, net2, siteType) {
       }
     }
     // if (!foundIdentical) {
-    //     n1.type.indexOf('script') >= 0 && console.log(n1.url)
+    //     console.log(n1.url)
     // }
     // var bestMatch = fuzzMatch(n1.url, net2.filter(e => e.type == n1.type).map(e => e.url));
 
@@ -536,7 +536,7 @@ var matchNetworkSize = function (net1, net2, siteType) {
     );
   };
   var isBestMatch = function (u1, u2) {
-    if (siteType == "jawa") return u1 == u2;
+    if (siteType != "jawa") return u1 == u2;
     (u1 = u1.split("?")[0]), (u2 = u2.split("?")[0]);
 
     if (u1 == u2) return true;
