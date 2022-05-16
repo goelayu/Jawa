@@ -15,7 +15,7 @@ data2$network <- factor(data2$network, levels=c('Jawa', 'IA'))
 
 plot <- function(xlab,output,d) {
 pdf(output, height=2.5, width=5.0)
-  ggplot(d, aes(x=n, linetype=network)) +
+  p <- ggplot(d, aes(x=n, linetype=network)) +
     stat_ecdf(pad = FALSE,size=1) +
     # geom_ribbon(aes(ymin=plt, ymax=1)) + 
     #geom_line()+
@@ -52,7 +52,7 @@ pdf(output, height=2.5, width=5.0)
       plot.margin=unit(c(15,25,5,15),"points"))
       
 
-
+  print(p)
   .junk <- dev.off()
 }
 

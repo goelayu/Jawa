@@ -12,16 +12,15 @@ cd ../scripts;
 echo "Loading web pages as Internet Archive..."
 echo "Original run.. (Internet Archive)"
 mkdir -p ../data/performance/fidelity/original
-rm tempfile
-cat ../sites/alexa/alexa-3k-orig | shuf -n $1 > tempfile
-cat tempfile | while read site ; do
-    echo DATAFLAGS=\" -j --timeout 15000 -n\" ./replay_mahimahi.sh ../record ../data/performance/fidelity/original replay live "'$site'" ;
+
+cat ../sites/alexa/alexa-ae | head -n $1 | while read site ; do
+    echo DATAFLAGS=\" -j --timeout 15000 -n\" ./replay_mahimahi.sh ../data/record ../data/performance/fidelity/original replay live "'$site'" ;
 done | parallel -j $2
 
 echo "Replay run.. (Internet Archive)"
 mkdir -p ../data/performance/fidelity/iphone
-cat tempfile| while read site ; do
-    echo DATAFLAGS=\" -j --deterministic --timeout 15000 -n\" ./replay_mahimahi.sh ../record ../data/performance/fidelity/iphone/ replay live "'$site'" ;
+cat ../sites/alexa/alexa-ae | head -n $1 | while read site ; do
+    echo DATAFLAGS=\" -j --deterministic --timeout 15000 -n\" ./replay_mahimahi.sh ../data/record ../data/performance/fidelity/iphone/ replay live "'$site'" ;
 done | parallel -j $2
 
 echo "Done loading pages for the Internet Archive.."
@@ -29,14 +28,14 @@ echo "Simulating a Jawa run.."
 
 echo "Original run.. (Jawa)"
 mkdir -p ../data/performance/fidelity/jawa/0
-cat tempfile | while read site ; do
-    echo DATAFLAGS=\" -j --timeout 15000 -n --filter\" ./replay_mahimahi.sh ../record ../data/performance/fidelity/jawa/0 replay live "'$site'" ;
+cat ../sites/alexa/alexa-ae | head -n $1 | while read site ; do
+    echo DATAFLAGS=\" -j --timeout 15000 -n --filter\" ./replay_mahimahi.sh ../data/record ../data/performance/fidelity/jawa/0 replay live "'$site'" ;
 done | parallel -j $2
 
 echo "Replay run.. (Jawa)"
 mkdir -p ../data/performance/fidelity/jawa/0
-cat tempfile | while read site ; do
-    echo DATAFLAGS=\" -j --timeout 15000 -n --filter\" ./replay_mahimahi.sh ../record ../data/performance/fidelity/jawa/1 replay live "'$site'" ;
+cat ../sites/alexa/alexa-ae | head -n $1  | while read site ; do
+    echo DATAFLAGS=\" -j --timeout 15000 -n --filter\" ./replay_mahimahi.sh ../data/record ../data/performance/fidelity/jawa/1 replay live "'$site'" ;
 done | parallel -j $2
 
 echo "Done generating network logs.."
