@@ -8,7 +8,7 @@ A web crawler for web archives that tackles the problem of increasing presence o
 on modern web pages, resulting in poor fidelity and high storage overhead.\
 Jawa's lightweight techniques are rooted in the key insights drawn from extensive JavaScript program analysis performed on a large corpus of web pages.
 
-Jawa reduces the storage overhead for a million web pages archived by Internet Archive by 40% and eliminates all fidelity related issue, while improving crawling throughput by 50%.
+Jawa reduces the storage overhead for a million web pages archived by Internet Archive by 40% and eliminates all fidelity related issue, while improving crawling throughput by 40%.
 
 This repository contains the source code and dataset to reproduce the key results from our paper.
 
