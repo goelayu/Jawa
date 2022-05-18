@@ -1,6 +1,6 @@
 # Jawa
 
-### Code repository for our _OSDI'22_ paper: [Jawa: Web Archival in the Era of JavaScript](https://goelayu.github.io/publication/jawa-2021)
+### Code repository for our _OSDI'22_ paper: [Jawa: Web Archival in the Era of JavaScript](https://goelayu.github.io/publication/jawa-2022)
 
 #
 
