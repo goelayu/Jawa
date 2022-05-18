@@ -1,12 +1,14 @@
 # Jawa
 
+### Code repository for our _OSDI'22_ paper: [Jawa: Web Archival in the Era of JavaScript](https://goelayu.github.io/publication/jawa-2021)
+
+#
+
 A web crawler for web archives that tackles the problem of increasing presence of JavaScript
 on modern web pages, resulting in poor fidelity and high storage overhead.\
 Jawa's lightweight techniques are rooted in the key insights drawn from extensive JavaScript program analysis performed on a large corpus of web pages.
 
 Jawa reduces the storage overhead for a million web pages archived by Internet Archive by 40% and eliminates all fidelity related issue, while improving crawling throughput by 50%.
-
-For more information, kindly refer to our OSDI'22 paper: [Jawa: Web Archival in the Era of JavaScript](https://goelayu.github.io/publication/jawa-2021)
 
 This repository contains the source code and dataset to reproduce the key results from our paper.
 
@@ -164,3 +166,12 @@ The above script will print three storage numbers (in bytes) to the console.
 3. Total JS storage after applying removing unused JS functions -- this mimics the Jawa bar in Figure 7a.
 
 ## Throughput
+
+We reproduce the throughput results in Table 3: Crawling index IOs.
+
+The storage script above outputs the crawling index IOs as well.
+
+# Contact
+
+Kindly contact Ayush Goel at goelayu@umich.edu for any questions or comments regarding this project. \
+We are also happy to receive code contributions.
