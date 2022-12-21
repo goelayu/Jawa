@@ -171,6 +171,19 @@ We reproduce the throughput results in Table 3: Crawling index IOs.
 
 The storage script above outputs the crawling index IOs as well.
 
+## Reference
+
+Please cite our OSDI'22 paper if you use this code in your research:
+
+```bibtex
+@inproceedings{goel2022jawa,
+  title={Jawa: Web Archival in the Era of $\{$JavaScript$\}$},
+  author={Goel, Ayush and Zhu, Jingyuan and Netravali, Ravi and Madhyastha, Harsha V},
+  booktitle={16th USENIX Symposium on Operating Systems Design and Implementation (OSDI 22)},
+  pages={805--820},
+  year={2022}
+}
+```
 # Contact
 
 Kindly contact Ayush Goel at goelayu@umich.edu for any questions or comments regarding this project. \
